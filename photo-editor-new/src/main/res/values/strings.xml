@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Photo Editor -->
+    <string name="pe_adjust">Adjust</string>
+    <string name="pe_rotate">Rotate</string>
+    <string name="pe_flip">Flip</string>
+    <string name="pe_ai_crop">AI Crop</string>
+    <string name="pe_no_crop">Full</string>
+    <string name="pe_brightness">Brightness</string>
+    <string name="pe_contrast">Contrast</string>
+    <string name="pe_saturation">Saturation</string>
+    <string name="pe_warmth">Warmth</string>
+    <string name="pe_done">Done</string>
+    <string name="pe_next">Next</string>
+    <string name="pe_save">Save</string>
+    <string name="pe_cancel">Cancel</string>
+    <string name="pe_discard">Discard</string>
+    <string name="pe_discard_title">Discard!</string>
+    <string name="pe_discard_message">This scan will be discarded. Are you sure?</string>
+    <string name="pe_delete">Delete</string>
+    <string name="pe_delete_page_title">Delete page</string>
+    <string name="pe_delete_page_message">Are you sure you want to delete this page?</string>
+    <string name="pe_saving">Saving…</string>
+    <string name="pe_page_deleted">Page deleted</string>
+    <string name="pe_cannot_delete_last_page">Cannot delete the last page</string>
+    <string name="pe_apply">Apply</string>
+    <string name="pe_apply_to_all">Apply to all</string>
+    <string name="pe_apply_no_crop_title">Apply No Crop to All Pages</string>
+    <string name="pe_apply_no_crop_message">This will remove cropping from all pages in this document.</string>
+    <string name="pe_apply_ai_crop_title">Apply AI Crop to All Pages</string>
+    <string name="pe_apply_ai_crop_message">AI will detect and crop all pages in this document.</string>
+    <string name="pe_apply_filter_title">Apply Filter to All Pages</string>
+    <string name="pe_apply_filter_message">This filter will be applied to all pages in this document.</string>
+</resources>

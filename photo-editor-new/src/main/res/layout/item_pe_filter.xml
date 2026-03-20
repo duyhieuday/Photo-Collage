@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="6dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_filter"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="1dp"
+        app:strokeColor="@color/pe_filter_border"
+        app:strokeWidth="1dp">
+
+        <!-- Filter preview image -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_filter_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            tools:src="@tools:sample/avatars" />
+
+        <!-- Filter name overlay at bottom -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_filter_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="#80000000"
+            android:gravity="center"
+            android:paddingVertical="3dp"
+            android:textColor="@android:color/white"
+            android:textSize="11sp"
+            tools:text="Auto" />
+
+        <!-- Premium crown icon -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_crown"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="2dp"
+            android:elevation="2dp"
+            android:src="@drawable/ic_pe_crown"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+</FrameLayout>

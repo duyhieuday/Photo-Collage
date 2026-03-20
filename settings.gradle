@@ -1,0 +1,20 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+//        jcenter()
+        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+        maven {
+            name = "GitLab"
+            url = uri("https://gitlab.com/api/v4/projects/77627723/packages/maven")
+            credentials {
+                username = "dthanhuet"
+                password = "glpat-nXUVY-vJIOt93nh1PnR6F286MQp1OjdhM3l6Cw.01.121cyc4aq"
+            }
+        }
+    }
+}
+rootProject.name = "PicEditor"
+include ':app',':simplecropview'
+include ':photo-editor-new'

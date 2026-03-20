@@ -1,0 +1,61 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    ext.kotlin_version = '2.2.0'
+    ext.nav_version = "2.5.3"
+    repositories {
+        google()
+        mavenCentral()
+//        jcenter()
+        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:8.5.1"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.google.dagger:hilt-android-gradle-plugin:2.45"
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
+        classpath 'com.google.gms:google-services:4.3.14'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.5'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            name = "GitLab"
+            url = uri("https://gitlab.com/api/v4/projects/77627723/packages/maven")
+            credentials {
+                username = "dthanhuet"
+                password = "glpat-nXUVY-vJIOt93nh1PnR6F286MQp1OjdhM3l6Cw.01.121cyc4aq"
+            }
+        }
+        maven {
+            url = "https://jitpack.io"
+        }
+        maven {
+            url = 'https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea'
+        }
+        maven {
+            url = 'https://artifact.bytedance.com/repository/pangle/'
+        }
+        maven { url "https://maven.aliyun.com/repository/jcenter" }
+        flatDir {
+            dirs 'libs'
+        }
+
+    }
+}
+
+ext {
+    dagger_hilt_version = "2.38.1"
+    lifecycle_version = "2.4.0-beta01"
+    coroutine_version = "2.3.1"
+    nav_version = "2.3.5"
+}

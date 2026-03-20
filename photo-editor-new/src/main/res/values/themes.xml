@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.PicEditor" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/pe_accent</item>
+        <item name="colorPrimaryContainer">@color/pe_accent</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="android:statusBarColor">@android:color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <!-- Toolbar Title TextAppearance -->
+    <style name="TextAppearance.PE.Toolbar.Title" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <!-- Slider Style -->
+    <style name="Widget.PE.Slider" parent="Widget.Material3.Slider">
+        <item name="labelBehavior">gone</item>
+        <item name="thumbColor">@color/pe_accent</item>
+        <item name="thumbWidth">14dp</item>
+        <item name="thumbHeight">14dp</item>
+        <item name="haloColor">@color/pe_slider_halo</item>
+        <item name="haloRadius">16dp</item>
+        <item name="trackColorActive">@color/pe_accent</item>
+        <item name="trackColorInactive">@color/pe_slider_track_inactive</item>
+        <item name="trackHeight">4dp</item>
+        <item name="thumbTrackGapSize">0dp</item>
+        <item name="trackInsideCornerSize">0dp</item>
+        <item name="trackStopIndicatorSize">0dp</item>
+    </style>
+
+
+
+</resources>

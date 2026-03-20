@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Photo Editor -->
+    <string name="pe_title_edit_images">Edit images</string>
+    <string name="pe_filter">Filter</string>
+    <string name="pe_crop">Crop</string>
+    <string name="pe_adjust">Adjust</string>
+    <string name="pe_rotate_left">Left</string>
+    <string name="pe_rotate_right">Right</string>
+    <string name="pe_ai_crop">AI Crop</string>
+    <string name="pe_brightness">Brightness</string>
+    <string name="pe_contrast">Contrast</string>
+    <string name="pe_full_crop">Full</string>
+    <string name="pe_sharpen">Sharpen</string>
+    <string name="pe_reset">Reset</string>
+    <string name="pe_done">Done</string>
+    <string name="pe_save">Save</string>
+    <string name="pe_cancel">Cancel</string>
+    <string name="pe_discard">Discard</string>
+    <string name="pe_discard_title">Discard!</string>
+    <string name="pe_discard_message">This scan will be discarded. Are you sure?</string>
+    <string name="pe_saving">Saving…</string>
+    <string name="pe_page_deleted">Page deleted</string>
+    <string name="pe_cannot_delete_last_page">Cannot delete the last page</string>
+</resources>

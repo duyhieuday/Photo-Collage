@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<defaultsMap>
+
+    <entry>
+        <key>test_banner</key>
+        <value>no</value>
+    </entry>
+
+    <entry>
+        <key>test_onboarding</key>
+        <value>no</value>
+    </entry>
+
+    <entry>
+        <key>test_native_full_screen</key>
+        <value>no</value>
+    </entry>
+    <entry>
+        <key>test_native_ob</key>
+        <value>no</value>
+    </entry>
+    <entry>
+        <key>test_noti_full_screen</key>
+        <value>yes</value>
+    </entry>
+
+
+    <entry>
+        <key>inter_time</key>
+        <value>20000</value>
+    </entry>
+
+
+</defaultsMap>

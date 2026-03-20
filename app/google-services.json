@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "253325390108",
+    "project_id": "ringtone-fae11",
+    "storage_bucket": "ringtone-fae11.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:253325390108:android:97e94ec2f9de8859394ad9",
+        "android_client_info": {
+          "package_name": "com.example.piceditor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGHtfTT5EJiDKIKgtb6aDOR9askQ_Il50"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

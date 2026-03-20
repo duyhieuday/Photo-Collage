@@ -1,0 +1,89 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.PicEditor" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/white_two</item>
+        <item name="colorPrimaryDark">@color/white_two</item>
+        <item name="colorAccent">@color/daintree</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+    </style>
+    <style name="SheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="android:windowCloseOnTouchOutside">false</item>
+        <item name="android:colorBackground">@android:color/transparent</item>
+    </style>
+
+    <style name="AppTheme.FullScreenDialog" parent="Theme.MaterialComponents.Light.Dialog">
+        <item name="colorPrimaryDark">@color/black</item>
+        <item name="colorAccent">@color/black</item>
+        <item name="colorPrimary">@color/black</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@color/black</item>
+        <item name="actionMenuTextColor">@color/black</item>
+        <item name="android:navigationBarColor" tools:targetApi="lollipop">@color/black
+        </item>
+    </style>
+
+    <style name="AdAttribution">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">left</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:text">@string/ad_attribution</item>
+        <item name="android:background">#FFCC66</item>
+    </style>
+
+    <declare-styleable name="DrawPreview">
+        <attr name="dp_color" format="color|reference" />
+        <attr name="dp_stroke_width" format="dimension" />
+        <attr name="dp_brush_style" format="enum">
+            <enum name="GESTURE" value="7892" />
+            <enum name="LINE" value="3801" />
+            <enum name="OVAL" value="1523" />
+            <enum name="RECT" value="9174" />
+            <enum name="HEART" value="2736" />
+            <enum name="MOON" value="4082" />
+            <enum name="TRIANGLE" value="5691" />
+            <enum name="RHOMBUS" value="6310" />
+            <enum name="PENTAGON" value="8425" />
+            <enum name="HEXAGON" value="1307" />
+            <enum name="HEPTAGON" value="9268" />
+            <enum name="OCTAGON" value="2154" />
+            <enum name="STAR4" value="5837" />
+            <enum name="STAR5" value="4906" />
+            <enum name="STAR6" value="3612" />
+            <enum name="STAR7" value="7059" />
+            <enum name="STAR8" value="1980" />
+            <enum name="STAR9" value="6743" />
+            <enum name="STAR10" value="2481" />
+        </attr>
+        <attr name="dp_paint_style" format="enum">
+            <enum name="FILL" value="7248" />
+            <enum name="FILL_SHADOW" value="4129" />
+            <enum name="STROKE" value="8503" />
+            <enum name="STROKE_SOLID" value="1254" />
+            <enum name="STROKE_NEON" value="1820" />
+            <enum name="STROKE_INNER" value="5967" />
+            <enum name="STROKE_BLUR" value="3011" />
+            <enum name="STROKE_SHADOW" value="6492" />
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="BrushSizeSlider">
+        <attr name="bs_size" format="dimension" />
+        <attr name="bs_min_size" format="dimension" />
+        <attr name="bs_max_size" format="dimension" />
+        <attr name="bs_track_color" format="color|reference" />
+        <attr name="bs_track_stroke_color" format="color|reference" />
+        <attr name="bs_track_stroke_width" format="dimension" />
+        <attr name="bs_thumb_color" format="color|reference" />
+        <attr name="bs_thumb_stroke_color" format="color|reference" />
+        <attr name="bs_thumb_stroke_width" format="dimension" />
+    </declare-styleable>
+
+</resources>

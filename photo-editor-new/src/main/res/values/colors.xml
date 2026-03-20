@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Photo Editor colors -->
+    <color name="pe_accent">#E53935</color>
+    <color name="pe_text_primary">#424242</color>
+    <color name="pe_text_secondary">#757575</color>
+    <color name="pe_divider">#E0E0E0</color>
+    <color name="pe_background">#F5F5F5</color>
+    <color name="pe_filter_border">#BDBDBD</color>
+
+    <!-- Slider colors -->
+    <color name="pe_slider_halo">#33E53935</color>
+    <color name="pe_slider_track_inactive">#E0E0E0</color>
+</resources>
