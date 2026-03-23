@@ -11,6 +11,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.SystemClock
+import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.RelativeLayout
@@ -88,19 +89,16 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
     // State
     @Type
     private var type = TYPE_GESTURE
-
     private var color: Int = Color.BLACK
-
-    private var gestureSize: Float = 20f
+    private var gestureSize: Float = 16f
     private var shapeSize: Float = 20f
     private var eraserSize: Float = 20f
-
     // Gesture draw
     private var gesturePaintStyle: PaintStyle = PaintStyle.STROKE
-
     // Shape draw
     private var shapePaintStyle: PaintStyle = PaintStyle.STROKE
     private var shapeBrushStyle: BrushStyle = BrushStyle.HEART
+    var isDrawingMode = false
 
     fun getDrawerManager(): DrawerManager? {
         if (drawerManager == null) {
@@ -199,6 +197,9 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                 binding.llBorder.visibility = View.GONE
                 binding.llBg.visibility = View.GONE
                 binding.llSticker.visibility = View.GONE
+                binding.llDraw.visibility = View.GONE
+
+                binding.drawView.setDrawingEnabled(false)
             }
 
             R.id.tab_border -> {
@@ -212,6 +213,9 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                 binding.llBorder.visibility = View.VISIBLE
                 binding.llBg.visibility = View.GONE
                 binding.llSticker.visibility = View.GONE
+                binding.llDraw.visibility = View.GONE
+
+                binding.drawView.setDrawingEnabled(false)
             }
 
             R.id.tab_bg -> {
@@ -225,7 +229,9 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                 binding.llBorder.visibility = View.GONE
                 binding.llBg.visibility = View.VISIBLE
                 binding.llSticker.visibility = View.GONE
+                binding.llDraw.visibility = View.GONE
 
+                binding.drawView.setDrawingEnabled(false)
             }
 
             R.id.tab_sticker -> {
@@ -239,7 +245,9 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                 binding.llBorder.visibility = View.GONE
                 binding.llBg.visibility = View.GONE
                 binding.llSticker.visibility = View.VISIBLE
+                binding.llDraw.visibility = View.GONE
 
+                binding.drawView.setDrawingEnabled(true)
             }
 
             R.id.tab_draw -> {
@@ -253,8 +261,9 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                 binding.llBorder.visibility = View.GONE
                 binding.llBg.visibility = View.GONE
                 binding.llSticker.visibility = View.GONE
+                binding.llDraw.visibility = View.VISIBLE
 
-                setupDefaultBrush()
+                updateDraw()
 
             }
 
@@ -313,6 +322,8 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         binding.btnBack.setOnClickListener() {
             finish()
         }
+
+        binding.drawView.setDrawingEnabled(false)
 
         DEFAULT_SPACE = ImageUtils.pxFromDp(this, 2F)
         MAX_SPACE = ImageUtils.pxFromDp(this, 30F)
@@ -379,9 +390,11 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
 
     }
 
-    private fun setupDefaultBrush() {
-        // nếu bạn chưa dùng draw path thì có thể bỏ
-        // ví dụ:
+    /* --- private --- */
+    private fun updateDraw() {
+        val drawPath: DrawPath?
+        val size: Float
+
         type = TYPE_GESTURE
         color = Color.BLACK
         gestureSize = ScreenUtils.dp2px(12F).also { eraserSize = it.toFloat() }.also { shapeSize =
@@ -391,33 +404,29 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         shapePaintStyle = PaintStyle.STROKE
         shapeBrushStyle = BrushStyle.HEART
 
-        updateDraw()
-    }
+        Log.e("xcncnah", "updateDraw: " + type.toString() )
 
-    /* --- private --- */
-    private fun updateDraw() {
-        val drawPath: DrawPath?
-        val size: Float
         when (type) {
             TYPE_GESTURE -> drawPath =
                 DrawPath(
                     BrushStyle.GESTURE,
                     gesturePaintStyle,
                     color,
-                    gestureSize.also { size = it })
+                    gestureSize)
 
             TYPE_SHAPE -> drawPath =
-                DrawPath(shapeBrushStyle, shapePaintStyle, color, shapeSize.also { size = it })
+                DrawPath(shapeBrushStyle, shapePaintStyle, color, shapeSize)
 
             TYPE_ERASER -> drawPath =
-                DrawPath(BrushStyle.GESTURE, PaintStyle.ERASE, color, eraserSize.also { size = it })
+                DrawPath(BrushStyle.GESTURE, PaintStyle.ERASE, color, eraserSize)
 
             else -> return
         }
         getDrawerManager()!!.setDrawPath(drawPath)
         binding.icBrush.isSelected = type == TYPE_GESTURE
         binding.icErase.isSelected = type == TYPE_ERASER
-        binding.brushSizeSlider.setSize(size)
+
+        binding.drawView.setDrawingEnabled(true)
     }
 
     private fun loadImageBeards(){

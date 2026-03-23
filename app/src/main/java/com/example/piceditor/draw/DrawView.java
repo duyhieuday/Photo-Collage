@@ -43,21 +43,22 @@ public class DrawView extends View {
         manager.onDraw(canvas);
     }
 
+    private boolean isDrawingEnabled = true;
+
+    public void setDrawingEnabled(boolean enabled) {
+        isDrawingEnabled = enabled;
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        boolean handled = manager.onTouch(event);
+        if (!isDrawingEnabled) {
+            return false; // 🔥 nhường cho view dưới
+        }
 
-        return handled; // ✅ cực kỳ quan trọng
-    }
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        boolean handled = manager.onTouch(event);
-
-        return handled; // sticker xử lý
-
-        // ❗ cho phép view dưới (FramePhotoLayout) nhận
+        getParent().requestDisallowInterceptTouchEvent(true);
+        manager.onTouch(event);
+        return true;
     }
 
 }

@@ -261,6 +261,9 @@ public class DrawerManager {
     public void setDrawPath(@NonNull DrawPath drawPath) {
         canvasDrawer.setCurrentData(drawPath);
     }
+    public void clearDrawPath() {
+        canvasDrawer.setCurrentData(null);
+    }
 
     public void setBackground(String url) {
         long timestamp = System.currentTimeMillis();

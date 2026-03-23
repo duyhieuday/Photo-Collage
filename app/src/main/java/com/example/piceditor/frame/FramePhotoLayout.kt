@@ -18,9 +18,6 @@ import com.photoeditor.photoeffect.template.PhotoItem
 
 import java.util.ArrayList
 
-/**
- * Created by vanhu_000 on 3/11/2016.
- */
 class FramePhotoLayout(
     context: Context,
     private val mPhotoItems: List<PhotoItem>

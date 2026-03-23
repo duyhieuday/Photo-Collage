@@ -103,7 +103,7 @@
             android:id="@+id/ll_frame"
             android:layout_width="match_parent"
             android:layout_height="80dp"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list_frames"
@@ -196,23 +196,23 @@
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:orientation="vertical"
-            android:visibility="visible">
+            android:visibility="gone">
 
-            <com.example.piceditor.draw.BrushSizeSlider
-                android:id="@+id/brushSizeSlider"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                app:bs_max_size="32dp"
-                app:bs_min_size="1dp"
-                app:bs_thumb_color="?colorPrimary"
-                app:bs_thumb_stroke_color="#339285FF"
-                app:bs_thumb_stroke_width="6dp"
-                app:bs_track_color="@color/black"
-                app:bs_track_stroke_color="@android:color/white"
-                android:layout_gravity="center"
-                android:layout_marginTop="16dp"
-                />
+<!--            <com.example.piceditor.draw.BrushSizeSlider-->
+<!--                android:id="@+id/brushSizeSlider"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginHorizontal="16dp"-->
+<!--                app:bs_max_size="32dp"-->
+<!--                app:bs_min_size="1dp"-->
+<!--                app:bs_thumb_color="?colorPrimary"-->
+<!--                app:bs_thumb_stroke_color="#339285FF"-->
+<!--                app:bs_thumb_stroke_width="6dp"-->
+<!--                app:bs_track_color="@color/black"-->
+<!--                app:bs_track_stroke_color="@android:color/white"-->
+<!--                android:layout_gravity="center"-->
+<!--                android:layout_marginTop="16dp"-->
+<!--                />-->
 
             <LinearLayout
                 android:layout_width="match_parent"
