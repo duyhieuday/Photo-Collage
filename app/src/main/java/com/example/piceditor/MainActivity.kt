@@ -3,11 +3,11 @@ package com.example.piceditor
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
-import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -17,6 +17,7 @@ import com.example.piceditor.databinding.ActivityMainBinding
 import com.example.piceditor.utils.BarsUtils
 import com.ezt.pdfreader.photoeditor.data.PageInfo
 import java.io.File
+import androidx.core.graphics.toColorInt
 
 class MainActivity : BaseActivityNew<ActivityMainBinding>() {
 
@@ -102,6 +103,8 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         super.onCreate(savedInstanceState)
 
         BarsUtils.setHideNavigation(this)
+        BarsUtils.setStatusBarColor(this, "#01000000".toColorInt())
+        BarsUtils.setAppearanceLightStatusBars(this, true)
         checkAndRequestPermission()
         setupClick()
     }
@@ -138,25 +141,34 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
 
     private fun setupClick() {
 
-        binding.openGal.setOnClickListener {
+        binding.llEdit.setOnClickListener {
 
             // ===== ADD =====
             openGallery()
         }
 
-        binding.openCam.setOnClickListener {
+//        binding.openCam.setOnClickListener {
+//
+//            // ===== ADD =====
+//            openCamera()
+//        }
 
-            // ===== ADD =====
-            openCamera()
-        }
-
-        binding.btnEditor.setOnClickListener {
+        binding.llCollage.setOnClickListener {
 
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
             mLastClickTime = SystemClock.elapsedRealtime()
 
             startActivity(Intent(this, SelectImageActivity::class.java))
         }
+
+        binding.llCreate.setOnClickListener {
+
+            if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
+            mLastClickTime = SystemClock.elapsedRealtime()
+
+            startActivity(Intent(this, SelectImageActivity::class.java))
+        }
+
     }
 
     // ================= ADD =================
