@@ -3,22 +3,19 @@ package com.example.piceditor
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.os.SystemClock
-import android.widget.ImageView
 import android.widget.Toast
+import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.piceditor.adapters.SelectedPhotoAdapter
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivitySelectImageBinding
-import com.example.piceditor.uiFragments.GalleryAlbumFragment
-import com.example.piceditor.uiFragments.GalleryAlbumImageFragment
+import com.example.piceditor.uiFragments.GalleryFragment
 import com.example.piceditor.utils.BarsUtils
-import java.io.File
 
-class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(), GalleryAlbumImageFragment.OnSelectImageListener,
+class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(), GalleryFragment.OnSelectImageListener,
     SelectedPhotoAdapter.OnDeleteButtonClickListener {
 
 
@@ -26,7 +23,7 @@ class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(), Galle
 
         mSelectedImages.remove(str)
         mSelectedPhotoAdapter.notifyDataSetChanged()
-        val textView = binding.textImgcount
+        val textView = binding.textImageCount
         val str2 = "Select upto 10 photo(s)"
         val sb = StringBuilder()
         sb.append("(")
@@ -48,25 +45,39 @@ class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(), Galle
 
 
     override fun onSelectImage(str: String) {
-        if (this.mSelectedImages.size == this.maxIamgeCount) {
-            Toast.makeText(
-                this,
-                String.format("You only need %d photo(s)", maxIamgeCount),
-                Toast.LENGTH_SHORT
-            )
-                .show()
-        } else {
-            var uri = Uri.fromFile(File(str))
 
-            this.mSelectedImages.add(str)
-            this.mSelectedPhotoAdapter.notifyDataSetChanged()
-            val textView = binding.textImgcount
-            val str2 = "Select upto 10 photo(s)"
-            val sb = StringBuilder()
-            sb.append("(")
-            sb.append(this.mSelectedImages.size)
-            sb.append(")")
-            textView.text = str2 + sb.toString()
+        if (mSelectedImages.contains(str)) {
+            // 👉 nếu đã chọn thì bỏ chọn (toggle)
+            mSelectedImages.remove(str)
+        } else {
+            if (mSelectedImages.size == maxIamgeCount) {
+                Toast.makeText(
+                    this,
+                    String.format("You only need %d photo(s)", maxIamgeCount),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
+            }
+            mSelectedImages.add(str)
+        }
+
+        mSelectedPhotoAdapter.notifyDataSetChanged()
+
+        binding.textImageCount.text =
+            "Select upto 10 photo(s) (${mSelectedImages.size})"
+
+        updateButtonState() // ✅ gọi ở đây
+    }
+
+    private fun updateButtonState() {
+        if (mSelectedImages.isEmpty()) {
+            // disable
+            binding.btnNext.setBackgroundResource(R.drawable.bg_btn_next)
+            binding.btnNext.setTextColor("#1D2939".toColorInt())
+        } else {
+            // enable
+            binding.btnNext.setBackgroundResource(R.drawable.bg_btn_next1)
+            binding.btnNext.setTextColor("#FCFCFD".toColorInt())
         }
     }
 
@@ -94,14 +105,20 @@ class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(), Galle
         return null
     }
 
+    override fun afterSetContentView() {
+        super.afterSetContentView()
+        BarsUtils.setHideNavigation(this)
+        BarsUtils.setStatusBarColor(this, "#01000000".toColorInt())
+        BarsUtils.setAppearanceLightStatusBars(this, true)
+    }
+
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         BarsUtils.setHideNavigation(this)
 
-        val back = findViewById<ImageView>(R.id.back)
-        back.setOnClickListener{
-            onBackPressed()
+        binding.ivBack.setOnClickListener {
+            finish()
         }
 
         mSelectedPhotoAdapter = SelectedPhotoAdapter(mSelectedImages, this)
@@ -111,7 +128,8 @@ class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(), Galle
         binding.listImages.adapter = mSelectedPhotoAdapter
 
         supportFragmentManager.beginTransaction()
-            .replace(R.id.frame_container, GalleryAlbumFragment(this)).commit()
+            .replace(R.id.frame_container, GalleryFragment())
+            .commit()
 
         binding.btnNext.setOnClickListener {
             checkClick()

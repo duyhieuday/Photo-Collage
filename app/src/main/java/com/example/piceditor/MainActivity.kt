@@ -99,13 +99,15 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         return null
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
+    override fun afterSetContentView() {
+        super.afterSetContentView()
         BarsUtils.setHideNavigation(this)
         BarsUtils.setStatusBarColor(this, "#01000000".toColorInt())
         BarsUtils.setAppearanceLightStatusBars(this, true)
-        checkAndRequestPermission()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         setupClick()
     }
 
@@ -154,7 +156,7 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
 //        }
 
         binding.llCollage.setOnClickListener {
-
+            checkAndRequestPermission()
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
             mLastClickTime = SystemClock.elapsedRealtime()
 
@@ -162,7 +164,7 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         }
 
         binding.llCreate.setOnClickListener {
-
+            checkAndRequestPermission()
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
             mLastClickTime = SystemClock.elapsedRealtime()
 
@@ -198,6 +200,4 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
 
         editorLauncher.launch(intent)
     }
-
-    // ================= END ADD =================
 }

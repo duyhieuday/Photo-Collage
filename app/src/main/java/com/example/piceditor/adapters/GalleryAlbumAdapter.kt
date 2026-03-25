@@ -46,7 +46,7 @@ class GalleryAlbumAdapter(
         }
         val galleryAlbum = getItem(i)
         if (galleryAlbum != null) {
-            if (galleryAlbum.mImageList.size > 0) {
+            if (galleryAlbum.mImageList.isNotEmpty()) {
                 AndroidUtils.loadImageWithGlide(
                     context,
                     viewHolder.thumbnailView!!,
@@ -55,7 +55,7 @@ class GalleryAlbumAdapter(
             } else {
                 viewHolder.thumbnailView!!.setImageBitmap(null)
             }
-            viewHolder.titleView!!.setText(galleryAlbum.mAlbumName)
+            viewHolder.titleView!!.text = galleryAlbum.mAlbumName
             val textView = viewHolder.itemCountView
             val sb = StringBuilder()
             sb.append("(")

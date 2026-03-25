@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+<LinearLayout android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Tabs -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        >
+
+        <TextView
+            android:id="@+id/tabAll"
+            android:text="@string/all"
+            android:padding="16dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textColor="#101828"
+            android:textSize="12sp"
+            android:fontFamily="@font/inter_medium"
+            />
+
+        <TextView
+            android:id="@+id/tabCamera"
+            android:text="@string/camera"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textColor="#98A2B3"
+            android:textSize="12sp"
+            android:fontFamily="@font/inter_medium"
+            android:padding="16dp"/>
+
+        <TextView
+            android:id="@+id/tabDownload"
+            android:text="@string/download"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textColor="#98A2B3"
+            android:textSize="12sp"
+            android:fontFamily="@font/inter_medium"
+            android:padding="16dp"/>
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:visibility="gone"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="3dp"
+        />
+</LinearLayout>
+</layout>

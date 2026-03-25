@@ -18,6 +18,7 @@ import android.widget.RelativeLayout
 import android.widget.SeekBar
 import androidx.annotation.IntDef
 import androidx.core.graphics.createBitmap
+import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.piceditor.adapters.BackgroundAdapter
 import com.example.piceditor.adapters.FrameAdapter
@@ -80,13 +81,9 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         const val TYPE_SHAPE = 1
         const val TYPE_ERASER = 2
     }
-
-    // Annotation
     @Retention(AnnotationRetention.SOURCE)
     @IntDef(TYPE_GESTURE, TYPE_SHAPE, TYPE_ERASER)
     annotation class Type
-
-    // State
     @Type
     private var type = TYPE_GESTURE
     private var color: Int = Color.BLACK
@@ -312,6 +309,13 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
 
     override fun initFragment(): BaseFragment<*>? {
         return null
+    }
+
+    override fun afterSetContentView() {
+        super.afterSetContentView()
+        BarsUtils.setHideNavigation(this)
+        BarsUtils.setStatusBarColor(this, "#01000000".toColorInt())
+        BarsUtils.setAppearanceLightStatusBars(this, true)
     }
 
     @SuppressLint("MissingInflatedId")

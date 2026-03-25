@@ -9,6 +9,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="secondaryTextColor">#D3CECD</color>
     <color name="yellow">#FFC343</color>
+    <color name="text_title_color">#1D2939</color>
+    <color name="bg_color">#F2F4F7</color>
 
     <color name="colorPrimary">#1C1C1C</color>
     <color name="colorPrimaryDark">#000000</color>
