@@ -112,4 +112,6 @@
     <string name="all">All</string>
     <string name="camera">Camera</string>
     <string name="download">Download</string>
+    <string name="save">Save</string>
+    <string name="saved">Saved!</string>
 </resources>

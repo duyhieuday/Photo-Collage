@@ -10,7 +10,7 @@
     android:orientation="vertical">
 <androidx.cardview.widget.CardView
     android:layout_width="wrap_content"
-    app:cardCornerRadius="@dimen/_5sdp"
+    app:cardCornerRadius="4dp"
     android:layout_height="wrap_content">
     <RelativeLayout
         android:layout_width="wrap_content"

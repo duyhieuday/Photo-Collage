@@ -1,51 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white_two"
+    android:background="@color/bg_color"
     android:orientation="vertical"
     tools:context=".CollageActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <RelativeLayout
+        android:id="@+id/layoutBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="44dp"
+        android:layout_marginHorizontal="@dimen/dimen_16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/btn_back"
-            android:layout_width="@dimen/_22sdp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:layout_marginStart="@dimen/_10sdp"
             android:adjustViewBounds="true"
-            android:src="@drawable/ic_backward"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/btn_next"
-            android:layout_width="@dimen/_22sdp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:layout_marginEnd="@dimen/_10sdp"
-            android:adjustViewBounds="true"
-            android:src="@drawable/ic_tick"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/btn_back" />
+            android:padding="@dimen/dimen_8dp"
+            android:src="@drawable/ic_back_new"
+            android:layout_centerVertical="true"
+            />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintStart_toEndOf="@+id/btn_back"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btn_next"
+            android:layout_centerInParent="true"
             >
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -53,8 +41,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_undo"
-                android:layout_marginEnd="4dp"
-                android:padding="4dp"
+                android:layout_marginEnd="8dp"
+                android:padding="8dp"
                 />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -62,26 +50,47 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_redo"
-                android:layout_marginStart="4dp"
-                android:padding="4dp"
+                android:layout_marginStart="8dp"
+                android:padding="8dp"
                 />
 
         </LinearLayout>
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnNext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/save"
+            android:layout_alignParentEnd="true"
+            android:elevation="0dp"
+            android:stateListAnimator="@null"
+            android:background="@drawable/bg_btn_next1"
+            android:textColor="#B3FF10"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            android:fontFamily="@font/inter_medium"
+            android:drawableStart="@drawable/ic_download_save"
+            android:padding="12dp"
+            />
 
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/rl_container"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="328dp"
+        android:layout_marginHorizontal="@dimen/dimen_16dp"
+        android:layout_below="@+id/layoutBar"
+        android:layout_above="@+id/llTab"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="60dp"
+        android:layout_marginBottom="180dp"
+        >
 
         <ImageView
             android:id="@+id/img_background"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_centerInParent="true"
             android:adjustViewBounds="true"
             android:orientation="horizontal" />
@@ -95,9 +104,12 @@
     </RelativeLayout>
 
     <FrameLayout
+        android:id="@+id/flContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/darkBrown">
+        android:background="@color/darkBrown"
+        android:layout_above="@+id/layoutAds"
+        >
 
         <LinearLayout
             android:id="@+id/ll_frame"
@@ -252,12 +264,12 @@
     </FrameLayout>
 
     <LinearLayout
+        android:id="@+id/llTab"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:layout_above="@+id/flContent"
+        >
 
         <LinearLayout
             android:id="@+id/tab_layout"
@@ -274,7 +286,7 @@
                 android:fontFamily="sans-serif-condensed-medium"
                 android:text="Layout"
                 android:textColor="@color/white"
-                android:textSize="@dimen/_12ssp" />
+                />
         </LinearLayout>
 
         <LinearLayout
@@ -293,7 +305,8 @@
 
                 android:text="Border"
                 android:textColor="@color/white"
-                android:textSize="@dimen/_12ssp" />
+                android:textSize="12sp"
+                />
         </LinearLayout>
 
         <LinearLayout
@@ -311,7 +324,7 @@
                 android:fontFamily="sans-serif-condensed-medium"
                 android:text="Background"
                 android:textColor="@color/white"
-                android:textSize="@dimen/_12ssp" />
+                />
 
         </LinearLayout>
 
@@ -330,7 +343,7 @@
                 android:fontFamily="sans-serif-condensed-medium"
                 android:text="Sticker"
                 android:textColor="@color/white"
-                android:textSize="@dimen/_12ssp" />
+                />
 
         </LinearLayout>
 
@@ -349,12 +362,33 @@
                 android:fontFamily="sans-serif-condensed-medium"
                 android:text="Draw"
                 android:textColor="@color/white"
-                android:textSize="@dimen/_12ssp" />
+                />
 
         </LinearLayout>
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/layoutAds"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:orientation="vertical"
+        android:visibility="visible">
 
-</LinearLayout>
+        <FrameLayout
+            android:id="@+id/ad_view_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ffffff" />
+
+        <include
+            android:id="@+id/banner"
+            layout="@layout/banner_ads"
+            android:visibility="visible" />
+    </LinearLayout>
+
+
+</RelativeLayout>
 </layout>

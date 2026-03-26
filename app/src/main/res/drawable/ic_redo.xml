@@ -3,8 +3,18 @@
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
-    <path
-        android:fillColor="#FF000000"
-        android:fillType="evenOdd"
-        android:pathData="M15.72 5.22c-0.3 0.3-0.3 0.77 0 1.06L17.44 8H8.25C5.07 8 2.5 10.57 2.5 13.75s2.57 5.75 5.75 5.75h7c0.41 0 0.75-0.34 0.75-0.75S15.66 18 15.25 18h-7C5.9 18 4 16.1 4 13.75S5.9 9.5 8.25 9.5h9.19l-1.72 1.72c-0.3 0.3-0.3 0.77 0 1.06 0.3 0.3 0.77 0.3 1.06 0l3-3c0.3-0.3 0.3-0.77 0-1.06l-3-3c-0.3-0.3-0.77-0.3-1.06 0Z"/>
+  <path
+      android:pathData="M16.87,18.31H8.87C6.11,18.31 3.87,16.07 3.87,13.31C3.87,10.55 6.11,8.31 8.87,8.31H19.87"
+      android:strokeLineJoin="round"
+      android:strokeWidth="2"
+      android:fillColor="#00000000"
+      android:strokeColor="#98A2B3"
+      android:strokeLineCap="round"/>
+  <path
+      android:pathData="M17.57,10.81L20.13,8.25L17.57,5.69"
+      android:strokeLineJoin="round"
+      android:strokeWidth="2"
+      android:fillColor="#00000000"
+      android:strokeColor="#98A2B3"
+      android:strokeLineCap="round"/>
 </vector>

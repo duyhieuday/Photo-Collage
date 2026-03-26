@@ -24,7 +24,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/_30sdp"
+        android:layout_marginBottom="36dp"
         android:fontFamily="sans-serif-condensed-medium"
         android:text="powered by blue lock solution"
         android:textColor="@color/woodsmoke"

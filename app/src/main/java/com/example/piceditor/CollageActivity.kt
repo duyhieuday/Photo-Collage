@@ -264,7 +264,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
 
             }
 
-            R.id.btn_next -> {
+            R.id.btnNext -> {
 
                 checkClick()
 

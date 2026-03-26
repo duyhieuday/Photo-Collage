@@ -126,8 +126,8 @@ dependencies {
     def multidex_version = "2.0.1"
     implementation "androidx.multidex:multidex:$multidex_version"
 
-    implementation 'com.intuit.ssp:ssp-android:1.1.0'
-    implementation 'com.intuit.sdp:sdp-android:1.1.0'
+//    implementation 'com.intuit.ssp:ssp-android:1.1.0'
+//    implementation 'com.intuit.sdp:sdp-android:1.1.0'
 
     //adjust
     implementation 'com.adjust.sdk:adjust-android:4.33.0'
