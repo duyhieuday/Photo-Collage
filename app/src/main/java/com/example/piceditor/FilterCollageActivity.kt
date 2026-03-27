@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.core.graphics.createBitmap
+import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.piceditor.MainActivity.Companion.isFromSaved
@@ -42,21 +43,6 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(), V
     }
 
     override fun onClick(v: View?) {
-        when (v!!.id) {
-            R.id.img_save -> {
-                checkClick()
-                isFromSaved = true
-                try {
-                    saveBitmap(screenShot)
-                } catch (th: Throwable) {
-                    th.printStackTrace()
-                }
-                val intent = Intent(this, ShowImageActivity::class.java)
-                intent.putExtra("image_uri", savedImageUri!!.toString())
-                startActivityForResult(intent, 2)
-                finish()
-            }
-        }
     }
 
 
@@ -136,22 +122,37 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(), V
         return null
     }
 
+    override fun afterSetContentView() {
+        super.afterSetContentView()
+        BarsUtils.setHideNavigation(this)
+        BarsUtils.setStatusBarColor(this, "#01000000".toColorInt())
+        BarsUtils.setAppearanceLightStatusBars(this, true)
+    }
+
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        BarsUtils.setHideNavigation(this)
-
         val bitmapPath = this.cacheDir.absolutePath + "/tempBMP"
         bmp = BitmapFactory.decodeFile(bitmapPath)
-        val back = findViewById<ImageView>(R.id.back)
-        back.setOnClickListener {
+        binding.ivBack.setOnClickListener {
             finish()
         }
 
-
+        binding.btnNext.setOnClickListener {
+            checkClick()
+            isFromSaved = true
+            try {
+                saveBitmap(screenShot)
+            } catch (th: Throwable) {
+                th.printStackTrace()
+            }
+            val intent = Intent(this, ShowImageActivity::class.java)
+            intent.putExtra("image_uri", savedImageUri!!.toString())
+            startActivityForResult(intent, 2)
+            finish()
+        }
 
         binding.imgCollage.setImageBitmap(bmp)
-        binding.imgSave.setOnClickListener(this)
         binding.listFilterstype.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         var filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_clr1)
@@ -164,57 +165,75 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(), V
         filter_nameAdapter.setOnFilterNameClick(object : FilterNameAdapter.FilterNameClickListener {
             override fun onItemClick(view: View, position: Int) {
 
-                if (position == 0) {
-                    filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_clr1)
-                    binding.listFilterstype.adapter = filter_typeAdapter
-                } else if (position == 1) {
-                    filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_clr2)
-                    binding.listFilterstype.adapter = filter_typeAdapter
-                } else if (position == 2) {
-                    filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_duo)
-                    binding.listFilterstype.adapter = filter_typeAdapter
-                } else if (position == 3) {
-                    filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_pink)
-                    binding.listFilterstype.adapter = filter_typeAdapter
-                } else if (position == 4) {
-                    filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_fresh)
-                    binding.listFilterstype.adapter = filter_typeAdapter
-                } else if (position == 5) {
-                    filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_euro)
-                    binding.listFilterstype.adapter = filter_typeAdapter
-                } else if (position == 6) {
-                    filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_dark)
-                    binding.listFilterstype.adapter = filter_typeAdapter
-                } else if (position == 7) {
-                    filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_ins)
-                    binding.listFilterstype.adapter = filter_typeAdapter
-                } else if (position == 8) {
-                    filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_elegant)
-                    binding.listFilterstype.adapter = filter_typeAdapter
-                } else if (position == 9) {
-                    filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_golden)
-                    binding.listFilterstype.adapter = filter_typeAdapter
-                } else if (position == 10) {
-                    filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_tint)
-                    binding.listFilterstype.adapter = filter_typeAdapter
-                } else if (position == 11) {
-                    filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_film)
-                    binding.listFilterstype.adapter = filter_typeAdapter
-                } else if (position == 12) {
-                    filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_lomo)
-                    binding.listFilterstype.adapter = filter_typeAdapter
-                } else if (position == 13) {
-                    filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_movie)
-                    binding.listFilterstype.adapter = filter_typeAdapter
-                } else if (position == 14) {
-                    filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_retro)
-                    binding.listFilterstype.adapter = filter_typeAdapter
-                } else if (position == 15) {
-                    filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_bw)
-                    binding.listFilterstype.adapter = filter_typeAdapter
-                } else {
-                    filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_clr1)
-                    binding.listFilterstype.adapter = filter_typeAdapter
+                when (position) {
+                    0 -> {
+                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_clr1)
+                        binding.listFilterstype.adapter = filter_typeAdapter
+                    }
+                    1 -> {
+                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_clr2)
+                        binding.listFilterstype.adapter = filter_typeAdapter
+                    }
+                    2 -> {
+                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_duo)
+                        binding.listFilterstype.adapter = filter_typeAdapter
+                    }
+                    3 -> {
+                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_pink)
+                        binding.listFilterstype.adapter = filter_typeAdapter
+                    }
+                    4 -> {
+                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_fresh)
+                        binding.listFilterstype.adapter = filter_typeAdapter
+                    }
+                    5 -> {
+                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_euro)
+                        binding.listFilterstype.adapter = filter_typeAdapter
+                    }
+                    6 -> {
+                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_dark)
+                        binding.listFilterstype.adapter = filter_typeAdapter
+                    }
+                    7 -> {
+                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_ins)
+                        binding.listFilterstype.adapter = filter_typeAdapter
+                    }
+                    8 -> {
+                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_elegant)
+                        binding.listFilterstype.adapter = filter_typeAdapter
+                    }
+                    9 -> {
+                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_golden)
+                        binding.listFilterstype.adapter = filter_typeAdapter
+                    }
+                    10 -> {
+                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_tint)
+                        binding.listFilterstype.adapter = filter_typeAdapter
+                    }
+                    11 -> {
+                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_film)
+                        binding.listFilterstype.adapter = filter_typeAdapter
+                    }
+                    12 -> {
+                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_lomo)
+                        binding.listFilterstype.adapter = filter_typeAdapter
+                    }
+                    13 -> {
+                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_movie)
+                        binding.listFilterstype.adapter = filter_typeAdapter
+                    }
+                    14 -> {
+                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_retro)
+                        binding.listFilterstype.adapter = filter_typeAdapter
+                    }
+                    15 -> {
+                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_bw)
+                        binding.listFilterstype.adapter = filter_typeAdapter
+                    }
+                    else -> {
+                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_clr1)
+                        binding.listFilterstype.adapter = filter_typeAdapter
+                    }
                 }
                 filter_nameAdapter.notifyDataSetChanged()
                 filter_typeAdapter.notifyDataSetChanged()
@@ -258,11 +277,7 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(), V
             blue = filterType[position].blue
             saturation = filterType[position].saturation
 
-            val bitmap = Bitmap.createBitmap(
-                bmp.width,
-                bmp.height,
-                Bitmap.Config.ARGB_8888
-            )
+            val bitmap = createBitmap(bmp.width, bmp.height)
             val canvas = Canvas(bitmap)
 
             val paint = Paint()
@@ -284,30 +299,27 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(), V
 
             holder.filterName.text = filterType[position].text
 
-            holder.rl_filteritem.setOnClickListener(object : View.OnClickListener {
-                override fun onClick(v: View?) {
+            holder.rl_filteritem.setOnClickListener {
+                val imgCollage = findViewById<ImageView>(R.id.img_collage)
 
-                    val imgCollage = findViewById<ImageView>(R.id.img_collage)
+                selectedindex = position
 
-                    selectedindex = position
+                red = filterType[position].red
+                green = filterType[position].green
+                blue = filterType[position].blue
+                saturation = filterType[position].saturation
 
-                    red = filterType[position].red
-                    green = filterType[position].green
-                    blue = filterType[position].blue
-                    saturation = filterType[position].saturation
-
-                    Async_Filter(
-                        bmp,
-                        imgCollage
-                    ).executeOnExecutor(
-                        AsyncTask.THREAD_POOL_EXECUTOR,
-                        red,
-                        green,
-                        blue
-                    )
-                    notifyDataSetChanged()
-                }
-            })
+                Async_Filter(
+                    bmp,
+                    imgCollage
+                ).executeOnExecutor(
+                    AsyncTask.THREAD_POOL_EXECUTOR,
+                    red,
+                    green,
+                    blue
+                )
+                notifyDataSetChanged()
+            }
         }
 
         inner class FilterDetailHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -326,7 +338,6 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(), V
     class Async_Filter() : AsyncTask<Float, Void, Bitmap>() {
 
         lateinit var originalBitmap: Bitmap
-
         @SuppressLint("StaticFieldLeak")
         lateinit var imgMain: ImageView
 
@@ -340,11 +351,7 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(), V
             val g = params[1]
             val b = params[2]
 
-            val bitmap = Bitmap.createBitmap(
-                this.originalBitmap.width,
-                this.originalBitmap.height,
-                Bitmap.Config.ARGB_8888
-            )
+            val bitmap = createBitmap(this.originalBitmap.width, this.originalBitmap.height)
             val canvas = Canvas(bitmap)
 
             val paint = Paint()

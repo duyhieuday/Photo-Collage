@@ -7,67 +7,76 @@
         android:name="android.hardware.camera"
         android:required="false" />
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_IMAGES"
         tools:ignore="SelectedPhotoAccess" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name=".WeatherApplication"
-        android:requestLegacyExternalStorage="true"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PicEditor"
-        >
+        android:theme="@style/Theme.PicEditor">
         <activity
             android:name=".splash.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <activity android:name=".SelectImageActivity"
+        <activity
+            android:name=".SelectImageActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <activity android:name=".ShowImageActivity"
+        <activity
+            android:name=".ShowImageActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <activity android:name=".FilterCollageActivity"
+        <activity
+            android:name=".FilterCollageActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <activity android:name=".CollageActivity"
+        <activity
+            android:name=".CollageActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-            <activity android:name=".PhotoEditorWithBannerActivity"
-            android:exported="false"/>
+        <activity
+            android:name=".PhotoEditorWithBannerActivity"
+            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -82,7 +91,6 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-3607148519095421~5449919526" />
-
     </application>
 
 </manifest>

@@ -13,14 +13,19 @@ import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.toColorInt
 import com.example.piceditor.MainActivity
+import com.example.piceditor.base.BaseActivityNew
+import com.example.piceditor.base.BaseFragment
+import com.example.piceditor.databinding.ActivityFilterCollageBinding
+import com.example.piceditor.databinding.ActivityShowImageBinding
 import com.example.piceditor.utils.BarsUtils
 import java.io.File
+import androidx.core.net.toUri
 
-class ShowImageActivity : AppCompatActivity(), View.OnClickListener {
+class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnClickListener {
 
     private var image_uri: String? = null
-    private var img_show: ImageView? = null
     private var saved_file: File? = null
     private var density: Float = 0.toFloat()
     private var D_height: Int = 0
@@ -35,52 +40,68 @@ class ShowImageActivity : AppCompatActivity(), View.OnClickListener {
         mLastClickTime = SystemClock.elapsedRealtime()
     }
 
+    override fun getLayoutRes(): Int {
+        return R.layout.activity_show_image
+    }
+
+    override fun getFrame(): Int {
+        return 0
+    }
+
+    override fun getDataFromIntent() {
+
+    }
+
+    override fun doAfterOnCreate() {
+
+    }
+
+    override fun setListener() {
+
+    }
+
+    override fun initFragment(): BaseFragment<*>? {
+        return null
+    }
+
+    override fun afterSetContentView() {
+        super.afterSetContentView()
+        BarsUtils.setHideNavigation(this)
+        BarsUtils.setStatusBarColor(this, "#01000000".toColorInt())
+        BarsUtils.setAppearanceLightStatusBars(this, true)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
-        BarsUtils.setHideNavigation(this)
-
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_FULLSCREEN,
-            WindowManager.LayoutParams.FLAG_FULLSCREEN
-        )
-        setContentView(R.layout.activity_show_image)
-
         image_uri = intent.getStringExtra("image_uri")
 
         saved_file = File(image_uri!!)
-        img_show = findViewById<View>(R.id.img_show) as ImageView
-
         display = resources.displayMetrics
         density = resources.displayMetrics.density
         D_width = display!!.widthPixels
         D_height = (display!!.heightPixels.toFloat() - density * 150.0f).toInt()
 
-        val layoutParams = RelativeLayout.LayoutParams(D_width, ViewGroup.LayoutParams.WRAP_CONTENT)
-        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE)
-        img_show!!.layoutParams = layoutParams
+        binding.imgShow.setImageURI(image_uri!!.toUri())
 
-        img_show!!.setImageURI(Uri.parse(image_uri))
+//        share.setOnClickListener {
+//            Log.d("jejeshare","shareclicked")
+//            val shareIntent = Intent(Intent.ACTION_SEND)
+//            shareIntent.type = "image/*"
+//            shareIntent.putExtra(Intent.EXTRA_STREAM, image_uri)
+//            startActivity(Intent.createChooser(shareIntent, "Share image"))
+//        }
 
-        findViewById<View>(R.id.img_folder).setOnClickListener(this)
-
-        val share: ImageView = findViewById(R.id.share)
-
-        share.setOnClickListener {
-            Log.d("jejeshare","shareclicked")
-            val shareIntent = Intent(Intent.ACTION_SEND)
-            shareIntent.type = "image/*"
-            shareIntent.putExtra(Intent.EXTRA_STREAM, image_uri)
-            startActivity(Intent.createChooser(shareIntent, "Share image"))
+        binding.icHome.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
         }
 
     }
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.img_folder -> {
-                checkClick()
-            }
+
         }
     }
 

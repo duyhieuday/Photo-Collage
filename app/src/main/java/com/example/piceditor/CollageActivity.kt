@@ -22,6 +22,7 @@ import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.piceditor.adapters.BackgroundAdapter
 import com.example.piceditor.adapters.FrameAdapter
+import com.example.piceditor.adapters.ToolAdapter
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityCollageBinding
@@ -36,6 +37,7 @@ import com.example.piceditor.draw.test.Beard
 import com.example.piceditor.draw.test.BeardAdapter
 import com.example.piceditor.frame.FramePhotoLayout
 import com.example.piceditor.model.TemplateItem
+import com.example.piceditor.model.ToolItem
 import com.example.piceditor.utils.AndroidUtils
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utils.FrameImageUtils
@@ -321,11 +323,12 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        BarsUtils.setHideNavigation(this)
 
         binding.btnBack.setOnClickListener() {
             finish()
         }
+
+        setUpTab()
 
         binding.drawView.setDrawingEnabled(false)
 
@@ -392,6 +395,40 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
 
         binding.btnRedo.setOnClickListener { getDrawerManager()!!.redo() }
 
+    }
+
+    private fun setUpTab(){
+        val tools = mutableListOf(
+            ToolItem(R.drawable.ic_layout, "Layout"),
+            ToolItem(R.drawable.ic_border, "Border"),
+            ToolItem(R.drawable.ic_ratio, "Ratio"),
+            ToolItem(R.drawable.ic_background, "Background"),
+            ToolItem(R.drawable.ic_text, "Text")
+        )
+
+        val adapter = ToolAdapter(tools) { item, pos ->
+            when (pos) {
+                0 -> { /* Layout */
+                }
+
+                1 -> { /* Border */
+                }
+
+                2 -> { /* Ratio */
+                }
+
+                3 -> { /* Background */
+                }
+
+                4 -> { /* Text */
+                }
+            }
+        }
+
+        binding.rvTools.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        binding.rvTools.adapter = adapter
     }
 
     /* --- private --- */
