@@ -13,6 +13,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.toDrawable
+import androidx.core.graphics.toColorInt
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -25,6 +26,7 @@ import com.ezt.pdfreader.photoeditor.databinding.DialogPeDiscardBinding
 import com.ezt.pdfreader.photoeditor.databinding.DialogPeSavingBinding
 import com.ezt.pdfreader.photoeditor.ui.fragment.PhotoCropperFragment
 import com.ezt.pdfreader.photoeditor.ui.fragment.PhotoFilterFragment
+import com.ezt.pdfreader.photoeditor.util.BarsUtils
 import com.ezt.pdfreader.photoeditor.viewmodel.PhotoEditorViewModel
 import kotlinx.coroutines.launch
 
@@ -51,6 +53,13 @@ abstract class PhotoEditorActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPhotoEditorBinding
     val viewModel: PhotoEditorViewModel by viewModels()
+
+    override fun onResume() {
+        super.onResume()
+        BarsUtils.setHideNavigation(this)
+        BarsUtils.setStatusBarColor(this, "#01000000".toColorInt())
+        BarsUtils.setAppearanceLightStatusBars(this, true)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         intent.setExtrasClassLoader(PageInfo::class.java.classLoader)

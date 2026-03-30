@@ -116,4 +116,7 @@
     <string name="saved">Saved!</string>
     <string name="photo_filter">Photo Filter</string>
     <string name="try_new_template">Try New Template</string>
+    <string name="layout">Layout</string>
+    <string name="ratio">Ratio</string>
+    <string name="background">Background</string>
 </resources>

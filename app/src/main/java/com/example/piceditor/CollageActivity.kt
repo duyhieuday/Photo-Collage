@@ -154,117 +154,35 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
     }
     inner class space_listener : SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-            mSpace = MAX_SPACE * seekBar!!.getProgress() / MAX_SPACE_PROGRESS
-            if (mFramePhotoLayout != null)
-                mFramePhotoLayout!!.setSpace(mSpace, mCorner)
+            mSpace = MAX_SPACE * progress / MAX_SPACE_PROGRESS
+
+            // update layout
+            mFramePhotoLayout?.setSpace(mSpace, mCorner)
+
+            // update UI
+            binding.tvGrid.text = progress.toString()
         }
 
-        override fun onStartTrackingTouch(seekBar: SeekBar?) {
-        }
-
-        override fun onStopTrackingTouch(seekBar: SeekBar?) {
-
-        }
+        override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+        override fun onStopTrackingTouch(seekBar: SeekBar?) {}
     }
     inner class corner_listener : SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-            mCorner = MAX_CORNER * seekBar!!.getProgress() / MAX_CORNER_PROGRESS
-            if (mFramePhotoLayout != null)
-                mFramePhotoLayout!!.setSpace(mSpace, mCorner)
+            mCorner = MAX_CORNER * progress / MAX_CORNER_PROGRESS
+
+            // update layout
+            mFramePhotoLayout?.setSpace(mSpace, mCorner)
+
+            // update UI
+            binding.tvCorner.text = progress.toString()
         }
 
-        override fun onStartTrackingTouch(seekBar: SeekBar?) {
-
-        }
-
-        override fun onStopTrackingTouch(seekBar: SeekBar?) {
-
-        }
+        override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+        override fun onStopTrackingTouch(seekBar: SeekBar?) {}
     }
 
     override fun onClick(v: View?) {
         when (v!!.id) {
-
-            R.id.tab_layout -> {
-                binding.tabLayout.setBackgroundColor(resources.getColor(R.color.darkBrown))
-                binding.tabBorder.setBackgroundColor(resources.getColor(R.color.woodsmoke))
-                binding.tabBg.setBackgroundColor(resources.getColor(R.color.woodsmoke))
-                binding.tabSticker.setBackgroundColor(resources.getColor(R.color.woodsmoke))
-                binding.tabDraw.setBackgroundColor(resources.getColor(R.color.woodsmoke))
-
-                binding.llFrame.visibility = View.VISIBLE
-                binding.llBorder.visibility = View.GONE
-                binding.llBg.visibility = View.GONE
-                binding.llSticker.visibility = View.GONE
-                binding.llDraw.visibility = View.GONE
-
-                binding.drawView.setDrawingEnabled(false)
-            }
-
-            R.id.tab_border -> {
-                binding.tabLayout.setBackgroundColor(resources.getColor(R.color.woodsmoke))
-                binding.tabBorder.setBackgroundColor(resources.getColor(R.color.darkBrown))
-                binding.tabBg.setBackgroundColor(resources.getColor(R.color.woodsmoke))
-                binding.tabSticker.setBackgroundColor(resources.getColor(R.color.woodsmoke))
-                binding.tabDraw.setBackgroundColor(resources.getColor(R.color.woodsmoke))
-
-                binding.llFrame.visibility = View.GONE
-                binding.llBorder.visibility = View.VISIBLE
-                binding.llBg.visibility = View.GONE
-                binding.llSticker.visibility = View.GONE
-                binding.llDraw.visibility = View.GONE
-
-                binding.drawView.setDrawingEnabled(false)
-            }
-
-            R.id.tab_bg -> {
-                binding.tabLayout.setBackgroundColor(resources.getColor(R.color.woodsmoke))
-                binding.tabBorder.setBackgroundColor(resources.getColor(R.color.woodsmoke))
-                binding.tabBg.setBackgroundColor(resources.getColor(R.color.darkBrown))
-                binding.tabSticker.setBackgroundColor(resources.getColor(R.color.woodsmoke))
-                binding.tabDraw.setBackgroundColor(resources.getColor(R.color.woodsmoke))
-
-                binding.llFrame.visibility = View.GONE
-                binding.llBorder.visibility = View.GONE
-                binding.llBg.visibility = View.VISIBLE
-                binding.llSticker.visibility = View.GONE
-                binding.llDraw.visibility = View.GONE
-
-                binding.drawView.setDrawingEnabled(false)
-            }
-
-            R.id.tab_sticker -> {
-                binding.tabLayout.setBackgroundColor(resources.getColor(R.color.woodsmoke))
-                binding.tabBorder.setBackgroundColor(resources.getColor(R.color.woodsmoke))
-                binding.tabBg.setBackgroundColor(resources.getColor(R.color.woodsmoke))
-                binding.tabSticker.setBackgroundColor(resources.getColor(R.color.darkBrown))
-                binding.tabDraw.setBackgroundColor(resources.getColor(R.color.woodsmoke))
-
-                binding.llFrame.visibility = View.GONE
-                binding.llBorder.visibility = View.GONE
-                binding.llBg.visibility = View.GONE
-                binding.llSticker.visibility = View.VISIBLE
-                binding.llDraw.visibility = View.GONE
-
-                binding.drawView.setDrawingEnabled(true)
-            }
-
-            R.id.tab_draw -> {
-                binding.tabLayout.setBackgroundColor(resources.getColor(R.color.woodsmoke))
-                binding.tabBorder.setBackgroundColor(resources.getColor(R.color.woodsmoke))
-                binding.tabBg.setBackgroundColor(resources.getColor(R.color.woodsmoke))
-                binding.tabSticker.setBackgroundColor(resources.getColor(R.color.woodsmoke))
-                binding.tabDraw.setBackgroundColor(resources.getColor(R.color.darkBrown))
-
-                binding.llFrame.visibility = View.GONE
-                binding.llBorder.visibility = View.GONE
-                binding.llBg.visibility = View.GONE
-                binding.llSticker.visibility = View.GONE
-                binding.llDraw.visibility = View.VISIBLE
-
-                updateDraw()
-
-            }
 
             R.id.btnNext -> {
 
@@ -348,13 +266,8 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
 
         binding.listBg.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.listBg.adapter = BackgroundAdapter(this, this)
-        loadImageBeards()
 
-        binding.tabLayout.setOnClickListener(this)
-        binding.tabBorder.setOnClickListener(this)
-        binding.tabBg.setOnClickListener(this)
-        binding.tabSticker.setOnClickListener(this)
-        binding.tabDraw.setOnClickListener(this)
+        loadImageBeards()
 
         binding.seekbarSpace.setOnSeekBarChangeListener(space_listener())
         binding.seekbarCorner.setOnSeekBarChangeListener(corner_listener())
@@ -399,48 +312,132 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
 
     private fun setUpTab(){
         val tools = mutableListOf(
-            ToolItem(R.drawable.ic_layout, "Layout"),
-            ToolItem(R.drawable.ic_border, "Border"),
-            ToolItem(R.drawable.ic_ratio, "Ratio"),
-            ToolItem(R.drawable.ic_background, "Background"),
-            ToolItem(R.drawable.ic_text, "Text")
+            ToolItem(R.drawable.ic_layout, getString(R.string.layout)),
+            ToolItem(R.drawable.ic_border, getString(R.string.border)),
+            ToolItem(R.drawable.ic_sticker, getString(R.string.sticker)),
+            ToolItem(R.drawable.ic_background, getString(R.string.background)),
+            ToolItem(R.drawable.ic_text, getString(R.string.text))
         )
 
         val adapter = ToolAdapter(tools) { item, pos ->
             when (pos) {
                 0 -> { /* Layout */
+
+                    binding.llFrame.visibility = View.VISIBLE
+                    binding.llBorder.visibility = View.GONE
+                    binding.llBg.visibility = View.GONE
+                    binding.llSticker.visibility = View.GONE
+                    binding.llDraw.visibility = View.GONE
+                    binding.rcvTools.visibility = View.GONE
+
+                    binding.icCheckLayout.setOnClickListener {
+                        binding.llFrame.visibility = View.GONE
+                        binding.rcvTools.visibility = View.VISIBLE
+                    }
+
+                    binding.drawView.setDrawingEnabled(false)
                 }
 
                 1 -> { /* Border */
+
+                    binding.llFrame.visibility = View.GONE
+                    binding.llBorder.visibility = View.VISIBLE
+                    binding.llBg.visibility = View.GONE
+                    binding.llSticker.visibility = View.GONE
+                    binding.llDraw.visibility = View.GONE
+                    binding.rcvTools.visibility = View.GONE
+
+                    binding.tvGrid.text = binding.seekbarSpace.progress.toString()
+                    binding.tvCorner.text = binding.seekbarCorner.progress.toString()
+
+                    binding.icCheckBorder.setOnClickListener {
+                        binding.llBorder.visibility = View.GONE
+                        binding.rcvTools.visibility = View.VISIBLE
+                    }
+
+                    binding.drawView.setDrawingEnabled(false)
                 }
 
-                2 -> { /* Ratio */
+                2 -> { /* Sticker */
+
+                    binding.llFrame.visibility = View.GONE
+                    binding.llBorder.visibility = View.GONE
+                    binding.llBg.visibility = View.GONE
+                    binding.llSticker.visibility = View.VISIBLE
+                    binding.llDraw.visibility = View.GONE
+                    binding.rcvTools.visibility = View.GONE
+
+
+                    binding.icCheckSticker.setOnClickListener {
+                        binding.llSticker.visibility = View.GONE
+                        binding.rcvTools.visibility = View.VISIBLE
+                        binding.drawView.setDrawingEnabled(false)
+                    }
+
+                    binding.drawView.setDrawingEnabled(true)
                 }
 
                 3 -> { /* Background */
+
+                    binding.llFrame.visibility = View.GONE
+                    binding.llBorder.visibility = View.GONE
+                    binding.llBg.visibility = View.VISIBLE
+                    binding.llSticker.visibility = View.GONE
+                    binding.llDraw.visibility = View.GONE
+                    binding.rcvTools.visibility = View.GONE
+
+                    binding.icCheckBackground.setOnClickListener {
+                        binding.llBg.visibility = View.GONE
+                        binding.rcvTools.visibility = View.VISIBLE
+                    }
+
+                    binding.drawView.setDrawingEnabled(false)
                 }
 
                 4 -> { /* Text */
+
+                    binding.llFrame.visibility = View.GONE
+                    binding.llBorder.visibility = View.GONE
+                    binding.llBg.visibility = View.GONE
+                    binding.llSticker.visibility = View.GONE
+                    binding.llDraw.visibility = View.VISIBLE
+                    binding.rcvTools.visibility = View.GONE
+
+                    binding.icBrush.setOnClickListener {
+                        binding.icBrush.setBackgroundResource(R.drawable.bg_icon_draw)
+                        binding.icErase.setBackgroundResource(0)
+                        type = TYPE_GESTURE
+                        updateDraw()
+                    }
+
+                    binding.icErase.setOnClickListener {
+                        binding.icErase.setBackgroundResource(R.drawable.bg_icon_draw)
+                        binding.icBrush.setBackgroundResource(0)
+                        type = TYPE_ERASER
+                        updateDraw()
+                    }
+
+                    binding.icCheckDraw.setOnClickListener {
+                        binding.llDraw.visibility = View.GONE
+                        binding.rcvTools.visibility = View.VISIBLE
+                        binding.drawView.setDrawingEnabled(false)
+                    }
+
+                    updateDraw()
                 }
             }
         }
 
-        binding.rvTools.layoutManager =
+        binding.rcvTools.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
-        binding.rvTools.adapter = adapter
+        binding.rcvTools.adapter = adapter
     }
 
     /* --- private --- */
     private fun updateDraw() {
         val drawPath: DrawPath?
         val size: Float
-
-        type = TYPE_GESTURE
-        color = Color.BLACK
-        gestureSize = ScreenUtils.dp2px(12F).also { eraserSize = it.toFloat() }.also { shapeSize =
-            it.toFloat()
-        }.toFloat()
         gesturePaintStyle = PaintStyle.STROKE
         shapePaintStyle = PaintStyle.STROKE
         shapeBrushStyle = BrushStyle.HEART

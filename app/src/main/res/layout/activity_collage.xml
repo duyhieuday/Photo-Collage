@@ -76,13 +76,12 @@
     <RelativeLayout
         android:id="@+id/rl_container"
         android:layout_width="match_parent"
-        android:layout_height="328dp"
+        android:layout_height="400dp"
         android:layout_marginHorizontal="@dimen/dimen_16dp"
         android:layout_below="@+id/layoutBar"
-        android:layout_above="@+id/llTab"
         android:layout_centerInParent="true"
         android:layout_marginTop="60dp"
-        android:layout_marginBottom="180dp"
+        android:layout_marginBottom="@dimen/dimen_16dp"
         >
 
         <ImageView
@@ -101,219 +100,300 @@
 
     </RelativeLayout>
 
-    <LinearLayout
-        android:id="@+id/llTab"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_above="@+id/flContent"
-        android:visibility="gone"
-        >
-
-        <LinearLayout
-            android:id="@+id/tab_layout"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:layout_weight="1"
-            android:background="@color/darkBrown"
-            android:gravity="center">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:fontFamily="sans-serif-condensed-medium"
-                android:text="Layout"
-                android:textColor="@color/white"
-                />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/tab_border"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:layout_weight="1"
-            android:background="@color/woodsmoke"
-            android:gravity="center">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:fontFamily="sans-serif-condensed-medium"
-
-                android:text="Border"
-                android:textColor="@color/white"
-                android:textSize="12sp"
-                />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/tab_bg"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:layout_weight="1"
-            android:background="@color/woodsmoke"
-            android:gravity="center">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:fontFamily="sans-serif-condensed-medium"
-                android:text="Background"
-                android:textColor="@color/white"
-                />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/tab_sticker"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:layout_weight="1"
-            android:background="@color/woodsmoke"
-            android:gravity="center">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:fontFamily="sans-serif-condensed-medium"
-                android:text="Sticker"
-                android:textColor="@color/white"
-                />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/tab_draw"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:layout_weight="1"
-            android:background="@color/woodsmoke"
-            android:gravity="center">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:fontFamily="sans-serif-condensed-medium"
-                android:text="Draw"
-                android:textColor="@color/white"
-                />
-
-        </LinearLayout>
-
-    </LinearLayout>
-
     <FrameLayout
         android:id="@+id/flContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/darkBrown"
         android:layout_above="@+id/layoutAds"
-        android:visibility="gone"
+        android:visibility="visible"
         >
 
         <LinearLayout
             android:id="@+id/ll_frame"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="visible">
+            android:background="@drawable/bg_item_tool"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <RelativeLayout
+                android:id="@+id/rlLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="20dp"
+                android:layout_marginHorizontal="@dimen/dimen_16dp"
+                >
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/layout"
+                    android:textColor="#101828"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/inter_medium"
+                    android:layout_centerVertical="true"
+                    />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/icCheckLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_check_tool"
+                    android:layout_alignParentEnd="true"
+                    android:padding="4dp"
+                    />
+
+            </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list_frames"
                 android:layout_width="match_parent"
-                android:layout_height="80dp" />
+                android:layout_height="80dp"
+                android:layout_marginBottom="@dimen/dimen_16dp"
+                android:layout_marginHorizontal="@dimen/dimen_16dp"
+                />
+
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/ll_border"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:background="@drawable/bg_item_tool"
             android:orientation="vertical"
             android:visibility="gone">
 
-            <LinearLayout
+            <RelativeLayout
+                android:id="@+id/rlBorder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginVertical="20dp"
+                android:layout_marginHorizontal="@dimen/dimen_16dp"
+                >
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/border"
+                    android:textColor="#101828"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/inter_medium"
+                    android:layout_centerVertical="true"
+                    />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/icCheckBorder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_check_tool"
+                    android:layout_alignParentEnd="true"
+                    android:padding="4dp"
+                    />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dimen_16dp"
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_marginLeft="50dp"
-                    android:layout_marginTop="3dp"
-                    android:src="@drawable/space" />
+                    android:id="@+id/icGrid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_grid" />
 
                 <SeekBar
                     android:id="@+id/seekbar_space"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginRight="20dp"
-                    android:layout_marginBottom="3dp"
-                    android:outlineAmbientShadowColor="@color/white"
-                    android:progressBackgroundTint="@color/white" />
-            </LinearLayout>
+                    android:layout_marginStart="@dimen/dimen_8dp"
+                    android:layout_marginEnd="@dimen/dimen_16dp"
+                    android:progressBackgroundTint="@color/white"
+                    android:layout_toEndOf="@+id/icGrid"
+                    android:layout_toStartOf="@+id/tvGrid"
+                    />
 
-            <LinearLayout
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvGrid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="50"
+                    android:textColor="#1D2939"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/inter_medium"
+                    android:layout_alignParentEnd="true"
+                    />
+
+            </RelativeLayout>
+
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/dimen_16dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginHorizontal="@dimen/dimen_16dp"
+                >
 
                 <ImageView
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    android:layout_marginLeft="51dp"
-                    android:layout_marginTop="10dp"
-                    android:src="@drawable/roundcorner" />
+                    android:id="@+id/icCorner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_corner" />
 
                 <SeekBar
                     android:id="@+id/seekbar_corner"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginRight="20dp"
-                    android:layout_marginBottom="5dp"
+                    android:layout_marginStart="@dimen/dimen_8dp"
+                    android:layout_marginEnd="@dimen/dimen_16dp"
+                    android:layout_toEndOf="@+id/icCorner"
+                    android:layout_toStartOf="@+id/tvCorner"
                     android:progressBackgroundTint="@color/white" />
-            </LinearLayout>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvCorner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="60"
+                    android:textColor="#1D2939"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/inter_medium"
+                    android:layout_alignParentEnd="true"
+                    />
+
+            </RelativeLayout>
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/ll_bg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/bg_item_tool"
+            android:orientation="vertical"
             android:visibility="gone">
+
+            <RelativeLayout
+                android:id="@+id/rlBackground"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="20dp"
+                android:layout_marginHorizontal="@dimen/dimen_16dp"
+                >
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/background"
+                    android:textColor="#101828"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/inter_medium"
+                    android:layout_centerVertical="true"
+                    />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/icCheckBackground"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_check_tool"
+                    android:layout_alignParentEnd="true"
+                    android:padding="4dp"
+                    />
+
+            </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list_bg"
                 android:layout_width="match_parent"
-                android:layout_height="80dp" />
+                android:layout_height="80dp"
+                android:layout_marginBottom="@dimen/dimen_16dp"
+                android:layout_marginHorizontal="@dimen/dimen_16dp"
+                />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/llSticker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/bg_item_tool"
+            android:orientation="vertical"
             android:visibility="gone">
+
+            <RelativeLayout
+                android:id="@+id/rlSticker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="20dp"
+                android:layout_marginHorizontal="@dimen/dimen_16dp"
+                >
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sticker"
+                    android:textColor="#101828"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/inter_medium"
+                    android:layout_centerVertical="true"
+                    />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/icCheckSticker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_check_tool"
+                    android:layout_alignParentEnd="true"
+                    android:padding="4dp"
+                    />
+
+            </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/listSticker"
                 android:layout_width="match_parent"
-                android:layout_height="80dp" />
+                android:layout_height="80dp"
+                android:layout_marginBottom="@dimen/dimen_16dp"
+                />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/llDraw"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/bg_item_tool"
             android:orientation="vertical"
             android:visibility="gone">
+
+            <RelativeLayout
+                android:id="@+id/rlDraw"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="20dp"
+                android:layout_marginHorizontal="@dimen/dimen_16dp"
+                >
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/text"
+                    android:textColor="#101828"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/inter_medium"
+                    android:layout_centerVertical="true"
+                    />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/icCheckDraw"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_check_tool"
+                    android:layout_alignParentEnd="true"
+                    android:padding="4dp"
+                    />
+
+            </RelativeLayout>
 
 <!--            <com.example.piceditor.draw.BrushSizeSlider-->
 <!--                android:id="@+id/brushSizeSlider"-->
@@ -336,26 +416,25 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
+                android:layout_marginBottom="@dimen/dimen_16dp"
                 >
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/icErase"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_erase"
-                    android:background="@color/white"
-                    android:padding="4dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginEnd="8dp"
-                    />
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/icBrush"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_brush"
-                    android:background="@color/white"
-                    android:padding="4dp"
+                    android:padding="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="8dp"
+                    />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/icErase"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_erase"
+                    android:padding="8dp"
                     android:layout_marginTop="4dp"
                     android:layout_marginStart="8dp"
                     />
@@ -369,12 +448,13 @@
     </FrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvTools"
+        android:id="@+id/rcvTools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/layoutAds"
         android:background="@color/white"
         android:paddingHorizontal="@dimen/dimen_8dp"
+        android:visibility="visible"
         />
 
     <LinearLayout
