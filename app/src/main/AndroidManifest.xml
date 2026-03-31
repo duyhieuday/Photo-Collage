@@ -31,6 +31,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PicEditor">
         <activity
+            android:name=".LanguageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SettingActivity"
+            android:exported="false" />
+        <activity
             android:name=".splash.SplashActivity"
             android:exported="true">
             <intent-filter>

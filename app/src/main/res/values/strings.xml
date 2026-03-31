@@ -119,4 +119,12 @@
     <string name="layout">Layout</string>
     <string name="ratio">Ratio</string>
     <string name="background">Background</string>
+    <string name="setting">Setting</string>
+    <string name="change_language">Change Language</string>
+    <string name="rate_app">Rate app</string>
+    <string name="share_app">Share app</string>
+    <string name="feedback">Feedback</string>
+    <string name="privacy_policy">Privacy policy</string>
+    <string name="gmail_not_install">Gmail not install</string>
+    <string name="choose_language">Choose language</string>
 </resources>

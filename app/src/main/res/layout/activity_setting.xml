@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/bg_color"
+        >
+
+        <RelativeLayout
+            android:id="@+id/layoutBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="44dp"
+            android:layout_marginHorizontal="16dp"
+            >
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/icBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_back_new"
+                android:padding="8dp"
+                />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/setting"
+                android:textSize="16sp"
+                android:fontFamily="@font/inter_medium"
+                android:layout_toEndOf="@+id/icBack"
+                android:textColor="#1D2939"
+                android:layout_marginStart="8dp"
+                android:layout_centerVertical="true"
+                />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/layout1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@+id/layoutBar"
+            android:layout_marginVertical="12dp"
+            android:layout_marginHorizontal="16dp"
+            android:background="@drawable/bg_card_setting"
+            >
+
+            <RelativeLayout
+                android:id="@+id/layoutLanguage"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="12dp"
+                >
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iconLanguage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_language"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="12dp"
+                    />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/change_language"
+                    android:layout_toEndOf="@id/iconLanguage"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="8dp"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/inter_regular"
+                    android:textColor="#1D2939"
+                    />
+
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/textLanguage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:text="English"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/inter_regular"
+                    android:layout_centerVertical="true"
+                    android:drawableEnd="@drawable/ic_arrow_down"
+                    android:drawablePadding="8dp"
+                    android:gravity="center"
+                    android:textColor="#98A2B3"
+                    android:layout_marginEnd="12dp"
+                    />
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/layoutRate"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="12dp"
+                >
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iconRate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_rate"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="12dp"
+                    />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/rate_app"
+                    android:layout_toEndOf="@id/iconRate"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="8dp"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/inter_regular"
+                    android:textColor="#1D2939"
+                    />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/layoutShare"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="12dp"
+
+                >
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iconShare"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_share"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="12dp"
+                    />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/share_app"
+                    android:layout_toEndOf="@id/iconShare"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="8dp"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/inter_regular"
+                    android:textColor="#1D2939"
+                    />
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/layoutFeedback"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="12dp"
+                >
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iconFeedback"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_feedback"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="12dp"
+                    />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/feedback"
+                    android:layout_toEndOf="@id/iconFeedback"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="8dp"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/inter_regular"
+                    android:textColor="#1D2939"
+                    />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/layoutPolicy"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:visibility="visible"
+                android:layout_marginTop="12dp"
+                >
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iconPolicy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_privacy"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="12dp"
+                    />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/privacy_policy"
+                    android:layout_toEndOf="@id/iconPolicy"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="8dp"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/inter_regular"
+                    android:textColor="#1D2939"
+                    />
+
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="bottom"
+            android:gravity="bottom"
+            android:id="@+id/layoutAds"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            >
+
+            <FrameLayout
+                android:id="@+id/ad_view_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/black" />
+
+            <include android:visibility="visible" android:id="@+id/banner" layout="@layout/banner_ads"/>
+        </LinearLayout>
+
+    </RelativeLayout>
+</layout>
