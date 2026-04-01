@@ -83,9 +83,9 @@ public class SettingActivity extends BaseActivityNew<ActivitySettingBinding> {
                 InterAds.showAdsBreak(SettingActivity.this, new Callback() {
                     @Override
                     public void callback() {
-//                        Intent intent = new Intent(SettingActivity.this, HanLanguageActivity.class);
-//                        startActivity(intent);
-//                        finish();
+                        Intent intent = new Intent(SettingActivity.this, LanguageActivity.class);
+                        startActivity(intent);
+                        finish();
                     }
                 });
             }

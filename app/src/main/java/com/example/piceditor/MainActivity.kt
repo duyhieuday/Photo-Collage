@@ -143,6 +143,10 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
 
     private fun setupClick() {
 
+        binding.btnMenu.setOnClickListener {
+            startActivity(Intent(this, SettingActivity::class.java))
+        }
+
         binding.llEdit.setOnClickListener {
 
             // ===== ADD =====

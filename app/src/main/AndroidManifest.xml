@@ -31,6 +31,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PicEditor">
         <activity
+            android:name=".MyDraftActivity"
+            android:exported="false" />
+        <activity
             android:name=".LanguageActivity"
             android:exported="false" />
         <activity

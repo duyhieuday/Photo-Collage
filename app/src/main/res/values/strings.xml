@@ -127,4 +127,8 @@
     <string name="privacy_policy">Privacy policy</string>
     <string name="gmail_not_install">Gmail not install</string>
     <string name="choose_language">Choose language</string>
+    <string name="select">Select</string>
+    <string name="cancel">Cancel</string>
+    <string name="no_drafts_yet">No drafts yet</string>
+    <string name="let_s_create_your_first_one">Let’s create your first one!</string>
 </resources>

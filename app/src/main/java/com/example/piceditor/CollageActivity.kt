@@ -77,23 +77,28 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
     private var drawerManager: DrawerManager? = null
     private var beardAdapter: BeardAdapter? = null
     private var beardList: MutableList<Beard?>? = null
+
     // Mode type
     companion object {
         const val TYPE_GESTURE = 0
         const val TYPE_SHAPE = 1
         const val TYPE_ERASER = 2
     }
+
     @Retention(AnnotationRetention.SOURCE)
     @IntDef(TYPE_GESTURE, TYPE_SHAPE, TYPE_ERASER)
     annotation class Type
+
     @Type
     private var type = TYPE_GESTURE
     private var color: Int = Color.BLACK
     private var gestureSize: Float = 16f
     private var shapeSize: Float = 20f
     private var eraserSize: Float = 20f
+
     // Gesture draw
     private var gesturePaintStyle: PaintStyle = PaintStyle.STROKE
+
     // Shape draw
     private var shapePaintStyle: PaintStyle = PaintStyle.STROKE
     private var shapeBrushStyle: BrushStyle = BrushStyle.HEART
@@ -121,9 +126,10 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         mBackgroundImage = AndroidUtils.resizeImageToNewSize(bitmap, bmp.width, bmp.height)
 
 //        img_background.background = BitmapDrawable(resources, mBackgroundImage)
-            binding.imgBackground.setImageBitmap(mBackgroundImage)
+        binding.imgBackground.setImageBitmap(mBackgroundImage)
 
     }
+
     override fun onFrameClick(templateItem: TemplateItem) {
 
         mSelectedTemplateItem!!.isSelected = false
@@ -152,6 +158,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         frameAdapter.notifyDataSetChanged()
         buildLayout(templateItem)
     }
+
     inner class space_listener : SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
             mSpace = MAX_SPACE * progress / MAX_SPACE_PROGRESS
@@ -166,6 +173,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         override fun onStartTrackingTouch(seekBar: SeekBar?) {}
         override fun onStopTrackingTouch(seekBar: SeekBar?) {}
     }
+
     inner class corner_listener : SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
             mCorner = MAX_CORNER * progress / MAX_CORNER_PROGRESS
@@ -264,7 +272,8 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         mImageInTemplateCount = intent.getIntExtra("imagesinTemplate", 0)
         val extraImagePaths = intent.getStringArrayListExtra("selectedImages")
 
-        binding.listBg.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.listBg.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.listBg.adapter = BackgroundAdapter(this, this)
 
         loadImageBeards()
@@ -286,7 +295,8 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
             })
 
         loadFrameImages()
-        binding.listFrames.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.listFrames.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         frameAdapter = FrameAdapter(this, mTemplateItemList!!, this)
         binding.listFrames.adapter = frameAdapter
 
@@ -310,7 +320,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
 
     }
 
-    private fun setUpTab(){
+    private fun setUpTab() {
         val tools = mutableListOf(
             ToolItem(R.drawable.ic_layout, getString(R.string.layout)),
             ToolItem(R.drawable.ic_border, getString(R.string.border)),
@@ -442,7 +452,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         shapePaintStyle = PaintStyle.STROKE
         shapeBrushStyle = BrushStyle.HEART
 
-        Log.e("xcncnah", "updateDraw: " + type.toString() )
+        Log.e("xcncnah", "updateDraw: " + type.toString())
 
         when (type) {
             TYPE_GESTURE -> drawPath =
@@ -450,7 +460,8 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                     BrushStyle.GESTURE,
                     gesturePaintStyle,
                     color,
-                    gestureSize)
+                    gestureSize
+                )
 
             TYPE_SHAPE -> drawPath =
                 DrawPath(shapeBrushStyle, shapePaintStyle, color, shapeSize)
@@ -467,7 +478,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         binding.drawView.setDrawingEnabled(true)
     }
 
-    private fun loadImageBeards(){
+    private fun loadImageBeards() {
         val gson = Gson()
         val beard = object : TypeToken<MutableList<Beard?>?>() {
         }.getType()
@@ -581,28 +592,35 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
     fun createOutputImage(): Bitmap {
         try {
             val template = mFramePhotoLayout!!.createImage()
-            val result =
-                createBitmap(template.width, template.height)
+
+            val result = createBitmap(template.width, template.height)
             val canvas = Canvas(result)
             val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-            if (mBackgroundImage != null && !mBackgroundImage!!.isRecycled()) {
+
+            if (mBackgroundImage != null) {
                 canvas.drawBitmap(
-                    mBackgroundImage!!,
-                    Rect(0, 0, mBackgroundImage!!.getWidth(), mBackgroundImage!!.getHeight()),
-                    Rect(0, 0, result.width, result.height),
-                    paint
+                    mBackgroundImage!!, null,
+                    Rect(0, 0, result.width, result.height), paint
                 )
             } else {
                 canvas.drawColor(mBackgroundColor)
             }
 
             canvas.drawBitmap(template, 0f, 0f, paint)
-            template.recycle()
-            System.gc()
+
+            val drawBitmap = getBitmapFromView(binding.drawView)
+            canvas.drawBitmap(drawBitmap, 0f, 0f, paint)
             return result
         } catch (error: OutOfMemoryError) {
             throw error
         }
+    }
+
+    fun getBitmapFromView(view: View): Bitmap {
+        val bitmap = createBitmap(view.width, view.height)
+        val canvas = Canvas(bitmap)
+        view.draw(canvas)
+        return bitmap
     }
 
     fun onSelectModel(s: String?) {

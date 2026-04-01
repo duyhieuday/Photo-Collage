@@ -5,7 +5,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/bg_color"
+        android:background="@color/white"
         tools:context=".activities.LanguageActivity">
 
         <RelativeLayout
@@ -22,6 +22,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_back_new"
                 android:padding="@dimen/dimen_8dp"
+                android:layout_centerVertical="true"
                 />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -44,6 +45,7 @@
                 android:textAllCaps="false"
                 android:src="@drawable/ic_check_tool"
                 android:padding="@dimen/dimen_8dp"
+                android:visibility="invisible"
                 />
 
         </RelativeLayout>

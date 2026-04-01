@@ -20,14 +20,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginStart="16dp"
+            android:layout_marginHorizontal="16dp"
             android:layout_centerVertical="true"
             >
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/circleFlagImage"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_gravity="center"
                 android:scaleType="centerCrop"
                 android:src="@drawable/english"
@@ -42,11 +42,20 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="20dp"
-                android:fontFamily="@font/poppins_medium"
+                android:fontFamily="@font/inter_regular"
                 android:text="English"
-                android:textColor="@color/black"
-                android:textSize="16sp"
+                android:textColor="#101828"
+                android:textSize="14sp"
                 android:layout_toEndOf="@id/circleFlagImage"
+                android:layout_centerVertical="true"
+                />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iconItemCheck"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/ic_unselect"
                 android:layout_centerVertical="true"
                 />
 
