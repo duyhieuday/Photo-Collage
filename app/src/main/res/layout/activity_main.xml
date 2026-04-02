@@ -104,6 +104,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/llDraft"
                     android:layout_width="0dp"
                     android:layout_height="80dp"
                     android:layout_weight="1"

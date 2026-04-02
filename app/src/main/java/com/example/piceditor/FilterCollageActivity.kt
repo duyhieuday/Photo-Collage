@@ -1,11 +1,13 @@
 package com.example.piceditor
 
 import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.Intent
 import android.graphics.*
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.*
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -132,8 +134,9 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(), V
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val bitmapPath = this.cacheDir.absolutePath + "/tempBMP"
-        bmp = BitmapFactory.decodeFile(bitmapPath)
+        val uri = Uri.parse(intent.getStringExtra("image_uri"))
+        bmp = BitmapFactory.decodeStream(contentResolver.openInputStream(uri))
+        binding.imgCollage.setImageBitmap(bmp)
         binding.ivBack.setOnClickListener {
             finish()
         }
@@ -141,14 +144,12 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(), V
         binding.btnNext.setOnClickListener {
             checkClick()
             isFromSaved = true
-            try {
-                saveBitmap(screenShot)
-            } catch (th: Throwable) {
-                th.printStackTrace()
-            }
+            val finalBitmap = screenShot
+            val finalUri = saveToGallery(finalBitmap)
+
             val intent = Intent(this, ShowImageActivity::class.java)
-            intent.putExtra("image_uri", savedImageUri!!.toString())
-            startActivityForResult(intent, 2)
+            intent.putExtra("image_uri", finalUri.toString())
+            startActivity(intent)
             finish()
         }
 
@@ -242,6 +243,29 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(), V
 
         binding.filterNames.adapter = filter_nameAdapter
 
+    }
+
+    private fun saveToGallery(bitmap: Bitmap): Uri {
+        val resolver = contentResolver
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "IMG_${System.currentTimeMillis()}.jpg")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/PhotoCollage")
+            put(MediaStore.Images.Media.IS_PENDING, 1)
+        }
+
+        val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)!!
+
+        val out = resolver.openOutputStream(uri)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 95, out!!)
+        out.close()
+
+        contentValues.clear()
+        contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
+        contentValues.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+        resolver.update(uri, contentValues, null, null)
+
+        return uri
     }
 
     inner class FilterDetailAdapter(filters: Array<FilterData>) :

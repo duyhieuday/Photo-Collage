@@ -9,6 +9,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
@@ -17,6 +18,7 @@ import android.view.ViewTreeObserver
 import android.widget.RelativeLayout
 import android.widget.SeekBar
 import androidx.annotation.IntDef
+import androidx.core.content.FileProvider
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -196,21 +198,12 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
 
                 checkClick()
 
-                var outStream: FileOutputStream? = null
-                try {
-                    val collageBitmap = createOutputImage()
-                    outStream = FileOutputStream(File(cacheDir, "tempBMP"))
-                    collageBitmap.compress(Bitmap.CompressFormat.JPEG, 75, outStream)
-                    outStream.close()
-                } catch (e: FileNotFoundException) {
-                    e.printStackTrace()
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
+                val bitmap = createOutputImage()
+                val uri = saveTempBitmap(bitmap)
 
                 val intent = Intent(this, FilterCollageActivity::class.java)
+                intent.putExtra("image_uri", uri.toString())
                 startActivity(intent)
-                finish()
             }
         }
     }
@@ -318,6 +311,20 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
 
         binding.btnRedo.setOnClickListener { getDrawerManager()!!.redo() }
 
+    }
+
+    private fun saveTempBitmap(bitmap: Bitmap): Uri {
+        val file = File(externalCacheDir, "collage_${System.currentTimeMillis()}.jpg")
+        val fos = FileOutputStream(file)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos)
+        fos.flush()
+        fos.close()
+
+        return FileProvider.getUriForFile(
+            this,
+            "${packageName}.provider",
+            file
+        )
     }
 
     private fun setUpTab() {

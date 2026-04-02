@@ -175,6 +175,14 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
             startActivity(Intent(this, SelectImageActivity::class.java))
         }
 
+        binding.llDraft.setOnClickListener {
+            checkAndRequestPermission()
+            if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
+            mLastClickTime = SystemClock.elapsedRealtime()
+
+            startActivity(Intent(this, MyDraftActivity::class.java))
+        }
+
     }
 
     // ================= ADD =================

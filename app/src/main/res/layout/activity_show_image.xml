@@ -68,6 +68,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="320dp"
                     android:background="#EAEAEA"
+                    android:layout_marginHorizontal="14dp"
                     android:scaleType="centerCrop" />
 
                 <!-- BUTTON -->
@@ -76,7 +77,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_below="@+id/imgShow"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="22dp"
                     android:background="@drawable/bg_btn_next1"
                     android:drawablePadding="8dp"
                     android:gravity="center"
@@ -92,24 +93,41 @@
                     android:layout_below="@+id/btnMakeAnother"
                     android:layout_marginTop="20dp"
                     android:gravity="center"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:weightSum="4"
+                    >
 
-                    <ImageView
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:src="@drawable/ic_instagram" />
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/icInstagram"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_instagram"
+                        android:layout_weight="1"
+                        />
 
-                    <ImageView
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_marginStart="16dp"
-                        android:src="@drawable/ic_telegram" />
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/icFaceBook"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_facebook"
+                        android:layout_weight="1"
+                        />
 
-                    <ImageView
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_marginStart="16dp"
-                        android:src="@drawable/ic_messenger" />
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/icTiktok"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_tiktok"
+                        android:layout_weight="1"
+                        />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/icMore"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_more"
+                        android:layout_weight="1"
+                        />
 
                 </LinearLayout>
 
