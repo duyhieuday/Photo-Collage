@@ -31,15 +31,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PicEditor">
         <activity
-            android:name=".MyDraftActivity"
-            android:exported="false" />
-        <activity
-            android:name=".LanguageActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SettingActivity"
-            android:exported="false" />
-        <activity
             android:name=".splash.SplashActivity"
             android:exported="true">
             <intent-filter>
@@ -48,6 +39,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".obd.ABOnBoardingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MyDraftActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LanguageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SettingActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="false">

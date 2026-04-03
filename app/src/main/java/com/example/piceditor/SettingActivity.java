@@ -13,6 +13,8 @@ import com.example.piceditor.base.BaseActivityNew;
 import com.example.piceditor.base.BaseFragment;
 import com.example.piceditor.databinding.ActivitySettingBinding;
 import com.example.piceditor.utilsApp.BarsUtils;
+import com.example.piceditor.utilsApp.Constant;
+import com.example.piceditor.utilsApp.PreferenceUtil;
 import com.example.piceditor.utilsApp.Prefs;
 
 import java.util.Locale;
@@ -36,11 +38,26 @@ public class SettingActivity extends BaseActivityNew<ActivitySettingBinding> {
 
     @Override
     public void doAfterOnCreate() {
+        if (PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no")
+                .equals("yes")
+        ) {
+            initBanner(getBinding().banner.adViewContainer);
+        } else {
+            initBanner(getBinding().adViewContainer);
+            getBinding().banner.getRoot().setVisibility(View.GONE);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        if (PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no")
+                .equals("yes")
+        ) {
+        } else {
+            initBanner(getBinding().adViewContainer);
+            getBinding().banner.getRoot().setVisibility(View.GONE);
+        }
     }
 
     @Override

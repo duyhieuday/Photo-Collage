@@ -27,6 +27,8 @@ import com.example.piceditor.databinding.ActivityFilterCollageBinding
 import com.example.piceditor.model.FilterData
 import com.example.piceditor.utils.AndroidUtils
 import com.example.piceditor.utils.BarsUtils
+import com.example.piceditor.utilsApp.Constant
+import com.example.piceditor.utilsApp.PreferenceUtil
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -113,7 +115,25 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(), V
     }
 
     override fun doAfterOnCreate() {
+        if (PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no")
+                .equals("yes")
+        ) {
+            initBanner(binding.banner.adViewContainer)
+        } else {
+            initBanner(binding.adViewContainer)
+            binding.banner.getRoot().visibility = View.GONE
+        }
+    }
 
+    protected override fun onResume() {
+        super.onResume()
+        if (PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no")
+                .equals("yes")
+        ) {
+        } else {
+            initBanner(binding.adViewContainer)
+            binding.banner.getRoot().visibility = View.GONE
+        }
     }
 
     override fun setListener() {

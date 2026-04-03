@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
+import android.view.View
 import android.widget.Toast
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +15,8 @@ import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivitySelectImageBinding
 import com.example.piceditor.uiFragments.GalleryFragment
 import com.example.piceditor.utils.BarsUtils
+import com.example.piceditor.utilsApp.Constant
+import com.example.piceditor.utilsApp.PreferenceUtil
 
 class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(), GalleryFragment.OnSelectImageListener,
     SelectedPhotoAdapter.OnDeleteButtonClickListener {
@@ -94,7 +97,25 @@ class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(), Galle
     }
 
     override fun doAfterOnCreate() {
+        if (PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no")
+                .equals("yes")
+        ) {
+            initBanner(binding.banner.adViewContainer)
+        } else {
+            initBanner(binding.adViewContainer)
+            binding.banner.getRoot().visibility = View.GONE
+        }
+    }
 
+    protected override fun onResume() {
+        super.onResume()
+        if (PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no")
+                .equals("yes")
+        ) {
+        } else {
+            initBanner(binding.adViewContainer)
+            binding.banner.getRoot().visibility = View.GONE
+        }
     }
 
     override fun setListener() {
@@ -148,8 +169,8 @@ class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(), Galle
             intent.putExtra("imageCount", mSelectedImages.size)
             intent.putExtra("selectedImages", mSelectedImages)
             intent.putExtra("imagesinTemplate", mSelectedImages.size)
-
             startActivityForResult(intent, 111)
+
 
         } catch (e: Exception) {
             e.printStackTrace()

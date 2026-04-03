@@ -26,6 +26,8 @@ import com.example.piceditor.base.BaseFragment;
 import com.example.piceditor.databinding.ActivityMyDraftBinding;
 import com.example.piceditor.model.ImageModel;
 import com.example.piceditor.utils.BarsUtils;
+import com.example.piceditor.utilsApp.Constant;
+import com.example.piceditor.utilsApp.PreferenceUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -52,7 +54,26 @@ public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
 
     @Override
     public void doAfterOnCreate() {
+        if (PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no")
+                .equals("yes")
+        ) {
+            initBanner(getBinding().banner.adViewContainer);
+        } else {
+            initBanner(getBinding().adViewContainer);
+            getBinding().banner.getRoot().setVisibility(View.GONE);
+        }
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no")
+                .equals("yes")
+        ) {
+        } else {
+            initBanner(getBinding().adViewContainer);
+            getBinding().banner.getRoot().setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -109,11 +130,12 @@ public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
         String[] projection = new String[]{
                 MediaStore.Images.Media._ID,
                 MediaStore.Images.Media.DISPLAY_NAME,
-                MediaStore.Images.Media.DATE_TAKEN
+                MediaStore.Images.Media.DATE_TAKEN,
+                MediaStore.Images.Media.DATE_ADDED
         };
 
         String selection = MediaStore.Images.Media.RELATIVE_PATH + " LIKE ?";
-        String[] selectionArgs = new String[]{"%Pictures/MyApp%"};
+        String[] selectionArgs = new String[]{"%Pictures/PhotoCollage%"};
 
         String sortOrder = MediaStore.Images.Media.DATE_TAKEN + " DESC";
 
@@ -129,16 +151,28 @@ public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
             int idCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
             int nameCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
             int dateTakenCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN);
-            int dateAddedCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED);
+            int dateAddedCol = cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED);
 
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(idCol);
                 String name = cursor.getString(nameCol);
-                long dateTaken = cursor.getLong(dateTakenCol);
-                long dateAdded = cursor.getLong(dateAddedCol);
-
                 // fallback nếu dateTaken = 0
-                long finalDate = dateTaken != 0 ? dateTaken : dateAdded;
+                long dateTaken = cursor.getLong(dateTakenCol);
+
+                long dateAdded = 0;
+                if (dateAddedCol != -1) {
+                    dateAdded = cursor.getLong(dateAddedCol);
+                }
+
+                long finalDate;
+
+                if (dateTaken != 0) {
+                    finalDate = dateTaken;
+                } else if (dateAdded > 0) {
+                    finalDate = dateAdded * 1000; // 👈 convert sang milliseconds
+                } else {
+                    finalDate = System.currentTimeMillis(); // fallback an toàn
+                }
 
                 Uri uri = ContentUris.withAppendedId(collection, id);
 

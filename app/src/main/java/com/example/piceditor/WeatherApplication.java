@@ -14,6 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
 
+import com.adjust.sdk.Adjust;
+import com.adjust.sdk.AdjustConfig;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingResult;
@@ -107,10 +109,10 @@ public class WeatherApplication extends Application{
 
     //////////////////////
     private void initAdjust() {
-//        String appToken = "ujai0r3ht9ts";
-//        String environment = BuildConfig.DEBUG ? AdjustConfig.ENVIRONMENT_SANDBOX : AdjustConfig.ENVIRONMENT_PRODUCTION;
-//        AdjustConfig config = new AdjustConfig(this, appToken, environment);
-//        Adjust.onCreate(config);
+        String appToken = "ujai0r3ht9ts";
+        String environment = BuildConfig.DEBUG ? AdjustConfig.ENVIRONMENT_SANDBOX : AdjustConfig.ENVIRONMENT_PRODUCTION;
+        AdjustConfig config = new AdjustConfig(this, appToken, environment);
+        Adjust.onCreate(config);
     }
 
     public static void initROAS(double revenue, String currency) {
@@ -296,17 +298,13 @@ public class WeatherApplication extends Application{
             String native_full_obd = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.NATIVE_FULL_OBD);
             String click_inter = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.CLICK_INTER);
             String load_ob1 = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.LOAD_OB1);
-            String button_apply_language = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.BUTTON_APPLY_LANGUAGE);
-            String hide_premium = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.HIDE_PREMIUM);
-            String delay_inter = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.DELAY_INTER);
-            String first_inter = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.FIRST_INTER);
-            String troll = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.TROLL);
             String hide_mode = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.HIDE_MODE);
             String remove_ads = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.REMOVE_ADS);
             String native_main = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.NATIVE_MAIN);
-            String inter_finger_up = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.INTER_FINGER_UP);
             String nt_collapse = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.NT_COLLAPSE);
             String inter_time = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.INTER_TIME);
+            String first_flow = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.FIRST_FLOW);
+            String inter_onb = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.INTER_Onb);
 
             //CHƯA TEST
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.BANNER_COL, banner_coll);
@@ -317,17 +315,13 @@ public class WeatherApplication extends Application{
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.NATIVE_FULL_OBD, native_full_obd);
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.CLICK_INTER, click_inter);
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.LOAD_OB1, load_ob1);
-            PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.BUTTON_APPLY_LANGUAGE, button_apply_language);
-            PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.HIDE_PREMIUM, hide_premium);
-            PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.DELAY_INTER, delay_inter);
-            PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.FIRST_INTER, first_inter);
-            PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.TROLL, troll);
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.HIDE_MODE, hide_mode);
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.REMOVE_ADS, remove_ads);
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.NATIVE_MAIN, native_main);
-            PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.INTER_FINGER_UP, inter_finger_up);
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.NT_COLLAPSE, nt_collapse);
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.INTER_TIME, inter_time);
+            PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.FIRST_FLOW, first_flow);
+            PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.INTER_Onb, inter_onb);
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -46,6 +46,8 @@ public class Constant {
         public static final String FIRST_INTER = "first_inter";
         public static final String INTER_FINGER_UP = "inter_finger_up";
         public static final String NT_COLLAPSE = "nt_collapse";
+        public static final String FIRST_FLOW = "first_flow";
+        public static final String INTER_Onb = "inter_onb";
         public static final String NT_UNDER_ADD = "nt_under_add";
         public static final String BANNER_ID_DEFAULT = "banner_id_default";
         public static final String BANNER_COLLAPSIBLE_ID_DEFAULT = "banner_collapsible_id_default";
@@ -138,6 +140,8 @@ public class Constant {
         public static final String FIRST_INTER = "first_inter";
         public static final String INTER_FINGER_UP = "inter_finger_up";
         public static final String NT_COLLAPSE = "nt_collapse";
+        public static final String FIRST_FLOW = "first_flow";
+        public static final String INTER_Onb = "inter_onb";
         public static final String BANNER_ID_DEFAULT = "banner_id_default";
         public static final String BANNER_COLLAPSIBLE_ID_DEFAULT = "banner_collapsible_id_default";
         public static final String INTER_ID_DEFAULT = "inter_id_default";

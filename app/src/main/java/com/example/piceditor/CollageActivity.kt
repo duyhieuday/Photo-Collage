@@ -44,6 +44,8 @@ import com.example.piceditor.utils.AndroidUtils
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utils.FrameImageUtils
 import com.example.piceditor.utils.ImageUtils
+import com.example.piceditor.utilsApp.Constant
+import com.example.piceditor.utilsApp.PreferenceUtil
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.File
@@ -204,6 +206,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                 val intent = Intent(this, FilterCollageActivity::class.java)
                 intent.putExtra("image_uri", uri.toString())
                 startActivity(intent)
+                finish()
             }
         }
     }
@@ -221,7 +224,25 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
     }
 
     override fun doAfterOnCreate() {
+        if (PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no")
+                .equals("yes")
+        ) {
+            initBanner(binding.banner.adViewContainer)
+        } else {
+            initBanner(binding.adViewContainer)
+            binding.banner.getRoot().visibility = View.GONE
+        }
+    }
 
+    protected override fun onResume() {
+        super.onResume()
+        if (PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no")
+                .equals("yes")
+        ) {
+        } else {
+            initBanner(binding.adViewContainer)
+            binding.banner.getRoot().visibility = View.GONE
+        }
     }
 
     override fun setListener() {

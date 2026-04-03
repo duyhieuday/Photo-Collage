@@ -131,4 +131,7 @@
     <string name="cancel">Cancel</string>
     <string name="no_drafts_yet">No drafts yet</string>
     <string name="let_s_create_your_first_one">Let’s create your first one!</string>
+    <string name="please_wait_loading">Please wait, Loading...</string>
+    <string name="this_action_may_contain_advertisement">(This action may contain advertisement)</string>
+
 </resources>

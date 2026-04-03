@@ -22,6 +22,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import androidx.core.net.toUri
+import com.example.piceditor.utilsApp.Constant
+import com.example.piceditor.utilsApp.PreferenceUtil
 
 class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnClickListener {
 
@@ -55,7 +57,25 @@ class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnCl
     }
 
     override fun doAfterOnCreate() {
+        if (PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no")
+                .equals("yes")
+        ) {
+            initBanner(binding.banner.adViewContainer)
+        } else {
+            initBanner(binding.adViewContainer)
+            binding.banner.getRoot().visibility = View.GONE
+        }
+    }
 
+    protected override fun onResume() {
+        super.onResume()
+        if (PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no")
+                .equals("yes")
+        ) {
+        } else {
+            initBanner(binding.adViewContainer)
+            binding.banner.getRoot().visibility = View.GONE
+        }
     }
 
     override fun setListener() {

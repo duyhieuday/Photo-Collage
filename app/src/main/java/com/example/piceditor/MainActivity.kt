@@ -3,21 +3,23 @@ package com.example.piceditor
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityMainBinding
 import com.example.piceditor.utils.BarsUtils
+import com.example.piceditor.utilsApp.Constant
+import com.example.piceditor.utilsApp.PreferenceUtil
 import com.ezt.pdfreader.photoeditor.data.PageInfo
 import java.io.File
-import androidx.core.graphics.toColorInt
 
 class MainActivity : BaseActivityNew<ActivityMainBinding>() {
 
@@ -88,7 +90,25 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
     }
 
     override fun doAfterOnCreate() {
+        if (PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no")
+                .equals("yes")
+        ) {
+            initBanner(binding.banner.adViewContainer)
+        } else {
+            initBanner(binding.adViewContainer)
+            binding.banner.getRoot().visibility = View.GONE
+        }
+    }
 
+    protected override fun onResume() {
+        super.onResume()
+        if (PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no")
+                .equals("yes")
+        ) {
+        } else {
+            initBanner(binding.adViewContainer)
+            binding.banner.getRoot().visibility = View.GONE
+        }
     }
 
     override fun setListener() {
