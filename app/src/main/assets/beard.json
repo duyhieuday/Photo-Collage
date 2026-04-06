@@ -1,126 +1,170 @@
 [
   {
     "id": 1,
-    "image": "images/beard1.jpg"
+    "image": "images/icon1.webp"
   },
   {
     "id": 2,
-    "image": "images/beard2.jpg"
+    "image": "images/icon2.webp"
   },
   {
     "id": 3,
-    "image": "images/beard3.jpg"
+    "image": "images/icon3.webp"
   },
   {
     "id": 4,
-    "image": "images/beard4.jpg"
+    "image": "images/icon4.webp"
   },
   {
     "id": 5,
-    "image": "images/beard5.jpg"
+    "image": "images/icon5.webp"
   },
   {
     "id": 6,
-    "image": "images/beard6.jpg"
+    "image": "images/icon6.webp"
   },
   {
     "id": 7,
-    "image": "images/beard7.jpg"
+    "image": "images/icon7.webp"
   },
   {
     "id": 8,
-    "image": "images/beard8.jpg"
+    "image": "images/icon8.webp"
   },
   {
     "id": 9,
-    "image": "images/beard9.jpg"
+    "image": "images/icon9.webp"
   },
   {
     "id": 10,
-    "image": "images/beard10.jpg"
+    "image": "images/icon10.webp"
   },
   {
     "id": 11,
-    "image": "images/beard11.jpg"
+    "image": "images/icon11.webp"
   },
   {
     "id": 12,
-    "image": "images/beard12.jpg"
+    "image": "images/icon12.webp"
   },
   {
     "id": 13,
-    "image": "images/beard13.jpg"
+    "image": "images/icon13.webp"
   },
   {
     "id": 14,
-    "image": "images/beard14.jpg"
+    "image": "images/icon14.webp"
   },
   {
     "id": 15,
-    "image": "images/beard15.jpg"
+    "image": "images/cute1.webp"
   },
   {
     "id": 16,
-    "image": "images/beard16.jpg"
+    "image": "images/cute2.webp"
   },
   {
     "id": 17,
-    "image": "images/beard17.jpg"
+    "image": "images/cute3.webp"
   },
   {
     "id": 18,
-    "image": "images/beard18.jpg"
+    "image": "images/cute4.webp"
   },
   {
     "id": 19,
-    "image": "images/beard19.jpg"
+    "image": "images/cute5.webp"
   },
   {
     "id": 20,
-    "image": "images/beard20.jpg"
+    "image": "images/cute6.webp"
   },
   {
     "id": 21,
-    "image": "images/beard21.jpg"
+    "image": "images/cute7.webp"
   },
   {
     "id": 22,
-    "image": "images/beard22.jpg"
+    "image": "images/cute8.webp"
   },
   {
     "id": 23,
-    "image": "images/beard23.jpg"
+    "image": "images/cute9.webp"
   },
   {
     "id": 24,
-    "image": "images/beard24.jpg"
+    "image": "images/cute10.webp"
   },
   {
     "id": 25,
-    "image": "images/beard25.jpg"
+    "image": "images/cute11.webp"
   },
   {
     "id": 26,
-    "image": "images/beard26.jpg"
+    "image": "images/cute12.webp"
   },
   {
     "id": 27,
-    "image": "images/beard27.jpg"
+    "image": "images/cute13.webp"
   },
   {
     "id": 28,
-    "image": "images/beard28.jpg"
+    "image": "images/cute14.webp"
   },
   {
     "id": 29,
-    "image": "images/beard29.jpg"
+    "image": "images/sticker1.webp"
   },
   {
     "id": 30,
-    "image": "images/beard30.jpg"
+    "image": "images/sticker2.webp"
   },
   {
     "id": 31,
-    "image": "images/beard31.jpg"
+    "image": "images/sticker3.webp"
+  },
+  {
+    "id": 32,
+    "image": "images/sticker4.webp"
+  },
+  {
+    "id": 33,
+    "image": "images/sticker5.webp"
+  },
+  {
+    "id": 34,
+    "image": "images/sticker6.webp"
+  },
+  {
+    "id": 35,
+    "image": "images/sticker7.webp"
+  },
+  {
+    "id": 36,
+    "image": "images/sticker8.webp"
+  },
+  {
+    "id": 37,
+    "image": "images/sticker9.webp"
+  },
+  {
+    "id": 38,
+    "image": "images/sticker10.webp"
+  },
+  {
+    "id": 39,
+    "image": "images/sticker11.webp"
+  },
+  {
+    "id": 40,
+    "image": "images/sticker12.webp"
+  },
+  {
+    "id": 41,
+    "image": "images/sticker13.webp"
+  },
+  {
+    "id": 42,
+    "image": "images/sticker14.webp"
   }
 ]

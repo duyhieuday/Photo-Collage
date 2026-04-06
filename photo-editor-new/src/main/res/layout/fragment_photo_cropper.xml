@@ -270,14 +270,21 @@
 
         </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_next"
-            android:layout_width="wrap_content"
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnNext"
+            android:layout_width="80dp"
             android:layout_height="40dp"
-            android:layout_marginStart="4dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/pe_next" />
+            android:background="@drawable/bg_btn_next1"
+            android:elevation="0dp"
+            android:padding="8dp"
+            android:stateListAnimator="@null"
+            android:text="@string/pe_next"
+            android:textAllCaps="false"
+            android:textColor="#B3FF10"
+            android:textSize="14sp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

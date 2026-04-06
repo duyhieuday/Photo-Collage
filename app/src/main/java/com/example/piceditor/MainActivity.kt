@@ -7,24 +7,35 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.piceditor.adapters.TemplateAdapter
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityMainBinding
+import com.example.piceditor.draw.test.Beard
+import com.example.piceditor.draw.test.BeardAdapter
+import com.example.piceditor.model.Template
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utilsApp.Constant
 import com.example.piceditor.utilsApp.PreferenceUtil
 import com.ezt.pdfreader.photoeditor.data.PageInfo
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.io.File
+import java.io.IOException
+import java.io.InputStreamReader
 
 class MainActivity : BaseActivityNew<ActivityMainBinding>() {
 
     private var mLastClickTime: Long = 0
-
+    private var templateAdapter: TemplateAdapter? = null
+    private var templateList: MutableList<Template?>? = null
     companion object {
         var isFromSaved: Boolean = true
     }
@@ -129,6 +140,46 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupClick()
+        setUpTemp()
+    }
+
+    private fun setUpTemp(){
+        val gson = Gson()
+        val temp = object : TypeToken<MutableList<Template?>?>() {
+        }.getType()
+        var temps: MutableList<Template?>? = null
+        try {
+            temps = gson.fromJson<MutableList<Template?>?>(
+                InputStreamReader(
+                    assets.open("temp.json")
+                ), temp
+            )
+        } catch (e: IOException) {
+            throw RuntimeException(e)
+        }
+
+        Log.e("xcncnajh1", "setUpTemp:  " + temps.size )
+        temps?.forEach {
+            Log.e("TEMP_JSON", "image = ${it?.image}")
+        }
+
+        binding.rcvTemplates.setLayoutManager(
+            LinearLayoutManager(
+                this, LinearLayoutManager.HORIZONTAL,
+                false
+            )
+        )
+
+        templateList = temps
+        templateAdapter = TemplateAdapter()
+        templateAdapter?.setData(templateList)
+
+        binding.rcvTemplates.setAdapter(templateAdapter)
+        binding.rcvTemplates.smoothScrollToPosition(0)
+
+        templateAdapter?.setClickListener { position, temp ->
+
+        }
     }
 
     private fun checkAndRequestPermission() {

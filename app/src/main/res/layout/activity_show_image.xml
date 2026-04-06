@@ -140,7 +140,10 @@
                     android:layout_marginTop="24dp"
                     android:text="@string/try_new_template"
                     android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:textColor="#1D2939"
+                    android:fontFamily="@font/inter_semi_bold"
+                    android:visibility="gone"
+                    />
 
                 <!-- LIST TEMPLATE -->
                 <androidx.recyclerview.widget.RecyclerView
@@ -149,7 +152,9 @@
                     android:layout_height="120dp"
                     android:layout_below="@+id/tvTemplates"
                     android:layout_marginTop="12dp"
-                    android:orientation="horizontal" />
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    />
 
             </RelativeLayout>
 

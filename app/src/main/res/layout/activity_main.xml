@@ -5,7 +5,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/bg_color">
+        android:background="@color/white">
 
         <!-- HEADER -->
         <LinearLayout
@@ -195,11 +195,12 @@
 
         <!-- LIST TEMPLATES -->
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvTemplates"
+            android:id="@+id/rcvTemplates"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:clipToPadding="false"
             android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="4dp"
             app:layout_constraintTop_toBottomOf="@id/tvTemplates"
             app:layout_constraintBottom_toTopOf="@+id/layoutAds"
             app:layout_constraintStart_toStartOf="parent"
