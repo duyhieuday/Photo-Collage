@@ -4,9 +4,6 @@ import android.graphics.Path
 import android.graphics.PointF
 import android.graphics.RectF
 
-import java.util.ArrayList
-import java.util.HashMap
-
 /**
  * Created by vanhu_000 on 3/11/2016.
  * Parcelable is not complete. It can not save Path object.
@@ -45,6 +42,9 @@ class PhotoItem {
     var clearPathAlignParentRight = false
     var clearPathScaleRatio = 1f
     var centerInClearBound = false
+    var rotation: Float = 0f
+    var flipX: Boolean = false
+    var flipY: Boolean = false
 
     companion object {
         val SHRINK_METHOD_DEFAULT = 0

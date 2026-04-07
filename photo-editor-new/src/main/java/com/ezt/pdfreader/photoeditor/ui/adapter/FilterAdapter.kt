@@ -88,7 +88,7 @@ class FilterAdapter(
             binding.tvFilterName.text = filterType.displayName
 
             // Premium crown icon
-            binding.ivCrown.isVisible = filterType.isPremium
+//            binding.ivCrown.isVisible = filterType.isPremium
 
             // Selection state
             binding.cardFilter.strokeColor = binding.root.context.getColor(

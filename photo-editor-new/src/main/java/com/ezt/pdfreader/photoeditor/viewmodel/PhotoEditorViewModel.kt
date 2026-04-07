@@ -1,9 +1,11 @@
 package com.ezt.pdfreader.photoeditor.viewmodel
 
 import android.app.Application
+import android.content.ContentValues
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.provider.MediaStore
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -471,12 +473,32 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
                 }
 
                 // 5. Save
-                val file = File(cacheDir, "page_${index}_${System.currentTimeMillis()}.jpg")
-                file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it) }
+                val resolver = context.contentResolver
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.Images.Media.DISPLAY_NAME, "page_${index}_${System.currentTimeMillis()}.jpg")
+                    put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                    put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/PhotoCollage")
+                    put(MediaStore.Images.Media.IS_PENDING, 1)
+                }
+
+                val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+                uri?.let {
+                    resolver.openOutputStream(it).use { out ->
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out!!)
+                    }
+
+                    contentValues.clear()
+                    contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
+                    contentValues.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+                    resolver.update(it, contentValues, null, null)
+                }
+
                 bitmap.recycle()
 
                 withContext(Dispatchers.Main) { onProgress?.invoke(index + 1, pageList.size) }
-                Uri.fromFile(file)
+
+                uri!!
             }
         }
 

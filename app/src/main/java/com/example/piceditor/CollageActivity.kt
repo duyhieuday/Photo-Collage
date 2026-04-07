@@ -354,7 +354,8 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
             ToolItem(R.drawable.ic_border, getString(R.string.border)),
             ToolItem(R.drawable.ic_sticker, getString(R.string.sticker)),
             ToolItem(R.drawable.ic_background, getString(R.string.background)),
-            ToolItem(R.drawable.ic_text, getString(R.string.text))
+            ToolItem(R.drawable.ic_text, getString(R.string.text)),
+            ToolItem(R.drawable.ic_ratio, getString(R.string.ratio))
         )
 
         val adapter = ToolAdapter(tools) { item, pos ->
@@ -366,6 +367,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                     binding.llBg.visibility = View.GONE
                     binding.llSticker.visibility = View.GONE
                     binding.llDraw.visibility = View.GONE
+                    binding.llRatio.visibility = View.GONE
                     binding.rcvTools.visibility = View.GONE
 
                     binding.icCheckLayout.setOnClickListener {
@@ -383,6 +385,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                     binding.llBg.visibility = View.GONE
                     binding.llSticker.visibility = View.GONE
                     binding.llDraw.visibility = View.GONE
+                    binding.llRatio.visibility = View.GONE
                     binding.rcvTools.visibility = View.GONE
 
                     binding.tvGrid.text = binding.seekbarSpace.progress.toString()
@@ -403,6 +406,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                     binding.llBg.visibility = View.GONE
                     binding.llSticker.visibility = View.VISIBLE
                     binding.llDraw.visibility = View.GONE
+                    binding.llRatio.visibility = View.GONE
                     binding.rcvTools.visibility = View.GONE
 
 
@@ -422,6 +426,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                     binding.llBg.visibility = View.VISIBLE
                     binding.llSticker.visibility = View.GONE
                     binding.llDraw.visibility = View.GONE
+                    binding.llRatio.visibility = View.GONE
                     binding.rcvTools.visibility = View.GONE
 
                     binding.icCheckBackground.setOnClickListener {
@@ -438,6 +443,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                     binding.llBorder.visibility = View.GONE
                     binding.llBg.visibility = View.GONE
                     binding.llSticker.visibility = View.GONE
+                    binding.llRatio.visibility = View.GONE
                     binding.llDraw.visibility = View.VISIBLE
                     binding.rcvTools.visibility = View.GONE
 
@@ -462,6 +468,28 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                     }
 
                     updateDraw()
+                }
+
+                5 -> { /* Ratio */
+
+                    binding.llFrame.visibility = View.GONE
+                    binding.llBorder.visibility = View.GONE
+                    binding.llBg.visibility = View.GONE
+                    binding.llSticker.visibility = View.GONE
+                    binding.llDraw.visibility = View.GONE
+                    binding.llRatio.visibility = View.VISIBLE
+                    binding.rcvTools.visibility = View.GONE
+
+                    binding.btnRotate.setOnClickListener {
+
+                    }
+
+                    binding.icCheckRatio.setOnClickListener {
+                        binding.llRatio.visibility = View.GONE
+                        binding.rcvTools.visibility = View.VISIBLE
+                    }
+
+                    binding.drawView.setDrawingEnabled(false)
                 }
             }
         }

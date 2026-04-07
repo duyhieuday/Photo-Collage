@@ -142,11 +142,11 @@ class PhotoFilterFragment : Fragment() {
         binding.btnNext.setOnClickListener {
             val activity = requireActivity() as PhotoEditorActivity
             // Check premium cho tất cả các trang có filter premium
-            val hasPremiumFilter = viewModel.pages.value.any { it.filterType.isPremium }
-            if (hasPremiumFilter && !activity.isPremium()) {
-                activity.openPaywall()
-                return@setOnClickListener
-            }
+//            val hasPremiumFilter = viewModel.pages.value.any { it.filterType.isPremium }
+//            if (hasPremiumFilter && !activity.isPremium()) {
+//                activity.openPaywall()
+//                return@setOnClickListener
+//            }
             activity.saveAndFinish()
         }
     }
