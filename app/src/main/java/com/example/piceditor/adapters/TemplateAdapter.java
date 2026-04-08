@@ -13,9 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.piceditor.R;
-import com.example.piceditor.draw.test.Beard;
-import com.example.piceditor.draw.test.BeardListener;
-import com.example.piceditor.model.Template;
+import com.example.piceditor.templates_editor.Template;
 
 import java.util.List;
 

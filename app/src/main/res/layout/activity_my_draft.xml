@@ -53,6 +53,7 @@
             android:fontFamily="@font/inter_medium"
             android:padding="@dimen/dimen_8dp"
             android:layout_centerVertical="true"
+            android:visibility="gone"
             />
 
         <androidx.appcompat.widget.AppCompatTextView

@@ -133,5 +133,8 @@
     <string name="let_s_create_your_first_one">Let’s create your first one!</string>
     <string name="please_wait_loading">Please wait, Loading...</string>
     <string name="this_action_may_contain_advertisement">(This action may contain advertisement)</string>
+    <string name="pictures">Pictures</string>
+    <string name="recent">Recent</string>
+    <string name="no_recent">No recent</string>
 
 </resources>

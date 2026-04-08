@@ -12,7 +12,8 @@
         android:id="@+id/img"
         android:layout_width="152dp"
         android:layout_height="152dp"
-        app:riv_corner_radius="12dp"
+        app:riv_corner_radius="8dp"
+        android:layout_margin="4dp"
         android:scaleType="centerCrop"/>
 
     <LinearLayout

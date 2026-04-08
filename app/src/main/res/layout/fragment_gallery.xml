@@ -36,7 +36,7 @@
 
         <TextView
             android:id="@+id/tabDownload"
-            android:text="@string/download"
+            android:text="@string/pictures"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:textColor="#98A2B3"

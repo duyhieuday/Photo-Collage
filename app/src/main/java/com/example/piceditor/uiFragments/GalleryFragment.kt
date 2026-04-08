@@ -56,7 +56,7 @@ class GalleryFragment : BaseFragment<FragmentGalleryBinding>() {
         }
 
         binding.tabDownload.setOnClickListener {
-            val downloadImages = allImages.filter { it.contains("Download") }
+            val downloadImages = allImages.filter { it.contains("Pictures") }
             adapter.updateData(ArrayList(downloadImages))
             updateTabUI(binding.tabDownload)
         }

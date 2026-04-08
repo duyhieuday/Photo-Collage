@@ -14,13 +14,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.piceditor.adapters.ImageAdapter
 import com.example.piceditor.adapters.TemplateAdapter
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityMainBinding
-import com.example.piceditor.draw.test.Beard
-import com.example.piceditor.draw.test.BeardAdapter
-import com.example.piceditor.model.Template
+import com.example.piceditor.templates_editor.Template
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utilsApp.Constant
 import com.example.piceditor.utilsApp.PreferenceUtil
@@ -141,6 +140,38 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         super.onCreate(savedInstanceState)
         setupClick()
         setUpTemp()
+        setUpRecent()
+    }
+
+    private fun setUpRecent(){
+        val images = MyDraftActivity.getSavedImages(this)
+
+        if (images.isEmpty()) {
+            binding.llRecent.visibility = View.VISIBLE
+            binding.rcvRecent.visibility = View.GONE
+        } else {
+            binding.rcvRecent.visibility = View.VISIBLE
+            binding.llRecent.visibility = View.GONE
+        }
+
+        val adapter = ImageAdapter(images)
+
+        binding.rcvRecent.setLayoutManager(
+            LinearLayoutManager(
+                this, LinearLayoutManager.HORIZONTAL,
+                false
+            )
+        )
+        binding.rcvRecent.setAdapter(adapter)
+
+        binding.tvSeeAll.setOnClickListener {
+            checkAndRequestPermission()
+            if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
+            mLastClickTime = SystemClock.elapsedRealtime()
+
+            startActivity(Intent(this, MyDraftActivity::class.java))
+        }
+
     }
 
     private fun setUpTemp(){
@@ -213,6 +244,7 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
     }
 
     private fun setupClick() {
+        checkAndRequestPermission()
 
         binding.btnMenu.setOnClickListener {
             startActivity(Intent(this, SettingActivity::class.java))
