@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    android:layout_margin="6dp"
+    android:elevation="3dp"
+    android:padding="0dp">
+
+    <!--
+        Thumbnail: tỉ lệ 9:16 (portrait) giống template thật
+        Dùng wrap_content height + scaleType=centerCrop
+    -->
+    <ImageView
+        android:id="@+id/imgThumb"
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        android:scaleType="centerCrop"
+        android:background="#E8E8E8"/>
+
+    <!-- Tên template -->
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:textSize="12sp"
+        android:textColor="#333333"
+        android:gravity="center"
+        android:maxLines="1"
+        android:ellipsize="end"/>
+
+</LinearLayout>

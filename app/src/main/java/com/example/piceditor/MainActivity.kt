@@ -20,6 +20,7 @@ import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityMainBinding
 import com.example.piceditor.templates_editor.Template
+import com.example.piceditor.templates_editor.TemplatePickerActivity
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utilsApp.Constant
 import com.example.piceditor.utilsApp.PreferenceUtil
@@ -141,6 +142,14 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         setupClick()
         setUpTemp()
         setUpRecent()
+
+//        binding.tvTemplates.setOnClickListener {
+//            checkAndRequestPermission()
+//            if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
+//            mLastClickTime = SystemClock.elapsedRealtime()
+//
+//            startActivity(Intent(this, TemplatePickerActivity::class.java))
+//        }
     }
 
     private fun setUpRecent(){

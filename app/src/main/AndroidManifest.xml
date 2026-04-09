@@ -31,7 +31,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PicEditor">
         <activity
-            android:name=".TemplateEditorActivity"
+            android:name=".templates_editor.TemplatePickerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".templates_editor.TemplateEditorActivity"
             android:exported="false" />
         <activity
             android:name=".splash.SplashActivity"
