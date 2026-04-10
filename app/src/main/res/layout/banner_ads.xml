@@ -3,12 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/banner_ad"
+    android:background="@color/white"
     android:layout_alignParentBottom="true"
     android:layout_gravity="bottom|center"
     android:orientation="vertical">
     <View
         android:id="@+id/view_d"
-        android:background="@color/black"
+        android:background="@color/transparent"
         android:layout_width="match_parent"
         android:layout_height="1dp"/>
     <TextView
@@ -16,7 +17,7 @@
         android:padding="2dp"
         android:textSize="12sp"
         android:id="@+id/tv_loading"
-        android:textColor="#555"
+        android:textColor="@color/transparent"
         android:text="Ad loading..."
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

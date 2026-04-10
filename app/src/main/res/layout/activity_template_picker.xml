@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F2F2F2">
+    android:background="@color/bg_color">
 
     <!-- Toolbar -->
     <LinearLayout
@@ -13,6 +13,7 @@
         android:background="#FFFFFF"
         android:gravity="center_vertical"
         android:paddingStart="20dp"
+        android:layout_marginTop="44dp"
         android:elevation="4dp">
 
         <TextView

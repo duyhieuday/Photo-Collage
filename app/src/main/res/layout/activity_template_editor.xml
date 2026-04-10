@@ -1,73 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<layout>
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#000000">
+    android:background="@color/bg_color">
 
     <!-- ── Toolbar top ── -->
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/layoutBar"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:orientation="horizontal"
-        android:background="#1A1A1A"
-        android:gravity="center_vertical"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp">
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dimen_16dp"
+        android:layout_marginTop="44dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Nút Back -->
-        <ImageButton
-            android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@android:drawable/ic_media_previous"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Back"
-            app:tint="#FFFFFF" />
-
-        <!-- Tên template -->
-        <TextView
-            android:id="@+id/tvTemplateName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:text="Editor"/>
-
-        <!-- Nút Export -->
-        <Button
-            android:id="@+id/btnExport"
+        <ImageView
+            android:id="@+id/btn_back"
             android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:text="Lưu"
-            android:textColor="#000000"
-            android:backgroundTint="#FFD700"
-            android:textStyle="bold"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:textSize="13sp"/>
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:adjustViewBounds="true"
+            android:padding="@dimen/dimen_8dp"
+            android:src="@drawable/ic_back_new" />
 
-    </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btnUndo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_undo" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btnRedo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_redo" />
+
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnNext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/bg_btn_next1"
+            android:elevation="0dp"
+            android:fontFamily="@font/inter_medium"
+            android:stateListAnimator="@null"
+            android:text="@string/save"
+            android:textAllCaps="false"
+            android:textColor="#B3FF10"
+            android:textSize="14sp" />
+
+    </RelativeLayout>
 
     <!-- ── Editor view (chiếm phần lớn màn hình) ── -->
     <com.example.piceditor.templates_editor.TemplateEditorView
         android:id="@+id/templateEditorView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_below="@+id/layoutBar"
+        android:layout_above="@+id/llTool"
+        android:layout_marginVertical="48dp"
+        android:layout_marginHorizontal="26dp"
+        />
 
     <!-- ── Bottom bar ── -->
     <LinearLayout
+        android:id="@+id/llTool"
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:orientation="horizontal"
         android:background="#1A1A1A"
         android:gravity="center"
+        android:layout_alignParentBottom="true"
         android:paddingStart="16dp"
         android:paddingEnd="16dp">
 
@@ -129,4 +149,5 @@
 
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>
+</layout>

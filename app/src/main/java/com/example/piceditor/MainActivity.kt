@@ -249,7 +249,7 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
     }
 
     private fun loadData() {
-        Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
+//        Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
     }
 
     private fun setupClick() {

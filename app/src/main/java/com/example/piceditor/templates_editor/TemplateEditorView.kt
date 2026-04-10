@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.*
 import kotlin.math.abs
 import kotlin.math.max
+import androidx.core.graphics.createBitmap
 
 class TemplateEditorView @JvmOverloads constructor(
     context: Context,
@@ -154,7 +155,7 @@ class TemplateEditorView @JvmOverloads constructor(
             val b = Color.blue(pixels[i])
             if (r > 240 && g > 240 && b > 240) pixels[i] = Color.TRANSPARENT
         }
-        val mask = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val mask = createBitmap(w, h)
         mask.setPixels(pixels, 0, w, 0, 0, w, h)
         return mask
     }
@@ -170,7 +171,7 @@ class TemplateEditorView @JvmOverloads constructor(
             val b = Color.blue(pixels[i])
             if (r < 50 && g < 50 && b < 50) pixels[i] = Color.TRANSPARENT
         }
-        val mask = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val mask = createBitmap(w, h)
         mask.setPixels(pixels, 0, w, 0, 0, w, h)
         return mask
     }
@@ -192,7 +193,7 @@ class TemplateEditorView @JvmOverloads constructor(
     // ===== Export =====
 
     fun export(): Bitmap {
-        val result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val result = createBitmap(width, height)
         draw(Canvas(result))
         return result
     }

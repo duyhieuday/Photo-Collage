@@ -15,8 +15,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.lifecycleScope
 import com.example.piceditor.R
+import com.example.piceditor.utils.BarsUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -59,6 +61,10 @@ class TemplateEditorActivity : AppCompatActivity() {
 
         // ✅ Dùng layout XML thay vì setContentView(editorView)
         setContentView(R.layout.activity_template_editor)
+
+        BarsUtils.setHideNavigation(this)
+        BarsUtils.setStatusBarColor(this, "#01000000".toColorInt())
+        BarsUtils.setAppearanceLightStatusBars(this, true)
 
         // Bind views
         editorView      = findViewById(R.id.templateEditorView)

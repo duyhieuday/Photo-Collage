@@ -134,7 +134,7 @@ class PhotoCropperFragment : Fragment() {
 
         // ── AI Crop ──────────────────────────────────────────────
         binding.btnAiCrop.setOnClickListener {
-            viewModel.detectCornersWithAI()
+//            viewModel.detectCornersWithAI()
         }
 
         // ── Apply to All ─────────────────────────────────────────
@@ -188,8 +188,8 @@ class PhotoCropperFragment : Fragment() {
         binding.btnApplyToAll.isVisible = !isSinglePage && showApplyToAll && viewModel.pages.value.size > 1
         when (mode) {
             CropMode.NO_CROP -> {
-                binding.btnNoCrop.isVisible = false
-                binding.btnAiCrop.isVisible = true
+                binding.btnNoCrop.isVisible = true
+                binding.btnAiCrop.isVisible = false
                 binding.btnApplyToAll.setIconResource(R.drawable.ic_pe_no_crop)
             }
             CropMode.AI -> {
@@ -238,7 +238,7 @@ class PhotoCropperFragment : Fragment() {
                         val initialMode = when {
 
                             state.corners == null          -> CropMode.NO_CROP
-                            state.cornersWithAI != null    -> CropMode.AI
+//                            state.cornersWithAI != null    -> CropMode.AI
                             else                           -> CropMode.MANUAL
                         }
                         setCropMode(initialMode)
@@ -263,14 +263,14 @@ class PhotoCropperFragment : Fragment() {
                 val corners = viewModel.pages.value.getOrNull(idx)?.corners
                 pagerAdapter.updateCorners(corners, adapterPos)
                 // AI detect thành công → chuyển sang AI mode, hiện apply to all
-                if (corners != null) setCropMode(CropMode.AI, showApplyToAll = true)
+//                if (corners != null) setCropMode(CropMode.AI, showApplyToAll = true)
             }
-            is PhotoEditorEvent.AiCropAllDone -> {
-                setCropMode(CropMode.AI, showApplyToAll = true)
-                val corners = viewModel.pages.value.getOrNull(idx)?.corners
-                pagerAdapter.updateCorners(corners, adapterPos)
-                Toast.makeText(requireContext(), R.string.pe_apply_to_all, Toast.LENGTH_SHORT).show()
-            }
+//            is PhotoEditorEvent.AiCropAllDone -> {
+//                setCropMode(CropMode.AI, showApplyToAll = true)
+//                val corners = viewModel.pages.value.getOrNull(idx)?.corners
+//                pagerAdapter.updateCorners(corners, adapterPos)
+//                Toast.makeText(requireContext(), R.string.pe_apply_to_all, Toast.LENGTH_SHORT).show()
+//            }
             is PhotoEditorEvent.ConfirmDeletePage -> showDeleteDialog(event.index)
             is PhotoEditorEvent.PageDeleted ->
                 Toast.makeText(requireContext(), R.string.pe_page_deleted, Toast.LENGTH_SHORT).show()
