@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Photo Editor</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">fragment vide Bonjour</string>
+    <string name="text_tag_line">Chaque photo apporte de la joie</string>
+    <string name="text_edit">Modifier</string>
+    <string name="text_camera">Caméra</string>
+    <string name="camera_rationale">Cette application a besoin d\'accéder à votre caméra pour que vous puissiez prendre des photos.</string>
+    <string name="todo">FAIRE</string>
+    <string name="ad_attribution" translatable="false">Annonce</string>
+    <string-array name="text_options">
+        <item>Recadrer</item>
+        <item>Filtre</item>
+        <item>Effet</item>
+        <item>Ajuster</item>
+        <item>HSL</item>
+        <item>Couche</item>
+    </string-array>
+
+    <string-array name="filters">
+        <item>Couleur 1</item>
+        <item>Couleur 2</item>
+        <item>Duo</item>
+        <item>Rose</item>
+        <item>Frais</item>
+        <item>Euro</item>
+        <item>Sombre</item>
+        <item>Assurance</item>
+        <item>Élégant</item>
+        <item>Doré</item>
+        <item>Teinte</item>
+        <item>Film</item>
+        <item>Lomo</item>
+        <item>Film</item>
+        <item>Rétro</item>
+        <item>NW</item>
+    </string-array>
+
+    <string-array name="effect_light">
+        <item>Lumière 1</item>
+        <item>Lumière2</item>
+        <item>Festival</item>
+        <item>Amour</item>
+        <item>Prisme</item>
+        <item>Néon</item>
+    </string-array>
+
+    <string-array name="effect_texture">
+        <item>Poussière</item>
+        <item>Taches</item>
+        <item>Ancien</item>
+        <item>Gratter</item>
+    </string-array>
+
+    <string-array name="effect_weather">
+        <item>neige</item>
+        <item>Nuage</item>
+        <item>Brouillard</item>
+        <item>Soleil</item>
+    </string-array>
+
+    <string name="waring_out_of_memory">Mémoire insuffisante. Veuillez supprimer les images, sinon votre programme plantera !</string>
+    <string name="txt_share">Let your true colors shine though Photo editor &amp; collage maker.
+\n\nDownload Now: https://bit.ly/3g3WUau</string>
+
+    <!--TODO : Replace  Admob App ID here -->
+    <string name="Admob_AppID">ca-app-pub-3940256099942544~3347511713</string>
+
+    <!--TODO : Replace  Admob UNIT ID here -->
+    <string name="Admob_adUnitId">ca-app-pub-3940256099942544/1033173712</string>
+
+    <!--TODO : Replace  Facebook Ad ID here -->
+    <string name="fb_adid">IMG_16_9_APP_INSTALL#VOTRE_ID_DE_PLACEMENT</string>
+
+    <string name="background_image">Image de fond</string>
+    <string name="light_effect">Effet lumineux</string>
+    <string name="resize">Redimensionner</string>
+    <string name="rotate">Tourner</string>
+    <string name="_90">- 90°</string>
+    <string name="crop">Recadrer</string>
+    <string name="vertical">Verticale</string>
+    <string name="horizontal">Horizontal</string>
+    <string name="plus_90">+ 90°</string>
+    <string name="close">Fermer</string>
+    <string name="done">Fait</string>
+    <string name="blend">Mélange</string>
+    <string name="effect">Effet</string>
+    <string name="light">Lumière</string>
+    <string name="texture">Texture</string>
+    <string name="weather">Météo</string>
+    <string name="gallery">Galerie</string>
+    <string name="hue">TEINTE</string>
+    <string name="saturation">SATURATION</string>
+    <string name="brightness">LUMINOSITÉ</string>
+    <string name="icon">Icône</string>
+    <string name="text">Texte</string>
+    <string name="sticker">Autocollant</string>
+    <string name="border">Frontière</string>
+    <string name="black_icon">Icône noire</string>
+    <string name="border_blur">Flou des bords</string>
+    <string name="done_save">Terminé | Enregistrer</string>
+    <string name="reset">Réinitialiser</string>
+    <string name="tri_editor">Éditeur Tri</string>
+    <string name="create_new">Créer un nouveau</string>
+    <string name="my_draft">Mon brouillon</string>
+    <string name="edit">Modifier</string>
+    <string name="ai_remove">Supprimer l\'IA</string>
+    <string name="templates">Modèles</string>
+    <string name="select_upto_10_photos">Sélectionnez jusqu\'à 10 photos</string>
+    <string name="select_photos">Sélectionner des photos</string>
+    <string name="next">Suivant</string>
+    <string name="all">Tous</string>
+    <string name="camera">Caméra</string>
+    <string name="download">Télécharger</string>
+    <string name="save">Sauvegarder</string>
+    <string name="saved">Sauvé !</string>
+    <string name="photo_filter">Filtre photo</string>
+    <string name="try_new_template">Essayer un nouveau modèle</string>
+    <string name="layout">Mise en page</string>
+    <string name="ratio">Rapport</string>
+    <string name="background">Arrière-plan</string>
+    <string name="setting">Paramètre</string>
+    <string name="change_language">Changer de langue</string>
+    <string name="rate_app">Évaluer l\'application</string>
+    <string name="share_app">Partager l\'application</string>
+    <string name="feedback">Retour</string>
+    <string name="privacy_policy">Politique de confidentialité</string>
+    <string name="gmail_not_install">Gmail ne s\'installe pas</string>
+    <string name="choose_language">Choisissez la langue</string>
+    <string name="select">Sélectionner</string>
+    <string name="cancel">Annuler</string>
+    <string name="no_drafts_yet">Pas encore de brouillons</string>
+    <string name="let_s_create_your_first_one">Créons votre premier !</string>
+    <string name="please_wait_loading">Veuillez patienter, chargement en cours...</string>
+    <string name="this_action_may_contain_advertisement">(Cette action peut contenir de la publicité)</string>
+    <string name="pictures">Photos</string>
+    <string name="recent">Récent</string>
+    <string name="no_recent">Aucune récente</string>
+
+</resources>

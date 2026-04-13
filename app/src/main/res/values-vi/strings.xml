@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Photo Editor</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Xin chào đoạn văn bản trống</string>
+    <string name="text_tag_line">Mang lại niềm vui trong từng bức ảnh.</string>
+    <string name="text_edit">Biên tập</string>
+    <string name="text_camera">Máy ảnh</string>
+    <string name="camera_rationale">Ứng dụng này cần quyền truy cập vào camera của bạn để bạn có thể chụp ảnh.</string>
+    <string name="todo">CẦN LÀM</string>
+    <string name="ad_attribution" translatable="false">Quảng cáo</string>
+    <string-array name="text_options">
+        <item>Mùa vụ</item>
+        <item>Lọc</item>
+        <item>Tác dụng</item>
+        <item>Điều chỉnh</item>
+        <item>HSL</item>
+        <item>Lớp</item>
+    </string-array>
+
+    <string-array name="filters">
+        <item>Màu1</item>
+        <item>Màu2</item>
+        <item>Cặp đôi</item>
+        <item>Hồng</item>
+        <item>Tươi</item>
+        <item>Euro</item>
+        <item>Tối tăm</item>
+        <item>Bảo hiểm</item>
+        <item>Thanh lịch</item>
+        <item>Vàng</item>
+        <item>Màu nhuộm</item>
+        <item>Phim ảnh</item>
+        <item>Lomo</item>
+        <item>Bộ phim</item>
+        <item>Cổ điển</item>
+        <item>Đen trắng</item>
+    </string-array>
+
+    <string-array name="effect_light">
+        <item>Ánh sáng1</item>
+        <item>Ánh sáng2</item>
+        <item>Lễ hội</item>
+        <item>Yêu</item>
+        <item>Lăng kính</item>
+        <item>Đèn neon</item>
+    </string-array>
+
+    <string-array name="effect_texture">
+        <item>Bụi</item>
+        <item>Vết bẩn</item>
+        <item>Cổ điển</item>
+        <item>Cào</item>
+    </string-array>
+
+    <string-array name="effect_weather">
+        <item>tuyết</item>
+        <item>Đám mây</item>
+        <item>Sương mù</item>
+        <item>Ánh sáng mặt trời</item>
+    </string-array>
+
+    <string name="waring_out_of_memory">Không đủ bộ nhớ. Vui lòng xóa hình ảnh, nếu không chương trình của bạn sẽ bị lỗi!!!</string>
+    <string name="txt_share">Let your true colors shine though Photo editor &amp; collage maker.
+\n\nDownload Now: https://bit.ly/3g3WUau</string>
+
+    <!--TODO : Replace  Admob App ID here -->
+    <string name="Admob_AppID">ca-app-pub-3940256099942544~3347511713</string>
+
+    <!--TODO : Replace  Admob UNIT ID here -->
+    <string name="Admob_adUnitId">ca-app-pub-3940256099942544/1033173712</string>
+
+    <!--TODO : Replace  Facebook Ad ID here -->
+    <string name="fb_adid">IMG_16_9_APP_INSTALL#YOUR_PLACEMENT_ID</string>
+
+    <string name="background_image">Hình nền</string>
+    <string name="light_effect">Hiệu ứng ánh sáng</string>
+    <string name="resize">Thay đổi kích thước</string>
+    <string name="rotate">Quay</string>
+    <string name="_90">- 90°</string>
+    <string name="crop">Mùa vụ</string>
+    <string name="vertical">Thẳng đứng</string>
+    <string name="horizontal">Nằm ngang</string>
+    <string name="plus_90">+ 90°</string>
+    <string name="close">Đóng</string>
+    <string name="done">Xong</string>
+    <string name="blend">Trộn</string>
+    <string name="effect">Tác dụng</string>
+    <string name="light">Ánh sáng</string>
+    <string name="texture">Kết cấu</string>
+    <string name="weather">Thời tiết</string>
+    <string name="gallery">Phòng trưng bày</string>
+    <string name="hue">SẮC THÁI</string>
+    <string name="saturation">BÃO HÒA</string>
+    <string name="brightness">ĐỘ SÁNG</string>
+    <string name="icon">Biểu tượng</string>
+    <string name="text">Chữ</string>
+    <string name="sticker">Nhãn dán</string>
+    <string name="border">Ranh giới</string>
+    <string name="black_icon">Biểu tượng đen</string>
+    <string name="border_blur">Làm mờ viền</string>
+    <string name="done_save">Xong | Lưu</string>
+    <string name="reset">Cài lại</string>
+    <string name="tri_editor">Trình biên tập ba chiều</string>
+    <string name="create_new">Tạo mới</string>
+    <string name="my_draft">Bản nháp của tôi</string>
+    <string name="edit">Biên tập</string>
+    <string name="ai_remove">AI Loại bỏ</string>
+    <string name="templates">Mẫu</string>
+    <string name="select_upto_10_photos">Chọn tối đa 10 ảnh</string>
+    <string name="select_photos">Chọn ảnh</string>
+    <string name="next">Kế tiếp</string>
+    <string name="all">Tất cả</string>
+    <string name="camera">Máy ảnh</string>
+    <string name="download">Tải xuống</string>
+    <string name="save">Cứu</string>
+    <string name="saved">Đã lưu!</string>
+    <string name="photo_filter">Bộ lọc ảnh</string>
+    <string name="try_new_template">Thử mẫu mới</string>
+    <string name="layout">Cách trình bày</string>
+    <string name="ratio">Tỷ lệ</string>
+    <string name="background">Lý lịch</string>
+    <string name="setting">Cài đặt</string>
+    <string name="change_language">Thay đổi ngôn ngữ</string>
+    <string name="rate_app">Đánh giá ứng dụng</string>
+    <string name="share_app">Chia sẻ ứng dụng</string>
+    <string name="feedback">Nhận xét</string>
+    <string name="privacy_policy">Chính sách bảo mật</string>
+    <string name="gmail_not_install">Gmail không được cài đặt</string>
+    <string name="choose_language">Chọn ngôn ngữ</string>
+    <string name="select">Lựa chọn</string>
+    <string name="cancel">Hủy bỏ</string>
+    <string name="no_drafts_yet">Chưa có bản nháp nào</string>
+    <string name="let_s_create_your_first_one">Hãy cùng tạo ra sản phẩm đầu tiên của bạn nào!</string>
+    <string name="please_wait_loading">Vui lòng chờ, Đang tải...</string>
+    <string name="this_action_may_contain_advertisement">(Hành động này có thể chứa quảng cáo)</string>
+    <string name="pictures">Hình ảnh</string>
+    <string name="recent">Gần đây</string>
+    <string name="no_recent">Không có thông tin gần đây</string>
+
+</resources>

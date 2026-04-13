@@ -23,6 +23,7 @@
                 android:src="@drawable/ic_back_new"
                 android:padding="@dimen/dimen_8dp"
                 android:layout_centerVertical="true"
+                android:visibility="gone"
                 />
 
             <androidx.appcompat.widget.AppCompatTextView

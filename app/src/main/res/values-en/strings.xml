@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Photo Editor</string>
     <!-- TODO: Remove or change this placeholder text -->
@@ -61,7 +62,7 @@
 
     <string name="waring_out_of_memory">Not enough memory. Please remove images or your program will be crashed.!!!</string>
     <string name="txt_share">Let your true colors shine though Photo editor &amp; collage maker.
-        \n\nDownload Now: https://bit.ly/3g3WUau</string>
+\n\nDownload Now: https://bit.ly/3g3WUau</string>
 
     <!--TODO : Replace  Admob App ID here -->
     <string name="Admob_AppID">ca-app-pub-3940256099942544~3347511713</string>
@@ -136,6 +137,5 @@
     <string name="pictures">Pictures</string>
     <string name="recent">Recent</string>
     <string name="no_recent">No recent</string>
-    <string name="see_all">See All</string>
 
 </resources>

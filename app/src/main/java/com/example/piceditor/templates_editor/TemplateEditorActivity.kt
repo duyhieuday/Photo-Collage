@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.LinearLayout
@@ -18,26 +19,23 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.lifecycleScope
 import com.example.piceditor.R
+import com.example.piceditor.base.BaseActivityNew
+import com.example.piceditor.base.BaseFragment
+import com.example.piceditor.databinding.ActivityCollageBinding
+import com.example.piceditor.databinding.ActivityTemplateEditorBinding
 import com.example.piceditor.utils.BarsUtils
+import com.example.piceditor.utilsApp.Constant
+import com.example.piceditor.utilsApp.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.min
 
-class TemplateEditorActivity : AppCompatActivity() {
+class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>() {
 
     companion object {
         const val EXTRA_TEMPLATE_ID = "extra_template_id"
     }
-
-    // ── Views ──────────────────────────────────────────────
-    private lateinit var editorView: TemplateEditorView
-    private lateinit var btnBack: ImageButton
-    private lateinit var btnExport: Button
-    private lateinit var btnChangePhoto: LinearLayout
-    private lateinit var btnReset: LinearLayout
-    private lateinit var tvTemplateName: TextView
-
     // ── State ──────────────────────────────────────────────
     private var selectedCell: PhotoCell? = null
     private lateinit var templateData: TemplateData
@@ -52,6 +50,13 @@ class TemplateEditorActivity : AppCompatActivity() {
             loadImageFromUri(uri)
         }
 
+    override fun getLayoutRes(): Int = R.layout.activity_template_editor
+    override fun getFrame(): Int = 0
+    override fun getDataFromIntent() {}
+    override fun doAfterOnCreate() {}
+    override fun setListener() {}
+    override fun initFragment(): BaseFragment<*>? = null
+
     // ──────────────────────────────────────────────────────
     // Lifecycle
     // ──────────────────────────────────────────────────────
@@ -60,19 +65,9 @@ class TemplateEditorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         // ✅ Dùng layout XML thay vì setContentView(editorView)
-        setContentView(R.layout.activity_template_editor)
-
         BarsUtils.setHideNavigation(this)
         BarsUtils.setStatusBarColor(this, "#01000000".toColorInt())
         BarsUtils.setAppearanceLightStatusBars(this, true)
-
-        // Bind views
-        editorView      = findViewById(R.id.templateEditorView)
-        btnBack         = findViewById(R.id.btnBack)
-        btnExport       = findViewById(R.id.btnExport)
-        btnChangePhoto  = findViewById(R.id.btnChangePhoto)
-        btnReset        = findViewById(R.id.btnReset)
-        tvTemplateName  = findViewById(R.id.tvTemplateName)
 
         // Lấy template từ intent
         val templateId = intent.getStringExtra(EXTRA_TEMPLATE_ID)
@@ -80,15 +75,13 @@ class TemplateEditorActivity : AppCompatActivity() {
         templateData = TemplateRepository.findById(templateId)
             ?: TemplateRepository.all.first()
 
-        tvTemplateName.text = templateData.name
-
         setupListeners()
         loadTemplate()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        editorView.cells.forEach { cell ->
+            binding.templateEditorView.cells.forEach { cell ->
             cell.bitmap?.takeIf { !it.isRecycled }?.recycle()
         }
     }
@@ -99,14 +92,14 @@ class TemplateEditorActivity : AppCompatActivity() {
 
     private fun setupListeners() {
         // Back
-        btnBack.setOnClickListener { finish() }
+        binding.btnBack.setOnClickListener { finish() }
 
         // Export
-        btnExport.setOnClickListener { onExportClick() }
+            binding.btnExport.setOnClickListener { onExportClick() }
 
         // Thay ảnh (tap nút bottom bar)
-        btnChangePhoto.setOnClickListener {
-            val cell = editorView.activeCell ?: run {
+        binding.btnChangePhoto.setOnClickListener {
+            val cell = binding.templateEditorView.activeCell ?: run {
                 Toast.makeText(this, "Hãy tap vào ô ảnh trước", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -115,18 +108,18 @@ class TemplateEditorActivity : AppCompatActivity() {
         }
 
         // Reset vị trí ảnh của cell đang active
-        btnReset.setOnClickListener {
-            val cell = editorView.activeCell ?: run {
+        binding.btnReset.setOnClickListener {
+            val cell = binding.templateEditorView.activeCell ?: run {
                 Toast.makeText(this, "Hãy tap vào ô ảnh trước", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             cell.bitmap?.let {
-                editorView.setImageToCell(cell, it) // reset về fit-center-crop mặc định
+                binding.templateEditorView.setImageToCell(cell, it) // reset về fit-center-crop mặc định
             }
         }
 
         // Tap cell → mở gallery nếu cell chưa có ảnh
-        editorView.setOnCellClickListener { cell ->
+        binding.templateEditorView.setOnCellClickListener { cell ->
             selectedCell = cell
             openGallery()
         }
@@ -150,15 +143,15 @@ class TemplateEditorActivity : AppCompatActivity() {
                 raw.recycle()
 
                 val mask = if (templateData.maskMode == MaskMode.BLACK) {
-                    editorView.createMaskFromBlack(scaled)
+                    binding.templateEditorView.createMaskFromBlack(scaled)
                 } else {
-                    editorView.createMaskFromWhite(scaled)
+                    binding.templateEditorView.createMaskFromWhite(scaled)
                 }
                 Pair(scaled, mask)
             }
 
-            editorView.templateBitmapRaw  = scaled
-            editorView.templateMaskBitmap = mask
+            binding.templateEditorView.templateBitmapRaw  = scaled
+            binding.templateEditorView.templateMaskBitmap = mask
             setupCells()
         }
     }
@@ -169,9 +162,9 @@ class TemplateEditorActivity : AppCompatActivity() {
 
     private fun setupCells() {
         // Đợi editorView được measure xong
-        editorView.post {
-            val viewW = editorView.width.toFloat()
-            val viewH = editorView.height.toFloat()
+        binding.templateEditorView.post {
+            val viewW = binding.templateEditorView.width.toFloat()
+            val viewH = binding.templateEditorView.height.toFloat()
 
             val scale = min(viewW / TEMPLATE_W, viewH / TEMPLATE_H)
             val newW = TEMPLATE_W * scale
@@ -179,7 +172,7 @@ class TemplateEditorActivity : AppCompatActivity() {
             val dx = (viewW - newW) / 2f
             val dy = (viewH - newH) / 2f
 
-            editorView.cells = templateData.cellRects.map { rect ->
+            binding.templateEditorView.cells = templateData.cellRects.map { rect ->
                 PhotoCell(
                     RectF(
                         rect.left   * scale + dx,
@@ -190,7 +183,7 @@ class TemplateEditorActivity : AppCompatActivity() {
                 )
             }.toMutableList()
 
-            editorView.invalidate()
+            binding.templateEditorView.invalidate()
         }
     }
 
@@ -221,7 +214,7 @@ class TemplateEditorActivity : AppCompatActivity() {
                 return@launch
             }
 
-            selectedCell?.let { editorView.setImageToCell(it, bitmap) }
+            selectedCell?.let { binding.templateEditorView.setImageToCell(it, bitmap) }
                 ?: Toast.makeText(this@TemplateEditorActivity, "Chưa chọn ô ảnh", Toast.LENGTH_SHORT).show()
         }
     }
@@ -233,7 +226,7 @@ class TemplateEditorActivity : AppCompatActivity() {
     private fun onExportClick() {
         lifecycleScope.launch {
             val saved = withContext(Dispatchers.IO) {
-                runCatching { saveToGallery(editorView.export()) }.isSuccess
+                runCatching { saveToGallery(binding.templateEditorView.export()) }.isSuccess
             }
             Toast.makeText(
                 this@TemplateEditorActivity,

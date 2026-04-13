@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Photo Editor</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">हैलो खाली अंश</string>
+    <string name="text_tag_line">हर तस्वीर में खुशी लाना</string>
+    <string name="text_edit">संपादन करना</string>
+    <string name="text_camera">कैमरा</string>
+    <string name="camera_rationale">इस ऐप को तस्वीरें लेने के लिए आपके कैमरे तक पहुंच की आवश्यकता है।</string>
+    <string name="todo">करने के लिए</string>
+    <string name="ad_attribution" translatable="false">विज्ञापन</string>
+    <string-array name="text_options">
+        <item>काटना</item>
+        <item>फ़िल्टर</item>
+        <item>प्रभाव</item>
+        <item>समायोजित करना</item>
+        <item>एचएसएल</item>
+        <item>परत</item>
+    </string-array>
+
+    <string-array name="filters">
+        <item>रंग1</item>
+        <item>रंग 2</item>
+        <item>जोड़ी</item>
+        <item>गुलाबी</item>
+        <item>ताजा</item>
+        <item>यूरो</item>
+        <item>अँधेरा</item>
+        <item>इन की</item>
+        <item>सुरुचिपूर्ण</item>
+        <item>सुनहरा</item>
+        <item>टिंट</item>
+        <item>पतली परत</item>
+        <item>लोमो</item>
+        <item>चलचित्र</item>
+        <item>रेट्रो</item>
+        <item>बीडब्ल्यू</item>
+    </string-array>
+
+    <string-array name="effect_light">
+        <item>लाइट1</item>
+        <item>लाइट2</item>
+        <item>त्योहार</item>
+        <item>प्यार</item>
+        <item>चश्मे</item>
+        <item>नियोन</item>
+    </string-array>
+
+    <string-array name="effect_texture">
+        <item>धूल</item>
+        <item>दाग</item>
+        <item>बढ़िया शराब</item>
+        <item>खरोंचना</item>
+    </string-array>
+
+    <string-array name="effect_weather">
+        <item>बर्फ</item>
+        <item>बादल</item>
+        <item>कोहरा</item>
+        <item>सूर्य का प्रकाश</item>
+    </string-array>
+
+    <string name="waring_out_of_memory">पर्याप्त मेमोरी नहीं है। कृपया चित्र हटा दें अन्यथा आपका प्रोग्राम क्रैश हो जाएगा!!!</string>
+    <string name="txt_share">Let your true colors shine though Photo editor &amp; collage maker.
+\n\nDownload Now: https://bit.ly/3g3WUau</string>
+
+    <!--TODO : Replace  Admob App ID here -->
+    <string name="Admob_AppID">सीए-ऐप-पब-3940256099942544~3347511713</string>
+
+    <!--TODO : Replace  Admob UNIT ID here -->
+    <string name="Admob_adUnitId">सीए-ऐप-पब-3940256099942544/1033173712</string>
+
+    <!--TODO : Replace  Facebook Ad ID here -->
+    <string name="fb_adid">IMG_16_9_APP_INSTALL#YOUR_PLACEMENT_ID</string>
+
+    <string name="background_image">पृष्ठभूमि छवि</string>
+    <string name="light_effect">प्रकाश प्रभाव</string>
+    <string name="resize">आकार</string>
+    <string name="rotate">घुमाएँ</string>
+    <string name="_90">- 90°</string>
+    <string name="crop">काटना</string>
+    <string name="vertical">खड़ा</string>
+    <string name="horizontal">क्षैतिज</string>
+    <string name="plus_90">+ 90°</string>
+    <string name="close">बंद करना</string>
+    <string name="done">हो गया</string>
+    <string name="blend">मिलाना</string>
+    <string name="effect">प्रभाव</string>
+    <string name="light">रोशनी</string>
+    <string name="texture">बनावट</string>
+    <string name="weather">मौसम</string>
+    <string name="gallery">गैलरी</string>
+    <string name="hue">रंग</string>
+    <string name="saturation">संतृप्ति</string>
+    <string name="brightness">चमक</string>
+    <string name="icon">आइकन</string>
+    <string name="text">मूलपाठ</string>
+    <string name="sticker">कँटिया</string>
+    <string name="border">सीमा</string>
+    <string name="black_icon">काला आइकन</string>
+    <string name="border_blur">बॉर्डर ब्लर</string>
+    <string name="done_save">हो गया | सहेजें</string>
+    <string name="reset">रीसेट करें</string>
+    <string name="tri_editor">त्रि संपादक</string>
+    <string name="create_new">नया निर्माण</string>
+    <string name="my_draft">मेरा मसौदा</string>
+    <string name="edit">संपादन करना</string>
+    <string name="ai_remove">एआई हटाएं</string>
+    <string name="templates">टेम्पलेट्स</string>
+    <string name="select_upto_10_photos">अधिकतम 10 फ़ोटो चुनें</string>
+    <string name="select_photos">फ़ोटो चुनें</string>
+    <string name="next">अगला</string>
+    <string name="all">सभी</string>
+    <string name="camera">कैमरा</string>
+    <string name="download">डाउनलोड करना</string>
+    <string name="save">बचाना</string>
+    <string name="saved">बचा लिया गया!</string>
+    <string name="photo_filter">फोटो फ़िल्टर</string>
+    <string name="try_new_template">नया टेम्पलेट आज़माएँ</string>
+    <string name="layout">लेआउट</string>
+    <string name="ratio">अनुपात</string>
+    <string name="background">पृष्ठभूमि</string>
+    <string name="setting">सेटिंग</string>
+    <string name="change_language">भाषा बदलें</string>
+    <string name="rate_app">एप्प का मूल्यांकन</string>
+    <string name="share_app">शेयर ऐप</string>
+    <string name="feedback">प्रतिक्रिया</string>
+    <string name="privacy_policy">गोपनीयता नीति</string>
+    <string name="gmail_not_install">जीमेल इंस्टॉल नहीं हो रहा है</string>
+    <string name="choose_language">भाषा चुनें</string>
+    <string name="select">चुनना</string>
+    <string name="cancel">रद्द करना</string>
+    <string name="no_drafts_yet">अभी तक कोई ड्राफ्ट नहीं है</string>
+    <string name="let_s_create_your_first_one">चलिए, आपका पहला बनाते हैं!</string>
+    <string name="please_wait_loading">कृपया प्रतीक्षा करें, लोडिंग जारी है...</string>
+    <string name="this_action_may_contain_advertisement">(इस गतिविधि में विज्ञापन शामिल हो सकता है)</string>
+    <string name="pictures">चित्र</string>
+    <string name="recent">हाल ही का</string>
+    <string name="no_recent">हाल ही में कोई नहीं</string>
+
+</resources>

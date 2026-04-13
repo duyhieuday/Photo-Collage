@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Photo Editor</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Olá, fragmento em branco</string>
+    <string name="text_tag_line">Trazendo alegria a cada foto.</string>
+    <string name="text_edit">Editar</string>
+    <string name="text_camera">Câmera</string>
+    <string name="camera_rationale">Este aplicativo precisa de acesso à sua câmera para que você possa tirar fotos.</string>
+    <string name="todo">PENDÊNCIA</string>
+    <string name="ad_attribution" translatable="false">Anúncio</string>
+    <string-array name="text_options">
+        <item>Cortar</item>
+        <item>Filtro</item>
+        <item>Efeito</item>
+        <item>Ajustar</item>
+        <item>HSL</item>
+        <item>Camada</item>
+    </string-array>
+
+    <string-array name="filters">
+        <item>Cor1</item>
+        <item>Cor2</item>
+        <item>Duo</item>
+        <item>Rosa</item>
+        <item>Fresco</item>
+        <item>Euro</item>
+        <item>Escuro</item>
+        <item>Ins</item>
+        <item>Elegante</item>
+        <item>Dourado</item>
+        <item>Matiz</item>
+        <item>Filme</item>
+        <item>Lomo</item>
+        <item>Filme</item>
+        <item>Retrô</item>
+        <item>P&amp;B</item>
+    </string-array>
+
+    <string-array name="effect_light">
+        <item>Luz1</item>
+        <item>Luz2</item>
+        <item>Festival</item>
+        <item>Amor</item>
+        <item>Prisma</item>
+        <item>Néon</item>
+    </string-array>
+
+    <string-array name="effect_texture">
+        <item>Pó</item>
+        <item>Manchas</item>
+        <item>Vintage</item>
+        <item>Arranhar</item>
+    </string-array>
+
+    <string-array name="effect_weather">
+        <item>neve</item>
+        <item>Nuvem</item>
+        <item>Névoa</item>
+        <item>Luz solar</item>
+    </string-array>
+
+    <string name="waring_out_of_memory">Memória insuficiente. Remova as imagens ou seu programa irá travar.</string>
+    <string name="txt_share">Let your true colors shine though Photo editor &amp; collage maker.
+\n\nDownload Now: https://bit.ly/3g3WUau</string>
+
+    <!--TODO : Replace  Admob App ID here -->
+    <string name="Admob_AppID">ca-app-pub-3940256099942544~3347511713</string>
+
+    <!--TODO : Replace  Admob UNIT ID here -->
+    <string name="Admob_adUnitId">ca-app-pub-3940256099942544/1033173712</string>
+
+    <!--TODO : Replace  Facebook Ad ID here -->
+    <string name="fb_adid">IMG_16_9_APP_INSTALL#YOUR_PLACEMENT_ID</string>
+
+    <string name="background_image">Imagem de fundo</string>
+    <string name="light_effect">Efeito de luz</string>
+    <string name="resize">Redimensionar</string>
+    <string name="rotate">Girar</string>
+    <string name="_90">- 90°</string>
+    <string name="crop">Cortar</string>
+    <string name="vertical">Vertical</string>
+    <string name="horizontal">Horizontal</string>
+    <string name="plus_90">+ 90°</string>
+    <string name="close">Fechar</string>
+    <string name="done">Feito</string>
+    <string name="blend">Mistura</string>
+    <string name="effect">Efeito</string>
+    <string name="light">Luz</string>
+    <string name="texture">Textura</string>
+    <string name="weather">Clima</string>
+    <string name="gallery">Galeria</string>
+    <string name="hue">MATIZ</string>
+    <string name="saturation">SATURAÇÃO</string>
+    <string name="brightness">BRILHO</string>
+    <string name="icon">Ícone</string>
+    <string name="text">Texto</string>
+    <string name="sticker">Adesivo</string>
+    <string name="border">Fronteira</string>
+    <string name="black_icon">Ícone preto</string>
+    <string name="border_blur">Desfoque de borda</string>
+    <string name="done_save">Concluído | Salvar</string>
+    <string name="reset">Reiniciar</string>
+    <string name="tri_editor">Tri Editor</string>
+    <string name="create_new">Criar novo</string>
+    <string name="my_draft">Meu rascunho</string>
+    <string name="edit">Editar</string>
+    <string name="ai_remove">IA Remover</string>
+    <string name="templates">Modelos</string>
+    <string name="select_upto_10_photos">Selecione até 10 fotos.</string>
+    <string name="select_photos">Selecione as fotos</string>
+    <string name="next">Próximo</string>
+    <string name="all">Todos</string>
+    <string name="camera">Câmera</string>
+    <string name="download">Download</string>
+    <string name="save">Salvar</string>
+    <string name="saved">Salvo!</string>
+    <string name="photo_filter">Filtro de foto</string>
+    <string name="try_new_template">Experimente um novo modelo</string>
+    <string name="layout">Layout</string>
+    <string name="ratio">Razão</string>
+    <string name="background">Fundo</string>
+    <string name="setting">Contexto</string>
+    <string name="change_language">Alterar idioma</string>
+    <string name="rate_app">Avalie o aplicativo</string>
+    <string name="share_app">Compartilhar aplicativo</string>
+    <string name="feedback">Opinião</string>
+    <string name="privacy_policy">Política de Privacidade</string>
+    <string name="gmail_not_install">O Gmail não instala.</string>
+    <string name="choose_language">Selecione o idioma</string>
+    <string name="select">Selecione</string>
+    <string name="cancel">Cancelar</string>
+    <string name="no_drafts_yet">Ainda não há rascunhos.</string>
+    <string name="let_s_create_your_first_one">Vamos criar o seu primeiro!</string>
+    <string name="please_wait_loading">Aguarde, carregando...</string>
+    <string name="this_action_may_contain_advertisement">(Esta ação pode conter publicidade)</string>
+    <string name="pictures">Fotos</string>
+    <string name="recent">Recente</string>
+    <string name="no_recent">Sem novidades</string>
+
+</resources>

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Photo Editor</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">你好，空白片段</string>
+    <string name="text_tag_line">让每一张照片都充满乐趣</string>
+    <string name="text_edit">编辑</string>
+    <string name="text_camera">相机</string>
+    <string name="camera_rationale">此应用需要访问您的相机才能拍照。</string>
+    <string name="todo">待办事项</string>
+    <string name="ad_attribution" translatable="false">广告</string>
+    <string-array name="text_options">
+        <item>庄稼</item>
+        <item>筛选</item>
+        <item>影响</item>
+        <item>调整</item>
+        <item>高速铁路</item>
+        <item>层</item>
+    </string-array>
+
+    <string-array name="filters">
+        <item>颜色1</item>
+        <item>颜色2</item>
+        <item>二人组</item>
+        <item>粉色的</item>
+        <item>新鲜的</item>
+        <item>欧元</item>
+        <item>黑暗的</item>
+        <item>保险</item>
+        <item>优雅的</item>
+        <item>金的</item>
+        <item>着色</item>
+        <item>电影</item>
+        <item>洛莫</item>
+        <item>电影</item>
+        <item>复古的</item>
+        <item>黑白</item>
+    </string-array>
+
+    <string-array name="effect_light">
+        <item>光1</item>
+        <item>光2</item>
+        <item>节日</item>
+        <item>爱</item>
+        <item>棱镜</item>
+        <item>氖</item>
+    </string-array>
+
+    <string-array name="effect_texture">
+        <item>灰尘</item>
+        <item>污渍</item>
+        <item>优质的</item>
+        <item>划痕</item>
+    </string-array>
+
+    <string-array name="effect_weather">
+        <item>雪</item>
+        <item>云</item>
+        <item>多雾路段</item>
+        <item>阳光</item>
+    </string-array>
+
+    <string name="waring_out_of_memory">内存不足。请移除图片，否则程序将崩溃！</string>
+    <string name="txt_share">Let your true colors shine though Photo editor &amp; collage maker.
+\n\nDownload Now: https://bit.ly/3g3WUau</string>
+
+    <!--TODO : Replace  Admob App ID here -->
+    <string name="Admob_AppID">ca-app-pub-3940256099942544~3347511713</string>
+
+    <!--TODO : Replace  Admob UNIT ID here -->
+    <string name="Admob_adUnitId">ca-app-pub-3940256099942544/1033173712</string>
+
+    <!--TODO : Replace  Facebook Ad ID here -->
+    <string name="fb_adid">IMG_16_9_APP_INSTALL#您的位置ID</string>
+
+    <string name="background_image">背景图片</string>
+    <string name="light_effect">灯光效果</string>
+    <string name="resize">调整大小</string>
+    <string name="rotate">旋转</string>
+    <string name="_90">-90°</string>
+    <string name="crop">庄稼</string>
+    <string name="vertical">垂直的</string>
+    <string name="horizontal">水平的</string>
+    <string name="plus_90">+90°</string>
+    <string name="close">关闭</string>
+    <string name="done">完毕</string>
+    <string name="blend">混合</string>
+    <string name="effect">影响</string>
+    <string name="light">光</string>
+    <string name="texture">质地</string>
+    <string name="weather">天气</string>
+    <string name="gallery">画廊</string>
+    <string name="hue">色调</string>
+    <string name="saturation">饱和</string>
+    <string name="brightness">亮度</string>
+    <string name="icon">图标</string>
+    <string name="text">文本</string>
+    <string name="sticker">贴纸</string>
+    <string name="border">边界</string>
+    <string name="black_icon">黑色图标</string>
+    <string name="border_blur">边界模糊</string>
+    <string name="done_save">完成|保存</string>
+    <string name="reset">重置</string>
+    <string name="tri_editor">三编辑</string>
+    <string name="create_new">创建新</string>
+    <string name="my_draft">我的草稿</string>
+    <string name="edit">编辑</string>
+    <string name="ai_remove">AI移除</string>
+    <string name="templates">模板</string>
+    <string name="select_upto_10_photos">最多选择 10 张照片</string>
+    <string name="select_photos">选择照片</string>
+    <string name="next">下一个</string>
+    <string name="all">全部</string>
+    <string name="camera">相机</string>
+    <string name="download">下载</string>
+    <string name="save">节省</string>
+    <string name="saved">已保存！</string>
+    <string name="photo_filter">照片滤镜</string>
+    <string name="try_new_template">尝试新模板</string>
+    <string name="layout">布局</string>
+    <string name="ratio">比率</string>
+    <string name="background">背景</string>
+    <string name="setting">环境</string>
+    <string name="change_language">更改语言</string>
+    <string name="rate_app">评价应用</string>
+    <string name="share_app">分享应用</string>
+    <string name="feedback">反馈</string>
+    <string name="privacy_policy">隐私政策</string>
+    <string name="gmail_not_install">Gmail 未安装</string>
+    <string name="choose_language">选择语言</string>
+    <string name="select">选择</string>
+    <string name="cancel">取消</string>
+    <string name="no_drafts_yet">暂无草稿</string>
+    <string name="let_s_create_your_first_one">让我们一起创建你的第一个吧！</string>
+    <string name="please_wait_loading">请稍候，正在加载……</string>
+    <string name="this_action_may_contain_advertisement">（此操作可能包含广告）</string>
+    <string name="pictures">图片</string>
+    <string name="recent">最近的</string>
+    <string name="no_recent">近期无</string>
+
+</resources>
