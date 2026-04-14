@@ -137,5 +137,6 @@
     <string name="pictures">Hình ảnh</string>
     <string name="recent">Gần đây</string>
     <string name="no_recent">Không có thông tin gần đây</string>
+    <string name="see_all">Xem tất cả</string>
 
 </resources>

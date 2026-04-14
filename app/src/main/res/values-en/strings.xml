@@ -137,5 +137,6 @@
     <string name="pictures">Pictures</string>
     <string name="recent">Recent</string>
     <string name="no_recent">No recent</string>
+    <string name="see_all">See All</string>
 
 </resources>

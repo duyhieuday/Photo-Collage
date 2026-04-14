@@ -30,6 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.min
+import androidx.core.graphics.scale
 
 class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>() {
 
@@ -139,7 +140,7 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>() 
                 val newW = (TEMPLATE_W * scale).toInt()
                 val newH = (TEMPLATE_H * scale).toInt()
 
-                val scaled = Bitmap.createScaledBitmap(raw, newW, newH, true)
+                val scaled = raw.scale(newW, newH)
                 raw.recycle()
 
                 val mask = if (templateData.maskMode == MaskMode.BLACK) {
@@ -242,7 +243,7 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>() 
             val values = ContentValues().apply {
                 put(MediaStore.Images.Media.DISPLAY_NAME, filename)
                 put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/PicEditor")
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/PhotoCollage")
                 put(MediaStore.Images.Media.IS_PENDING, 1)
             }
             val uri = contentResolver.insert(
@@ -256,7 +257,7 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>() 
             @Suppress("DEPRECATION")
             val dir = Environment
                 .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                .resolve("PicEditor").also { it.mkdirs() }
+                .resolve("PhotoCollage").also { it.mkdirs() }
             val file = dir.resolve(filename)
             file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 95, it) }
             @Suppress("DEPRECATION")

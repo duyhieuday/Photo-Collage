@@ -137,5 +137,6 @@
     <string name="pictures">图片</string>
     <string name="recent">最近的</string>
     <string name="no_recent">近期无</string>
+    <string name="see_all">查看全部</string>
 
 </resources>

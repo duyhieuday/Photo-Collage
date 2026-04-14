@@ -174,7 +174,7 @@ class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnCl
             }
         }
 
-        Toast.makeText(this, "TikTok not installed", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "App not installed", Toast.LENGTH_SHORT).show()
     }
 
     private fun shareToApp(packageName: String) {
