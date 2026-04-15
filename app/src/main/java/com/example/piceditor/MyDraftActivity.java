@@ -3,22 +3,24 @@ package com.example.piceditor;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+import android.app.PendingIntent;
+import android.app.RecoverableSecurityException;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
 
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.IntentSenderRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.piceditor.adapters.ImageAdapter;
 import com.example.piceditor.base.BaseActivityNew;
@@ -37,6 +39,20 @@ import java.util.Locale;
 
 public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
 
+    private ImageAdapter adapter;
+    private ImageAdapter pendingAdapter;
+
+    private final ActivityResultLauncher<IntentSenderRequest> deleteRequestLauncher =
+            registerForActivityResult(
+                    new ActivityResultContracts.StartIntentSenderForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK && pendingAdapter != null) {
+                            pendingAdapter.deleteSelected();
+                            resetSelectMode();
+                        }
+                    }
+            );
+
     @Override
     public int getLayoutRes() {
         return R.layout.activity_my_draft;
@@ -48,15 +64,12 @@ public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
     }
 
     @Override
-    public void getDataFromIntent() {
-
-    }
+    public void getDataFromIntent() {}
 
     @Override
     public void doAfterOnCreate() {
-        if (PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no")
-                .equals("yes")
-        ) {
+        if (PreferenceUtil.getInstance(this)
+                .getValue(Constant.SharePrefKey.BANNER_COL, "no").equals("yes")) {
             initBanner(getBinding().banner.adViewContainer);
         } else {
             initBanner(getBinding().adViewContainer);
@@ -67,9 +80,8 @@ public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
     @Override
     protected void onResume() {
         super.onResume();
-        if (PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no")
-                .equals("yes")
-        ) {
+        if (PreferenceUtil.getInstance(this)
+                .getValue(Constant.SharePrefKey.BANNER_COL, "no").equals("yes")) {
         } else {
             initBanner(getBinding().adViewContainer);
             getBinding().banner.getRoot().setVisibility(View.GONE);
@@ -77,9 +89,7 @@ public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
     }
 
     @Override
-    public void setListener() {
-
-    }
+    public void setListener() {}
 
     @Override
     public BaseFragment initFragment() {
@@ -98,28 +108,112 @@ public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getBinding().btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
-
         List<ImageModel> images = getSavedImages(this);
 
-        if (images.isEmpty()){
+        if (images.isEmpty()) {
             getBinding().llEmptyDraft.setVisibility(VISIBLE);
             getBinding().rcvDrafts.setVisibility(GONE);
-        }else {
+        } else {
             getBinding().rcvDrafts.setVisibility(VISIBLE);
             getBinding().llEmptyDraft.setVisibility(GONE);
         }
 
-        ImageAdapter adapter = new ImageAdapter(images);
-
+        adapter = new ImageAdapter(new ArrayList<>(images));
         getBinding().rcvDrafts.setLayoutManager(new GridLayoutManager(this, 2));
         getBinding().rcvDrafts.setAdapter(adapter);
 
+        // Cập nhật số lượng trên nút Delete
+        adapter.setOnSelectionChanged(count -> {
+            if (count > 0) {
+                getBinding().layoutDelete.setVisibility(VISIBLE);
+                getBinding().tvDelete.setText("Delete(" + count + ")");
+            } else {
+                getBinding().layoutDelete.setVisibility(GONE);
+            }
+            return null;
+        });
+
+        // Nút Back
+        getBinding().btnBack.setOnClickListener(v -> finish());
+
+        // Nút Select
+        getBinding().btnNext.setOnClickListener(v -> {
+            adapter.setSelectMode(true);
+            getBinding().btnNext.setVisibility(GONE);
+            getBinding().btnCancel.setVisibility(VISIBLE);
+        });
+
+        // Nút Cancel
+        getBinding().btnCancel.setOnClickListener(v -> {
+            resetSelectMode();
+        });
+
+        // Nút Delete
+        getBinding().layoutDelete.setOnClickListener(v -> {
+            showDeleteDialog();
+        });
+    }
+
+    private void showDeleteDialog() {
+        int count = adapter.getSelectedCount();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Xóa ảnh")
+                    .setMessage("Bạn có chắc muốn xóa " + count + " ảnh?")
+                    .setPositiveButton("Xóa", (dialog, which) -> deleteSelectedImages())
+                    .setNegativeButton("Huỷ", null)
+                    .show();
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    private void deleteSelectedImages() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            List<Uri> uris = new ArrayList<>();
+            for (ImageModel item : adapter.getSelectedItems()) {
+                uris.add(item.getUri());
+            }
+            try {
+                PendingIntent pi = MediaStore.createDeleteRequest(getContentResolver(), uris);
+                pendingAdapter = adapter;
+                IntentSenderRequest request = new IntentSenderRequest.Builder(
+                        pi.getIntentSender()
+                ).build();
+                deleteRequestLauncher.launch(request);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            for (ImageModel item : adapter.getSelectedItems()) {
+                try {
+                    getContentResolver().delete(item.getUri(), null, null);
+                } catch (RecoverableSecurityException e) {
+                    pendingAdapter = adapter;
+                    try {
+                        IntentSenderRequest request = new IntentSenderRequest.Builder(
+                                e.getUserAction().getActionIntent().getIntentSender()
+                        ).build();
+                        deleteRequestLauncher.launch(request);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+            adapter.deleteSelected();
+            resetSelectMode();
+        }
+    }
+
+    private void resetSelectMode() {
+        adapter.clearSelection();
+        getBinding().btnNext.setVisibility(VISIBLE);
+        getBinding().btnCancel.setVisibility(GONE);
+        getBinding().layoutDelete.setVisibility(GONE);
+
+        if (adapter.getItemCount() == 0) {
+            getBinding().llEmptyDraft.setVisibility(VISIBLE);
+            getBinding().rcvDrafts.setVisibility(GONE);
+        }
     }
 
     public static List<ImageModel> getSavedImages(Context context) {
@@ -156,7 +250,6 @@ public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(idCol);
                 String name = cursor.getString(nameCol);
-                // fallback nếu dateTaken = 0
                 long dateTaken = cursor.getLong(dateTakenCol);
 
                 long dateAdded = 0;
@@ -165,17 +258,15 @@ public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
                 }
 
                 long finalDate;
-
                 if (dateTaken != 0) {
                     finalDate = dateTaken;
                 } else if (dateAdded > 0) {
-                    finalDate = dateAdded * 1000; // 👈 convert sang milliseconds
+                    finalDate = dateAdded * 1000;
                 } else {
-                    finalDate = System.currentTimeMillis(); // fallback an toàn
+                    finalDate = System.currentTimeMillis();
                 }
 
                 Uri uri = ContentUris.withAppendedId(collection, id);
-
                 list.add(new ImageModel(uri, name, finalDate));
             }
 
@@ -189,5 +280,4 @@ public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
         return sdf.format(new Date(time));
     }
-
 }

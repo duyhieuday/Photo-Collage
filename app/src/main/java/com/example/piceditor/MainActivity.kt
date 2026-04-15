@@ -120,6 +120,7 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
             initBanner(binding.adViewContainer)
             binding.banner.getRoot().visibility = View.GONE
         }
+        setUpRecent()
     }
 
     override fun setListener() {

@@ -137,5 +137,7 @@
     <string name="recent">Recent</string>
     <string name="no_recent">No recent</string>
     <string name="see_all">See All</string>
+    <string name="delete_drafts">Delete drafts</string>
+    <string name="drafts_will_be_lost_if_you_unistall">Drafts will be lost if you unistall</string>
 
 </resources>

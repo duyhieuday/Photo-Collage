@@ -53,7 +53,7 @@
             android:fontFamily="@font/inter_medium"
             android:padding="@dimen/dimen_8dp"
             android:layout_centerVertical="true"
-            android:visibility="gone"
+            android:visibility="visible"
             />
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -116,10 +116,38 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/layoutBar"
         android:layout_marginHorizontal="12dp"
-        android:layout_above="@+id/layoutAds"
+        android:layout_above="@+id/layoutDelete"
         android:overScrollMode="never"
         android:visibility="gone"
         />
+
+    <LinearLayout
+        android:id="@+id/layoutDelete"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_above="@+id/layoutAds"
+        android:background="#F97066"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="visible">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_trash"
+            android:layout_marginEnd="8dp"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delete(0)"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:fontFamily="@font/inter_medium"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/layoutAds"

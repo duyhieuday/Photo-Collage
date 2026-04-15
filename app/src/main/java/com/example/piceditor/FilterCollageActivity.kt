@@ -34,7 +34,8 @@ import java.io.FileOutputStream
 import java.util.*
 
 
-class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(), View.OnClickListener {
+class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(),
+    View.OnClickListener {
 
     private var mLastClickTime: Long = 0
 
@@ -62,36 +63,6 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(), V
             findViewById.draw(Canvas(createBitmap2))
             return createBitmap2
         }
-
-    private var savedImageUri: Uri? = null
-
-    private fun saveBitmap(bitmap: Bitmap) {
-        val now = Date()
-        val myDir = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Camera");
-        myDir.mkdirs()
-
-        val fname: String = (now.time / 1000).toString() + ".png"
-        val file = File(myDir, fname)
-        if (file.exists()) file.delete()
-//        file.createNewFile();
-        try {
-            val out = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 90, out)
-            out.flush()
-            out.close()
-            savedImageUri = Uri.parse(file.path)
-
-
-
-            MediaScannerConnection.scanFile(this, arrayOf(file.absolutePath), null) { path, uri ->
-                Log.i("ExternalStorage", "Scanned $path:")
-                Log.i("ExternalStorage", "-> uri=$uri")
-            }
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-        }
-    }
-
 
     companion object {
         var red: Float = 0F
@@ -191,66 +162,82 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(), V
                         filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_clr1)
                         binding.listFilterstype.adapter = filter_typeAdapter
                     }
+
                     1 -> {
                         filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_clr2)
                         binding.listFilterstype.adapter = filter_typeAdapter
                     }
+
                     2 -> {
                         filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_duo)
                         binding.listFilterstype.adapter = filter_typeAdapter
                     }
+
                     3 -> {
                         filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_pink)
                         binding.listFilterstype.adapter = filter_typeAdapter
                     }
+
                     4 -> {
                         filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_fresh)
                         binding.listFilterstype.adapter = filter_typeAdapter
                     }
+
                     5 -> {
                         filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_euro)
                         binding.listFilterstype.adapter = filter_typeAdapter
                     }
+
                     6 -> {
                         filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_dark)
                         binding.listFilterstype.adapter = filter_typeAdapter
                     }
+
                     7 -> {
                         filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_ins)
                         binding.listFilterstype.adapter = filter_typeAdapter
                     }
+
                     8 -> {
                         filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_elegant)
                         binding.listFilterstype.adapter = filter_typeAdapter
                     }
+
                     9 -> {
                         filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_golden)
                         binding.listFilterstype.adapter = filter_typeAdapter
                     }
+
                     10 -> {
                         filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_tint)
                         binding.listFilterstype.adapter = filter_typeAdapter
                     }
+
                     11 -> {
                         filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_film)
                         binding.listFilterstype.adapter = filter_typeAdapter
                     }
+
                     12 -> {
                         filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_lomo)
                         binding.listFilterstype.adapter = filter_typeAdapter
                     }
+
                     13 -> {
                         filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_movie)
                         binding.listFilterstype.adapter = filter_typeAdapter
                     }
+
                     14 -> {
                         filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_retro)
                         binding.listFilterstype.adapter = filter_typeAdapter
                     }
+
                     15 -> {
                         filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_bw)
                         binding.listFilterstype.adapter = filter_typeAdapter
                     }
+
                     else -> {
                         filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_clr1)
                         binding.listFilterstype.adapter = filter_typeAdapter
@@ -277,7 +264,7 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(), V
         val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)!!
 
         val out = resolver.openOutputStream(uri)
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 95, out!!)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out!!)
         out.close()
 
         contentValues.clear()
@@ -382,6 +369,7 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(), V
     class Async_Filter() : AsyncTask<Float, Void, Bitmap>() {
 
         lateinit var originalBitmap: Bitmap
+
         @SuppressLint("StaticFieldLeak")
         lateinit var imgMain: ImageView
 
