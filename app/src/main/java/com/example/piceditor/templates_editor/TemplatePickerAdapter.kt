@@ -15,7 +15,6 @@ class TemplatePickerAdapter(
 
     inner class VH(view: View) : RecyclerView.ViewHolder(view) {
         val thumb: ImageView = view.findViewById(R.id.imgThumb)
-        val name: TextView   = view.findViewById(R.id.tvName)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
@@ -29,8 +28,6 @@ class TemplatePickerAdapter(
 
         // ✅ Hiện thumbnail riêng (nhỏ, load nhanh)
         holder.thumb.setImageResource(t.thumbRes)
-        holder.name.text = t.name
-
         holder.itemView.setOnClickListener { onPick(t) }
     }
 

@@ -41,8 +41,6 @@ class ImageAdapter(
         holder.binding.tvSavedDate.text = formatDateTime(item.date)
 
         val isSelected = selectedPositions.contains(position)
-        holder.binding.checkbox.isVisible = isSelectMode
-        holder.binding.checkbox.isChecked = isSelected
 
         // Highlight border khi selected
         holder.binding.root.setBackgroundResource(

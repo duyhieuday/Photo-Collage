@@ -1,7 +1,15 @@
 package com.example.piceditor.templates_editor
 
 import android.content.ContentValues
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.ImageDecoder
+import android.graphics.RectF
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
@@ -9,40 +17,74 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.view.View
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.SeekBar
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import androidx.annotation.IntDef
+import androidx.core.graphics.scale
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.piceditor.R
+import com.example.piceditor.adapters.BackgroundAdapter
+import com.example.piceditor.adapters.ToolAdapter
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
-import com.example.piceditor.databinding.ActivityCollageBinding
 import com.example.piceditor.databinding.ActivityTemplateEditorBinding
+import com.example.piceditor.draw.DrawInteractListener
+import com.example.piceditor.draw.model.draw.DrawPath
+import com.example.piceditor.draw.model.draw.style.BrushStyle
+import com.example.piceditor.draw.model.draw.style.PaintStyle
+import com.example.piceditor.draw.model.sticker.StickerData
+import com.example.piceditor.draw.test.Beard
+import com.example.piceditor.draw.test.BeardAdapter
+import com.example.piceditor.model.ToolItem
 import com.example.piceditor.utils.BarsUtils
+import com.example.piceditor.utils.ImageUtils
 import com.example.piceditor.utilsApp.Constant
 import com.example.piceditor.utilsApp.PreferenceUtil
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.IOException
+import java.io.InputStreamReader
 import kotlin.math.min
-import androidx.core.graphics.scale
 
-class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>() {
+class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
+    BackgroundAdapter.OnBGClickListener,
+    DrawInteractListener {
 
     companion object {
         const val EXTRA_TEMPLATE_ID = "extra_template_id"
+        const val TYPE_GESTURE = 0
+        const val TYPE_SHAPE   = 1
+        const val TYPE_ERASER  = 2
     }
-    // ── State ──────────────────────────────────────────────
+
+    @Retention(AnnotationRetention.SOURCE)
+    @IntDef(TYPE_GESTURE, TYPE_SHAPE, TYPE_ERASER)
+    annotation class DrawType
+
+    // ── Template state ─────────────────────────────────────
     private var selectedCell: PhotoCell? = null
     private lateinit var templateData: TemplateData
-
     private val TEMPLATE_W = 1125f
     private val TEMPLATE_H = 2000f
+
+    // ── Draw / sticker state ───────────────────────────────
+    @DrawType private var drawType = TYPE_GESTURE
+    private var drawColor: Int = Color.BLACK
+    private var gestureSize: Float = 16f
+    private var eraserSize: Float  = 20f
+    private var gesturePaintStyle: PaintStyle = PaintStyle.STROKE
+
+    // ── Sticker ────────────────────────────────────────────
+    private var beardAdapter: BeardAdapter? = null
+
+    // ── Background ─────────────────────────────────────────
+    private var backgroundBitmap: Bitmap? = null
 
     // ── Gallery launcher ───────────────────────────────────
     private val pickImageLauncher =
@@ -51,12 +93,37 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>() 
             loadImageFromUri(uri)
         }
 
+    // ── BaseActivityNew overrides ──────────────────────────
     override fun getLayoutRes(): Int = R.layout.activity_template_editor
     override fun getFrame(): Int = 0
     override fun getDataFromIntent() {}
-    override fun doAfterOnCreate() {}
     override fun setListener() {}
     override fun initFragment(): BaseFragment<*>? = null
+    override fun doAfterOnCreate() {
+        if (PreferenceUtil.getInstance(this)
+                .getValue(Constant.SharePrefKey.BANNER_COL, "no").equals("yes")) {
+            initBanner(binding.banner.adViewContainer)
+        } else {
+            initBanner(binding.adViewContainer)
+            binding.banner.root.visibility = View.GONE
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!PreferenceUtil.getInstance(this)
+                .getValue(Constant.SharePrefKey.BANNER_COL, "no").equals("yes")) {
+            initBanner(binding.adViewContainer)
+            binding.banner.root.visibility = View.GONE
+        }
+    }
+
+    override fun afterSetContentView() {
+        super.afterSetContentView()
+        BarsUtils.setHideNavigation(this)
+        BarsUtils.setStatusBarColor(this, "#01000000".toColorInt())
+        BarsUtils.setAppearanceLightStatusBars(this, true)
+    }
 
     // ──────────────────────────────────────────────────────
     // Lifecycle
@@ -65,26 +132,64 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>() 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // ✅ Dùng layout XML thay vì setContentView(editorView)
-        BarsUtils.setHideNavigation(this)
-        BarsUtils.setStatusBarColor(this, "#01000000".toColorInt())
-        BarsUtils.setAppearanceLightStatusBars(this, true)
-
-        // Lấy template từ intent
         val templateId = intent.getStringExtra(EXTRA_TEMPLATE_ID)
             ?: TemplateRepository.all.first().id
         templateData = TemplateRepository.findById(templateId)
             ?: TemplateRepository.all.first()
 
+        // DrawView tắt drawing mặc định, chỉ bật khi vào tab sticker/draw
+        binding.templateEditorView.drawView?.setDrawingEnabled(false)
+
+        setupToolTabs()
         setupListeners()
         loadTemplate()
+
+        // Đăng ký undo/redo listener
+        binding.templateEditorView.drawView?.drawManager?.addDrawInteractListener(this)
+        syncUndoRedoUI()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-            binding.templateEditorView.cells.forEach { cell ->
+        binding.templateEditorView.cells.forEach { cell ->
             cell.bitmap?.takeIf { !it.isRecycled }?.recycle()
         }
+    }
+
+    // ──────────────────────────────────────────────────────
+    // Undo / Redo
+    // ──────────────────────────────────────────────────────
+
+    private fun syncUndoRedoUI() {
+        val manager = binding.templateEditorView.drawView?.drawManager ?: return
+        val canUndo = manager.isActiveUndo
+        val canRedo = manager.isActiveRedo
+
+        binding.btnUndo.isEnabled   = canUndo
+        binding.btnUndo.alpha       = if (canUndo) 1f else 0.3f
+        binding.btnUndo.colorFilter = if (canUndo) null
+        else ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+
+        binding.btnRedo.isEnabled   = canRedo
+        binding.btnRedo.alpha       = if (canRedo) 1f else 0.3f
+        binding.btnRedo.colorFilter = if (canRedo) null
+        else ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+    }
+
+    override fun interactUndoRedoChange() { syncUndoRedoUI() }
+    override fun interactStickerFocusChange(stickerData: StickerData?) {}
+    override fun interactTouchDown() {}
+    override fun interactTouchUp() {}
+    override fun interactUpdateBackground(url: String?) {}
+
+    // ──────────────────────────────────────────────────────
+    // Background callback
+    // ──────────────────────────────────────────────────────
+
+    override fun onBGClick(drawable: Drawable) {
+        val bitmap = (drawable as BitmapDrawable).bitmap
+        backgroundBitmap = bitmap
+        binding.templateEditorView.setBackgroundBitmap(bitmap)
     }
 
     // ──────────────────────────────────────────────────────
@@ -92,99 +197,239 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>() 
     // ──────────────────────────────────────────────────────
 
     private fun setupListeners() {
-        // Back
         binding.btnBack.setOnClickListener { finish() }
+        binding.btnExport.setOnClickListener { onExportClick() }
 
-        // Export
-            binding.btnExport.setOnClickListener { onExportClick() }
-
-        // Thay ảnh (tap nút bottom bar)
-        binding.btnChangePhoto.setOnClickListener {
-            val cell = binding.templateEditorView.activeCell ?: run {
-                Toast.makeText(this, "Hãy tap vào ô ảnh trước", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            selectedCell = cell
-            openGallery()
+        binding.btnUndo.setOnClickListener {
+            binding.templateEditorView.drawView?.drawManager?.undo()
+        }
+        binding.btnRedo.setOnClickListener {
+            binding.templateEditorView.drawView?.drawManager?.redo()
         }
 
-        // Reset vị trí ảnh của cell đang active
-        binding.btnReset.setOnClickListener {
-            val cell = binding.templateEditorView.activeCell ?: run {
-                Toast.makeText(this, "Hãy tap vào ô ảnh trước", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            cell.bitmap?.let {
-                binding.templateEditorView.setImageToCell(cell, it) // reset về fit-center-crop mặc định
-            }
-        }
-
-        // Tap cell → mở gallery nếu cell chưa có ảnh
+        // Tap cell trống → mở gallery
         binding.templateEditorView.setOnCellClickListener { cell ->
             selectedCell = cell
             openGallery()
         }
     }
 
-    private fun loadTemplate() {
-        lifecycleScope.launch {
-            val (scaled, mask) = withContext(Dispatchers.IO) {
-                val raw = BitmapFactory.decodeResource(resources, templateData.drawableRes)
+    private fun setupToolTabs() {
+        val tools = mutableListOf(
+            ToolItem(R.drawable.ic_replace_image, getString(R.string.replace)),
+            ToolItem(R.drawable.ic_border,       getString(R.string.border)),
+            ToolItem(R.drawable.ic_sticker,      getString(R.string.sticker)),
+            ToolItem(R.drawable.ic_background,   getString(R.string.background)),
+            ToolItem(R.drawable.ic_text,         getString(R.string.text)),
+        )
 
-                // Dùng kích thước thực của editorView sau khi layout xong
-                // Fallback về screen size nếu view chưa measure
-                val viewW = resources.displayMetrics.widthPixels.toFloat()
-                val viewH = (resources.displayMetrics.heightPixels - dipToPx(56 + 64)).toFloat()
+        val adapter = ToolAdapter(tools) { _, pos ->
+            binding.llPhoto.visibility   = View.GONE
+            binding.llBorder.visibility  = View.GONE
+            binding.llSticker.visibility = View.GONE
+            binding.llBg.visibility      = View.GONE
+            binding.llDraw.visibility    = View.GONE
+            binding.rcvTools.visibility  = View.GONE
+            binding.templateEditorView.drawView?.setDrawingEnabled(false)
 
-                val scale = min(viewW / TEMPLATE_W, viewH / TEMPLATE_H)
-                val newW = (TEMPLATE_W * scale).toInt()
-                val newH = (TEMPLATE_H * scale).toInt()
-
-                val scaled = raw.scale(newW, newH)
-                raw.recycle()
-
-                val mask = if (templateData.maskMode == MaskMode.BLACK) {
-                    binding.templateEditorView.createMaskFromBlack(scaled)
-                } else {
-                    binding.templateEditorView.createMaskFromWhite(scaled)
+            when (pos) {
+                0 -> { // Ảnh
+                    binding.llPhoto.visibility = View.VISIBLE
+                    refreshPhotoCellList()
+                    binding.icCheckPhoto.setOnClickListener {
+                        binding.llPhoto.visibility = View.GONE
+                        binding.rcvTools.visibility = View.VISIBLE
+                    }
                 }
-                Pair(scaled, mask)
+                1 -> { // Border
+                    binding.llBorder.visibility = View.VISIBLE
+                    binding.tvGrid.text   = binding.seekbarSpace.progress.toString()
+                    binding.tvCorner.text = binding.seekbarCorner.progress.toString()
+                    binding.icCheckBorder.setOnClickListener {
+                        binding.llBorder.visibility = View.GONE
+                        binding.rcvTools.visibility = View.VISIBLE
+                    }
+                    setupBorderSeekbars()
+                }
+                2 -> { // Sticker
+                    binding.llSticker.visibility = View.VISIBLE
+                    loadStickers()
+                    binding.icCheckSticker.setOnClickListener {
+                        binding.llSticker.visibility = View.GONE
+                        binding.rcvTools.visibility  = View.VISIBLE
+                        binding.templateEditorView.drawView?.setDrawingEnabled(false)
+                    }
+                    binding.templateEditorView.drawView?.setDrawingEnabled(true)
+                    syncUndoRedoUI()
+                }
+                3 -> { // Background
+                    binding.llBg.visibility = View.VISIBLE
+                    binding.listBg.layoutManager =
+                        LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+                    binding.listBg.adapter = BackgroundAdapter(this, this)
+                    binding.icCheckBackground.setOnClickListener {
+                        binding.llBg.visibility = View.GONE
+                        binding.rcvTools.visibility = View.VISIBLE
+                    }
+                }
+                4 -> { // Text / Draw
+                    binding.llDraw.visibility = View.VISIBLE
+                    binding.icBrush.setOnClickListener {
+                        binding.icBrush.setBackgroundResource(R.drawable.bg_icon_draw)
+                        binding.icErase.setBackgroundResource(0)
+                        drawType = TYPE_GESTURE
+                        updateDraw()
+                    }
+                    binding.icErase.setOnClickListener {
+                        binding.icErase.setBackgroundResource(R.drawable.bg_icon_draw)
+                        binding.icBrush.setBackgroundResource(0)
+                        drawType = TYPE_ERASER
+                        updateDraw()
+                    }
+                    binding.icCheckDraw.setOnClickListener {
+                        binding.llDraw.visibility = View.GONE
+                        binding.rcvTools.visibility = View.VISIBLE
+                        binding.templateEditorView.drawView?.setDrawingEnabled(false)
+                    }
+                    updateDraw()
+                    syncUndoRedoUI()
+                }
             }
+        }
 
-            binding.templateEditorView.templateBitmapRaw  = scaled
-            binding.templateEditorView.templateMaskBitmap = mask
-            setupCells()
+        binding.rcvTools.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.rcvTools.adapter = adapter
+    }
+
+    // ──────────────────────────────────────────────────────
+    // Border seekbars
+    // ──────────────────────────────────────────────────────
+
+    private fun setupBorderSeekbars() {
+        binding.seekbarSpace.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
+                binding.tvGrid.text = progress.toString()
+                val space = ImageUtils.pxFromDp(this@TemplateEditorActivity, progress * 0.1f)
+                binding.templateEditorView.setCellSpacing(space)
+            }
+            override fun onStartTrackingTouch(sb: SeekBar?) {}
+            override fun onStopTrackingTouch(sb: SeekBar?) {}
+        })
+
+        binding.seekbarCorner.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
+                binding.tvCorner.text = progress.toString()
+                val corner = ImageUtils.pxFromDp(this@TemplateEditorActivity, progress * 0.3f)
+                binding.templateEditorView.setCellCorner(corner)
+            }
+            override fun onStartTrackingTouch(sb: SeekBar?) {}
+            override fun onStopTrackingTouch(sb: SeekBar?) {}
+        })
+    }
+
+    // ──────────────────────────────────────────────────────
+    // Draw
+    // ──────────────────────────────────────────────────────
+
+    private fun updateDraw() {
+        gesturePaintStyle = PaintStyle.STROKE
+        val drawPath = when (drawType) {
+            TYPE_GESTURE -> DrawPath(BrushStyle.GESTURE, gesturePaintStyle, drawColor, gestureSize)
+            TYPE_ERASER  -> DrawPath(BrushStyle.GESTURE, PaintStyle.ERASE,  drawColor, eraserSize)
+            else         -> DrawPath(BrushStyle.GESTURE, gesturePaintStyle, drawColor, gestureSize)
+        }
+        binding.templateEditorView.drawView?.drawManager?.setDrawPath(drawPath)
+        binding.icBrush.isSelected = drawType == TYPE_GESTURE
+        binding.icErase.isSelected = drawType == TYPE_ERASER
+        binding.templateEditorView.drawView?.setDrawingEnabled(true)
+    }
+
+    // ──────────────────────────────────────────────────────
+    // Photo cell list
+    // ──────────────────────────────────────────────────────
+
+    private fun refreshPhotoCellList() {
+        val cells = binding.templateEditorView.cells
+        val adapter = PhotoCellAdapter(cells) { cell ->
+            // User tap vào 1 cell trong panel → chọn cell đó và mở gallery
+            selectedCell = cell
+            openGallery()
+        }
+        binding.listPhotoCell.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.listPhotoCell.adapter = adapter
+    }
+
+    // ──────────────────────────────────────────────────────
+    // Stickers
+    // ──────────────────────────────────────────────────────
+
+    private fun loadStickers() {
+        if (beardAdapter != null) return // đã load rồi
+        val gson  = Gson()
+        val type  = object : TypeToken<MutableList<Beard?>?>() {}.getType()
+        val beards: MutableList<Beard?>? = try {
+            gson.fromJson(InputStreamReader(assets.open("beard.json")), type)
+        } catch (e: IOException) { null }
+
+        binding.listSticker.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        beardAdapter = BeardAdapter()
+        beardAdapter?.setData(beards)
+        binding.listSticker.adapter = beardAdapter
+        beardAdapter?.setClickListener { _, beard ->
+            binding.templateEditorView.drawView?.drawManager
+                ?.addSticker(StickerData(beard.imageAsset))
         }
     }
 
     // ──────────────────────────────────────────────────────
-    // Cells
+    // Template loading
     // ──────────────────────────────────────────────────────
 
-    private fun setupCells() {
-        // Đợi editorView được measure xong
+    private fun loadTemplate() {
+        // Đợi view measure xong mới lấy kích thước thực
         binding.templateEditorView.post {
             val viewW = binding.templateEditorView.width.toFloat()
             val viewH = binding.templateEditorView.height.toFloat()
 
-            val scale = min(viewW / TEMPLATE_W, viewH / TEMPLATE_H)
-            val newW = TEMPLATE_W * scale
-            val newH = TEMPLATE_H * scale
-            val dx = (viewW - newW) / 2f
-            val dy = (viewH - newH) / 2f
+            lifecycleScope.launch {
+                val (scaled, mask) = withContext(Dispatchers.IO) {
+                    val raw   = BitmapFactory.decodeResource(resources, templateData.drawableRes)
+                    // ✅ Scale theo editorView thực tế, không phải screen size
+                    val scale = min(viewW / TEMPLATE_W, viewH / TEMPLATE_H)
+                    val newW  = (TEMPLATE_W * scale).toInt()
+                    val newH  = (TEMPLATE_H * scale).toInt()
+                    val scaled = raw.scale(newW, newH)
+                    raw.recycle()
+                    val mask = if (templateData.maskMode == MaskMode.BLACK)
+                        binding.templateEditorView.createMaskFromBlack(scaled)
+                    else
+                        binding.templateEditorView.createMaskFromWhite(scaled)
+                    Pair(scaled, mask)
+                }
+                binding.templateEditorView.templateBitmapRaw  = scaled
+                binding.templateEditorView.templateMaskBitmap = mask
 
-            binding.templateEditorView.cells = templateData.cellRects.map { rect ->
-                PhotoCell(
-                    RectF(
+                // ✅ Setup cell dùng cùng viewW/viewH — không cần post lại
+                val scale = min(viewW / TEMPLATE_W, viewH / TEMPLATE_H)
+                val newW  = TEMPLATE_W * scale
+                val newH  = TEMPLATE_H * scale
+                val dx    = (viewW - newW) / 2f
+                val dy    = (viewH - newH) / 2f
+
+                binding.templateEditorView.cells = templateData.cellRects.map { rect ->
+                    PhotoCell(RectF(
                         rect.left   * scale + dx,
                         rect.top    * scale + dy,
                         rect.right  * scale + dx,
                         rect.bottom * scale + dy
-                    )
-                )
-            }.toMutableList()
+                    ))
+                }.toMutableList()
 
-            binding.templateEditorView.invalidate()
+                binding.templateEditorView.invalidate()
+            }
         }
     }
 
@@ -209,12 +454,10 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>() 
                     }
                 }.getOrNull()
             }
-
             if (bitmap == null) {
                 Toast.makeText(this@TemplateEditorActivity, "Không thể tải ảnh", Toast.LENGTH_SHORT).show()
                 return@launch
             }
-
             selectedCell?.let { binding.templateEditorView.setImageToCell(it, bitmap) }
                 ?: Toast.makeText(this@TemplateEditorActivity, "Chưa chọn ô ảnh", Toast.LENGTH_SHORT).show()
         }
@@ -266,10 +509,6 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>() 
             )
         }
     }
-
-    // ──────────────────────────────────────────────────────
-    // Helpers
-    // ──────────────────────────────────────────────────────
 
     private fun dipToPx(dip: Int): Int =
         (dip * resources.displayMetrics.density).toInt()

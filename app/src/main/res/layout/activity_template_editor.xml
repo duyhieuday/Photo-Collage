@@ -1,153 +1,412 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/bg_color">
 
-    <!-- ── Toolbar top ── -->
-    <RelativeLayout
-        android:id="@+id/layoutBar"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/dimen_16dp"
-        android:layout_marginTop="44dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent"
+        android:background="@color/bg_color"
+        android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/btn_back"
-            android:layout_width="wrap_content"
+        <!-- ── Toolbar top ── -->
+        <RelativeLayout
+            android:id="@+id/layoutBar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:adjustViewBounds="true"
-            android:padding="@dimen/dimen_8dp"
-            android:src="@drawable/ic_back_new" />
+            android:layout_marginHorizontal="@dimen/dimen_16dp"
+            android:layout_marginTop="44dp">
 
+            <ImageView
+                android:id="@+id/btn_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:adjustViewBounds="true"
+                android:padding="@dimen/dimen_8dp"
+                android:src="@drawable/ic_back_new" />
+
+            <!-- Undo / Redo ở giữa toolbar -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/btnUndo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_undo" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/btnRedo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_redo" />
+
+            </LinearLayout>
+
+            <!-- Nút Save -->
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnExport"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/bg_btn_next1"
+                android:elevation="0dp"
+                android:fontFamily="@font/inter_medium"
+                android:stateListAnimator="@null"
+                android:text="@string/save"
+                android:textAllCaps="false"
+                android:textColor="#B3FF10"
+                android:textSize="14sp" />
+
+        </RelativeLayout>
+
+        <!-- ── TemplateEditorView ── -->
+        <com.example.piceditor.templates_editor.TemplateEditorView
+            android:id="@+id/templateEditorView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_below="@+id/layoutBar"
+            android:layout_above="@+id/flContent"
+            android:layout_marginHorizontal="26dp"
+            android:layout_marginVertical="40dp"
+            />
+
+        <!-- ── Tool panels (giống CollageActivity, bỏ ll_frame) ── -->
+        <FrameLayout
+            android:id="@+id/flContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/rcvTools">
+
+            <!-- Photo — thay ảnh từng ô -->
+            <LinearLayout
+                android:id="@+id/ll_photo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_item_tool"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/dimen_16dp"
+                    android:layout_marginVertical="20dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:fontFamily="@font/inter_medium"
+                        android:text="@string/replace_photos"
+                        android:textColor="#101828"
+                        android:textSize="14sp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/icCheckPhoto"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:padding="4dp"
+                        android:src="@drawable/ic_check_tool" />
+
+                </RelativeLayout>
+
+                <!-- Danh sách thumbnail các ô ảnh -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/listPhotoCell"
+                    android:layout_width="match_parent"
+                    android:layout_height="84dp"
+                    android:layout_marginHorizontal="@dimen/dimen_16dp"
+                    android:layout_marginBottom="@dimen/dimen_16dp" />
+
+            </LinearLayout>
+
+            <!-- Border -->
+            <LinearLayout
+                android:id="@+id/ll_border"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_item_tool"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/dimen_16dp"
+                    android:layout_marginVertical="20dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:fontFamily="@font/inter_medium"
+                        android:text="@string/border"
+                        android:textColor="#101828"
+                        android:textSize="14sp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/icCheckBorder"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:padding="4dp"
+                        android:src="@drawable/ic_check_tool" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/dimen_16dp">
+
+                    <ImageView
+                        android:id="@+id/icGrid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_grid" />
+
+                    <SeekBar
+                        android:id="@+id/seekbar_space"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dimen_8dp"
+                        android:layout_marginEnd="@dimen/dimen_16dp"
+                        android:layout_toStartOf="@+id/tvGrid"
+                        android:layout_toEndOf="@+id/icGrid"
+                        android:progressBackgroundTint="@color/white" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvGrid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:fontFamily="@font/inter_medium"
+                        android:text="0"
+                        android:textColor="#1D2939"
+                        android:textSize="14sp" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/dimen_16dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="@dimen/dimen_16dp">
+
+                    <ImageView
+                        android:id="@+id/icCorner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_corner" />
+
+                    <SeekBar
+                        android:id="@+id/seekbar_corner"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dimen_8dp"
+                        android:layout_marginEnd="@dimen/dimen_16dp"
+                        android:layout_toStartOf="@+id/tvCorner"
+                        android:layout_toEndOf="@+id/icCorner"
+                        android:progressBackgroundTint="@color/white" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvCorner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:fontFamily="@font/inter_medium"
+                        android:text="0"
+                        android:textColor="#1D2939"
+                        android:textSize="14sp" />
+
+                </RelativeLayout>
+            </LinearLayout>
+
+            <!-- Background -->
+            <LinearLayout
+                android:id="@+id/ll_bg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_item_tool"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/dimen_16dp"
+                    android:layout_marginVertical="20dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:fontFamily="@font/inter_medium"
+                        android:text="@string/background"
+                        android:textColor="#101828"
+                        android:textSize="14sp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/icCheckBackground"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:padding="4dp"
+                        android:src="@drawable/ic_check_tool" />
+
+                </RelativeLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/list_bg"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:layout_marginHorizontal="@dimen/dimen_16dp"
+                    android:layout_marginBottom="@dimen/dimen_16dp" />
+            </LinearLayout>
+
+            <!-- Sticker -->
+            <LinearLayout
+                android:id="@+id/llSticker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_item_tool"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/dimen_16dp"
+                    android:layout_marginVertical="20dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:fontFamily="@font/inter_medium"
+                        android:text="@string/sticker"
+                        android:textColor="#101828"
+                        android:textSize="14sp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/icCheckSticker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:padding="4dp"
+                        android:src="@drawable/ic_check_tool" />
+
+                </RelativeLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/listSticker"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:layout_marginBottom="@dimen/dimen_16dp" />
+            </LinearLayout>
+
+            <!-- Text / Draw -->
+            <LinearLayout
+                android:id="@+id/llDraw"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_item_tool"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/dimen_16dp"
+                    android:layout_marginVertical="20dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:fontFamily="@font/inter_medium"
+                        android:text="@string/text"
+                        android:textColor="#101828"
+                        android:textSize="14sp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/icCheckDraw"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:padding="4dp"
+                        android:src="@drawable/ic_check_tool" />
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="@dimen/dimen_16dp"
+                    android:gravity="center">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/icBrush"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_brush" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/icErase"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_erase" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <!-- ── Bottom tool tabs ── -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcvTools"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/layoutAds"
+            android:background="@color/white"
+            android:paddingHorizontal="@dimen/dimen_8dp"
+            android:visibility="visible" />
+
+        <!-- ── Ads ── -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/layoutAds"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:orientation="horizontal">
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical"
+            android:visibility="visible">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/btnUndo"
-                android:layout_width="wrap_content"
+            <FrameLayout
+                android:id="@+id/ad_view_container"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:padding="8dp"
-                android:src="@drawable/ic_undo" />
+                android:background="#ffffff" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/btnRedo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:padding="8dp"
-                android:src="@drawable/ic_redo" />
-
+            <include
+                android:id="@+id/banner"
+                layout="@layout/banner_ads"
+                android:visibility="visible" />
         </LinearLayout>
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnExport"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:background="@drawable/bg_btn_next1"
-            android:elevation="0dp"
-            android:fontFamily="@font/inter_medium"
-            android:stateListAnimator="@null"
-            android:text="@string/save"
-            android:textAllCaps="false"
-            android:textColor="#B3FF10"
-            android:textSize="14sp" />
 
     </RelativeLayout>
-
-    <!-- ── Editor view (chiếm phần lớn màn hình) ── -->
-    <com.example.piceditor.templates_editor.TemplateEditorView
-        android:id="@+id/templateEditorView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_below="@+id/layoutBar"
-        android:layout_above="@+id/llTool"
-        android:layout_marginVertical="48dp"
-        android:layout_marginHorizontal="26dp"
-        />
-
-    <!-- ── Bottom bar ── -->
-    <LinearLayout
-        android:id="@+id/llTool"
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:orientation="horizontal"
-        android:background="#1A1A1A"
-        android:gravity="center"
-        android:layout_alignParentBottom="true"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
-
-        <!-- Nút Thay ảnh (chỉ active khi đã chọn cell) -->
-        <LinearLayout
-            android:id="@+id/btnChangePhoto"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:background="?attr/selectableItemBackground">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@android:drawable/ic_menu_gallery"
-                app:tint="#AAAAAA" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Thay ảnh"
-                android:textColor="#AAAAAA"
-                android:textSize="11sp"
-                android:layout_marginTop="2dp"/>
-        </LinearLayout>
-
-        <!-- Divider -->
-        <View
-            android:layout_width="1dp"
-            android:layout_height="32dp"
-            android:background="#333333"/>
-
-        <!-- Nút Reset cell -->
-        <LinearLayout
-            android:id="@+id/btnReset"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:background="?attr/selectableItemBackground">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@android:drawable/ic_menu_revert"
-                app:tint="#AAAAAA" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Đặt lại"
-                android:textColor="#AAAAAA"
-                android:textSize="11sp"
-                android:layout_marginTop="2dp"/>
-        </LinearLayout>
-
-    </LinearLayout>
-
-</RelativeLayout>
 </layout>

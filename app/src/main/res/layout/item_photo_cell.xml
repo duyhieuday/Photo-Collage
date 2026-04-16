@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cellContainer"
+    android:layout_width="72dp"
+    android:layout_height="72dp"
+    android:layout_margin="6dp">
+
+    <!-- Preview ảnh đã chọn -->
+    <ImageView
+        android:id="@+id/imgCellPreview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:visibility="gone" />
+
+    <!-- Số thứ tự ô ở góc trên trái -->
+    <TextView
+        android:id="@+id/tvCellIndex"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_gravity="top|start"
+        android:layout_margin="3dp"
+        android:background="#CC000000"
+        android:gravity="center"
+        android:textColor="#FFFFFF"
+        android:textSize="9sp"
+        android:textStyle="bold" />
+
+    <!-- Icon "+" ở giữa khi chưa có ảnh -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="+"
+        android:textColor="#888888"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+</FrameLayout>

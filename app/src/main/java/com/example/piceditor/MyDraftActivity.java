@@ -3,6 +3,7 @@ package com.example.piceditor;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.app.RecoverableSecurityException;
 import android.content.ContentUris;
@@ -13,7 +14,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.IntentSenderRequest;
@@ -30,17 +34,18 @@ import com.example.piceditor.model.ImageModel;
 import com.example.piceditor.utils.BarsUtils;
 import com.example.piceditor.utilsApp.Constant;
 import com.example.piceditor.utilsApp.PreferenceUtil;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
 
     private ImageAdapter adapter;
     private ImageAdapter pendingAdapter;
+    private Dialog dialogDelete;
 
     private final ActivityResultLauncher<IntentSenderRequest> deleteRequestLauncher =
             registerForActivityResult(
@@ -150,20 +155,45 @@ public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
 
         // Nút Delete
         getBinding().layoutDelete.setOnClickListener(v -> {
-            showDeleteDialog();
+            showDialogDelete();
         });
     }
 
-    private void showDeleteDialog() {
-        int count = adapter.getSelectedCount();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Xóa ảnh")
-                    .setMessage("Bạn có chắc muốn xóa " + count + " ảnh?")
-                    .setPositiveButton("Xóa", (dialog, which) -> deleteSelectedImages())
-                    .setNegativeButton("Huỷ", null)
-                    .show();
+    private void showDialogDelete() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MyDraftActivity.this);
+        View view = LayoutInflater.from(MyDraftActivity.this).inflate(
+                R.layout.dialog_delete_draft,
+                null
+        );
+        builder.setView(view);
+
+        dialogDelete = builder.create();
+        Objects.requireNonNull(dialogDelete.getWindow()).setBackgroundDrawableResource(R.drawable.bg_dialog_draft);
+
+        Button btnCancel = view.findViewById(R.id.btnCancel);
+        Button btnDelete = view.findViewById(R.id.btnDelete);
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogDelete.dismiss();
+            }
+        });
+
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    deleteSelectedImages();
+                }
+                dialogDelete.dismiss();
+            }
+        });
+
+        if (!isFinishing() && !isDestroyed()) {
+            dialogDelete.show();
         }
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)

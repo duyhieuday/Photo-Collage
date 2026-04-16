@@ -31,11 +31,11 @@ object TemplateRepository {
                 drawableRes = com.example.piceditor.R.drawable.temp_1,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_1,
                 cellRects   = listOf(
-                    RectF(124f, 179f,  537f,  592f),
-                    RectF(101f, 616f,  515f,  1029f),
-                    RectF(79f,  1053f, 492f,  1466f),
-                    RectF(602f, 755f,  1011f, 1164f),
-                    RectF(619f, 1192f, 1028f, 1602f)
+                    RectF(96f, 179f,  537f,  592f),
+                    RectF(80f, 616f,  515f,  1029f),
+                    RectF(60f,  1053f, 492f,  1466f),
+                    RectF(580f, 755f,  1011f, 1164f),
+                    RectF(595f, 1192f, 1028f, 1602f)
                 ),
                 maskMode    = MaskMode.WHITE
             ),
@@ -49,12 +49,12 @@ object TemplateRepository {
                 drawableRes = com.example.piceditor.R.drawable.temp_2,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_2,
                 cellRects   = listOf(
-                    RectF(145f, 344f,  560f,  759f),
-                    RectF(603f, 344f,  1017f, 759f),
-                    RectF(144f, 803f,  559f,  1217f),
-                    RectF(604f, 803f,  1018f, 1217f),
-                    RectF(145f, 1261f, 560f,  1676f),
-                    RectF(603f, 1261f, 1017f, 1676f)
+                    RectF(110f, 344f,  560f,  759f),
+                    RectF(567f, 344f,  1017f, 759f),
+                    RectF(110f, 803f,  559f,  1217f),
+                    RectF(567f, 803f,  1018f, 1217f),
+                    RectF(110f, 1261f, 560f,  1676f),
+                    RectF(567f, 1261f, 1017f, 1676f)
                 ),
                 maskMode    = MaskMode.WHITE
             ),
@@ -68,7 +68,7 @@ object TemplateRepository {
                 drawableRes = com.example.piceditor.R.drawable.temp_3,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_3,
                 cellRects   = listOf(
-                    RectF(348f, 421f,  876f,  964f),
+                    RectF(328f, 421f,  856f,  974f),
                     RectF(93f,  988f,  583f,  1503f),
                     RectF(531f, 1355f, 1109f, 1954f)
                 ),

@@ -133,7 +133,7 @@ public class SettingActivity extends BaseActivityNew<ActivitySettingBinding> {
             @Override
             public void onClick(View v) {
                 try {
-                    String url = "https://privacyterms.io/app/?preview=FGIE3GP5-d9pFJx30-B18qxD";
+                    String url = "";
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                     if (intent.resolveActivity(getPackageManager()) != null) {
                         startActivity(intent); // Start the intent to open the link
