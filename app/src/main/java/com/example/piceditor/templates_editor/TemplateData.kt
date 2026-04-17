@@ -69,8 +69,8 @@ object TemplateRepository {
                 thumbRes    = com.example.piceditor.R.drawable.thumb_3,
                 cellRects   = listOf(
                     RectF(328f, 421f,  856f,  974f),
-                    RectF(93f,  988f,  583f,  1503f),
-                    RectF(531f, 1355f, 1109f, 1954f)
+                    RectF(75f,  988f,  560f,  1503f),
+                    RectF(531f, 1355f, 1093f, 1954f)
                 ),
                 maskMode    = MaskMode.WHITE
             ),
@@ -84,8 +84,8 @@ object TemplateRepository {
                 drawableRes = com.example.piceditor.R.drawable.temp_4,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_4,
                 cellRects   = listOf(
-                    RectF(449f, 484f,  828f,  966f),
-                    RectF(181f, 1281f, 560f,  1661f)
+                    RectF(420f, 468f,  828f,  986f),
+                    RectF(158f, 1268f, 560f,  1686f)
                 ),
                 maskMode    = MaskMode.WHITE
             ),
@@ -99,8 +99,8 @@ object TemplateRepository {
                 drawableRes = com.example.piceditor.R.drawable.temp_5,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_5,
                 cellRects   = listOf(
-                    RectF(510f, 181f, 1051f, 734f),
-                    RectF(105f, 974f, 662f,  1538f)
+                    RectF(493f, 186f, 1051f, 734f),
+                    RectF(86f, 974f, 662f,  1538f)
                 ),
                 maskMode    = MaskMode.WHITE
             ),
@@ -115,9 +115,9 @@ object TemplateRepository {
                 thumbRes    = com.example.piceditor.R.drawable.thumb_6,
                 cellRects   = listOf(
                     RectF(66f,  275f,  541f,  899f),
-                    RectF(578f, 399f,  1072f, 1023f),
-                    RectF(52f,  923f,  543f,  1607f),
-                    RectF(583f, 1097f, 1059f, 1721f)
+                    RectF(570f, 399f,  1072f, 1023f),
+                    RectF(30f,  923f,  543f,  1607f),
+                    RectF(560f, 1097f, 1059f, 1721f)
                 ),
                 maskMode    = MaskMode.WHITE
             ),
@@ -131,7 +131,7 @@ object TemplateRepository {
                 drawableRes = com.example.piceditor.R.drawable.temp_7,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_7,
                 cellRects   = listOf(
-                    RectF(155f, 212f, 971f, 1023f)
+                    RectF(128f, 212f, 971f, 1023f)
                 ),
                 maskMode    = MaskMode.WHITE
             ),
@@ -145,7 +145,7 @@ object TemplateRepository {
                 drawableRes = com.example.piceditor.R.drawable.temp_8,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_8,
                 cellRects   = listOf(
-                    RectF(251f, 599f, 900f, 1286f)
+                    RectF(222f, 599f, 900f, 1286f)
                 ),
                 maskMode    = MaskMode.WHITE
             ),
@@ -176,8 +176,8 @@ object TemplateRepository {
                 drawableRes = com.example.piceditor.R.drawable.temp_10,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_10,
                 cellRects   = listOf(
-                    RectF(298f, 581f,  947f,  1143f),
-                    RectF(279f, 1145f, 659f,  1576f)
+                    RectF(276f, 581f,  947f,  1143f),
+                    RectF(252f, 1145f, 643f,  1576f)
                 ),
                 maskMode    = MaskMode.WHITE
             )

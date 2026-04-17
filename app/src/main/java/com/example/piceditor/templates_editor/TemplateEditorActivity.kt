@@ -389,48 +389,60 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
     // ──────────────────────────────────────────────────────
 
     private fun loadTemplate() {
-        // Đợi view measure xong mới lấy kích thước thực
-        binding.templateEditorView.post {
-            val viewW = binding.templateEditorView.width.toFloat()
-            val viewH = binding.templateEditorView.height.toFloat()
+        // ViewTreeObserver đảm bảo view đã measure + layout xong hoàn toàn
+        // (post{} có thể chạy trước khi margin được áp dụng)
+        binding.templateEditorView.viewTreeObserver.addOnGlobalLayoutListener(
+            object : android.view.ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    // Chỉ chạy 1 lần
+                    binding.templateEditorView.viewTreeObserver
+                        .removeOnGlobalLayoutListener(this)
 
-            lifecycleScope.launch {
-                val (scaled, mask) = withContext(Dispatchers.IO) {
-                    val raw   = BitmapFactory.decodeResource(resources, templateData.drawableRes)
-                    // ✅ Scale theo editorView thực tế, không phải screen size
-                    val scale = min(viewW / TEMPLATE_W, viewH / TEMPLATE_H)
-                    val newW  = (TEMPLATE_W * scale).toInt()
-                    val newH  = (TEMPLATE_H * scale).toInt()
-                    val scaled = raw.scale(newW, newH)
-                    raw.recycle()
-                    val mask = if (templateData.maskMode == MaskMode.BLACK)
-                        binding.templateEditorView.createMaskFromBlack(scaled)
-                    else
-                        binding.templateEditorView.createMaskFromWhite(scaled)
-                    Pair(scaled, mask)
+                    val viewW = binding.templateEditorView.width.toFloat()
+                    val viewH = binding.templateEditorView.height.toFloat()
+
+                    // Guard: nếu view vẫn chưa có kích thước thì bỏ qua
+                    if (viewW <= 0f || viewH <= 0f) return
+
+                    lifecycleScope.launch {
+                        val (scaled, mask) = withContext(Dispatchers.IO) {
+                            val raw   = BitmapFactory.decodeResource(resources, templateData.drawableRes)
+                            val scale = min(viewW / TEMPLATE_W, viewH / TEMPLATE_H)
+                            val newW  = (TEMPLATE_W * scale).toInt()
+                            val newH  = (TEMPLATE_H * scale).toInt()
+                            val scaled = raw.scale(newW, newH)
+                            raw.recycle()
+                            val mask = if (templateData.maskMode == MaskMode.BLACK)
+                                binding.templateEditorView.createMaskFromBlack(scaled)
+                            else
+                                binding.templateEditorView.createMaskFromWhite(scaled)
+                            Pair(scaled, mask)
+                        }
+
+                        binding.templateEditorView.templateBitmapRaw  = scaled
+                        binding.templateEditorView.templateMaskBitmap = mask
+
+                        // Setup cells dùng cùng viewW/viewH
+                        val scale = min(viewW / TEMPLATE_W, viewH / TEMPLATE_H)
+                        val newW  = TEMPLATE_W * scale
+                        val newH  = TEMPLATE_H * scale
+                        val dx    = (viewW - newW) / 2f
+                        val dy    = (viewH - newH) / 2f
+
+                        binding.templateEditorView.cells = templateData.cellRects.map { rect ->
+                            PhotoCell(RectF(
+                                rect.left   * scale + dx,
+                                rect.top    * scale + dy,
+                                rect.right  * scale + dx,
+                                rect.bottom * scale + dy
+                            ))
+                        }.toMutableList()
+
+                        binding.templateEditorView.invalidate()
+                    }
                 }
-                binding.templateEditorView.templateBitmapRaw  = scaled
-                binding.templateEditorView.templateMaskBitmap = mask
-
-                // ✅ Setup cell dùng cùng viewW/viewH — không cần post lại
-                val scale = min(viewW / TEMPLATE_W, viewH / TEMPLATE_H)
-                val newW  = TEMPLATE_W * scale
-                val newH  = TEMPLATE_H * scale
-                val dx    = (viewW - newW) / 2f
-                val dy    = (viewH - newH) / 2f
-
-                binding.templateEditorView.cells = templateData.cellRects.map { rect ->
-                    PhotoCell(RectF(
-                        rect.left   * scale + dx,
-                        rect.top    * scale + dy,
-                        rect.right  * scale + dx,
-                        rect.bottom * scale + dy
-                    ))
-                }.toMutableList()
-
-                binding.templateEditorView.invalidate()
             }
-        }
+        )
     }
 
     // ──────────────────────────────────────────────────────

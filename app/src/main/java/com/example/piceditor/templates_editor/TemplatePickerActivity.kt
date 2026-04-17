@@ -27,6 +27,10 @@ class TemplatePickerActivity : BaseActivityNew<ActivityTemplatePickerBinding>() 
         BarsUtils.setStatusBarColor(this, "#01000000".toColorInt())
         BarsUtils.setAppearanceLightStatusBars(this, true)
 
+        binding.btnBack.setOnClickListener {
+            finish()
+        }
+
         binding.rvTemplates.layoutManager = GridLayoutManager(this, 2)
 
         binding.rvTemplates.adapter = TemplatePickerAdapter(TemplateRepository.all) { template ->
