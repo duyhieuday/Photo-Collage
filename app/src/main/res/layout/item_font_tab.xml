@@ -14,8 +14,9 @@
         android:paddingRight="9dp"
         android:text="test"
         android:gravity="center"
-        android:textColor="@color/white"
+        android:textColor="#98A2B3"
         android:textAllCaps="true"
-        android:textSize="13.5dp" />
+        android:fontFamily="@font/inter_medium"
+        android:textSize="14sp" />
 
 </LinearLayout>

@@ -2,6 +2,7 @@ package com.example.piceditor.adapters
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.piceditor.R
 import com.example.piceditor.model.TemplateItem
 import com.example.piceditor.utils.PhotoUtils
+import androidx.core.graphics.toColorInt
 
 
 class FrameAdapter(
@@ -45,7 +47,7 @@ class FrameAdapter(
         PhotoUtils.loadImageWithGlide(mContext, holder.img_frame, mImages[position].preview)
 
         if (mImages[position].isSelected) {
-            holder.ll_itemframe.setBackgroundColor(mContext.resources.getColor(R.color.colorAccent))
+            holder.ll_itemframe.setBackgroundColor("#2DD71A".toColorInt())
         } else {
             holder.ll_itemframe.setBackgroundColor(mContext.resources.getColor(R.color.transparent))
         }

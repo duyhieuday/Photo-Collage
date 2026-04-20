@@ -92,14 +92,14 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/filter_names"
                     android:layout_width="match_parent"
-                    android:layout_height="34dp"
-                    android:background="@color/woodsmoke" />
+                    android:layout_height="wrap_content"
+                    android:background="@color/white" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/list_filterstype"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:background="@color/woodsmoke"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
                     android:paddingTop="5dp"
                     android:paddingBottom="5dp" />
 

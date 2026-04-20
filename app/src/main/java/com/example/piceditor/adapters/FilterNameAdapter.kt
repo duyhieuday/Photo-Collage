@@ -2,6 +2,7 @@ package com.example.piceditor.adapters
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.piceditor.R
+import androidx.core.graphics.toColorInt
 
 
 class FilterNameAdapter(context: Context,filterList:Array<String>) : Adapter<FilterNameAdapter.FilterNameHolder>() {
@@ -46,9 +48,9 @@ class FilterNameAdapter(context: Context,filterList:Array<String>) : Adapter<Fil
         holder.txt_filter_tab.setText(filters!![position])
 
         if (selectedindex == position) {
-            holder.ll_filteritem.setBackgroundResource(R.drawable.round_corner)
+            holder.txt_filter_tab.setTextColor("#101828".toColorInt())
         } else {
-            holder.ll_filteritem.setBackgroundColor(mContext.resources.getColor(R.color.transparent))
+            holder.txt_filter_tab.setTextColor("#98A2B3".toColorInt())
         }
 
         holder.ll_filteritem.setOnClickListener(object : View.OnClickListener {
