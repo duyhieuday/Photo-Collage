@@ -45,7 +45,13 @@ class BackgroundAdapter(
 
         val inputStream = mContext.assets.open("background/" + mImages[position])
         val drawable = Drawable.createFromStream(inputStream, null)
+        holder.imgFrame.scaleType = ImageView.ScaleType.CENTER_CROP
+        holder.imgFrame.layoutParams = holder.imgFrame.layoutParams.apply {
+            width  = mContext.resources.getDimensionPixelSize(R.dimen.bg_thumb_size) // 80dp
+            height = mContext.resources.getDimensionPixelSize(R.dimen.bg_thumb_size)
+        }
         holder.imgFrame.setImageDrawable(drawable)
+
 
         if (selectedindex == position) {
             holder.llItemFrame.setBackgroundResource(R.drawable.bg_item_selected)

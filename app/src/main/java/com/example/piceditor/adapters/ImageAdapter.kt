@@ -1,12 +1,13 @@
 package com.example.piceditor.adapters
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.piceditor.MyDraftActivity.formatDateTime
 import com.example.piceditor.R
+import com.example.piceditor.ShowImageActivity
 import com.example.piceditor.databinding.ItemImageSavedBinding
 import com.example.piceditor.model.ImageModel
 
@@ -15,7 +16,7 @@ class ImageAdapter(
 ) : RecyclerView.Adapter<ImageAdapter.ImageViewHolder>() {
 
     private val selectedPositions = mutableSetOf<Int>()
-    var isSelectMode = false
+    private var selectMode = false   // đổi tên để tránh conflict với setSelectMode()
     var onSelectionChanged: ((count: Int) -> Unit)? = null
 
     inner class ImageViewHolder(val binding: ItemImageSavedBinding) :
@@ -42,29 +43,53 @@ class ImageAdapter(
 
         val isSelected = selectedPositions.contains(position)
 
-        // Highlight border khi selected
         holder.binding.root.setBackgroundResource(
-            if (isSelectMode && isSelected) R.drawable.bg_saved_image_selected
+            if (selectMode && isSelected) R.drawable.bg_saved_image_selected
             else R.drawable.bg_saved_image
         )
 
         holder.binding.root.setOnClickListener {
-            if (isSelectMode) {
+            if (selectMode) {
+                // ── Select mode: toggle chọn item ──
                 if (selectedPositions.contains(position)) {
                     selectedPositions.remove(position)
                 } else {
                     selectedPositions.add(position)
                 }
                 notifyItemChanged(position)
-                // Chỉ update count, không show dialog
+                onSelectionChanged?.invoke(selectedPositions.size)
+            } else {
+                // ✅ Normal mode: mở ShowImageActivity với URI của ảnh
+                val context = holder.itemView.context
+                context.startActivity(
+                    Intent(context, ShowImageActivity::class.java).apply {
+                        putExtra("image_uri", item.uri.toString())
+                    }
+                )
+            }
+        }
+
+        // ✅ Long press → bật select mode và chọn item này luôn
+        holder.binding.root.setOnLongClickListener {
+            if (!selectMode) {
+                selectMode = true
+                selectedPositions.add(position)
+                notifyDataSetChanged()
                 onSelectionChanged?.invoke(selectedPositions.size)
             }
+            true
         }
     }
 
-    fun getSelectedItems(): List<ImageModel> {
-        return selectedPositions.map { list[it] }
+    fun setSelectMode(enabled: Boolean) {
+        selectMode = enabled
+        if (!enabled) {
+            selectedPositions.clear()
+        }
+        notifyDataSetChanged()
     }
+
+    fun getSelectedItems(): List<ImageModel> = selectedPositions.map { list[it] }
 
     fun getSelectedCount() = selectedPositions.size
 
@@ -76,7 +101,7 @@ class ImageAdapter(
 
     fun clearSelection() {
         selectedPositions.clear()
-        isSelectMode = false
+        selectMode = false
         notifyDataSetChanged()
     }
 }
