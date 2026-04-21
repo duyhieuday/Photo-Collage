@@ -4,11 +4,9 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Intent
 import android.graphics.*
-import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.*
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,91 +27,69 @@ import com.example.piceditor.utils.AndroidUtils
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utilsApp.Constant
 import com.example.piceditor.utilsApp.PreferenceUtil
-import java.io.File
-import java.io.FileOutputStream
-import java.util.*
-
 
 class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(),
     View.OnClickListener {
 
     private var mLastClickTime: Long = 0
 
-
     private fun checkClick() {
-        if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) {
-            return
-        }
+        if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return
         mLastClickTime = SystemClock.elapsedRealtime()
     }
 
-    override fun onClick(v: View?) {
-    }
-
+    override fun onClick(v: View?) {}
 
     private val screenShot: Bitmap
         get() {
-            val findViewById = findViewById<View>(R.id.img_collage)
-            findViewById.background = null
-            findViewById.destroyDrawingCache()
-            findViewById.isDrawingCacheEnabled = true
-            val createBitmap = Bitmap.createBitmap(findViewById.drawingCache)
-            findViewById.isDrawingCacheEnabled = false
-            val createBitmap2 = createBitmap(createBitmap.width, createBitmap.height)
-            findViewById.draw(Canvas(createBitmap2))
-            return createBitmap2
+            val view = findViewById<View>(R.id.img_collage)
+            view.background = null
+            view.destroyDrawingCache()
+            view.isDrawingCacheEnabled = true
+            val cache = Bitmap.createBitmap(view.drawingCache)
+            view.isDrawingCacheEnabled = false
+            val result = createBitmap(cache.width, cache.height)
+            view.draw(Canvas(result))
+            return result
         }
 
     companion object {
-        var red: Float = 0F
-        var green: Float = 0F
-        var blue: Float = 0F
-        var saturation: Float = 0F
+        var red: Float        = 1f
+        var green: Float      = 1f
+        var blue: Float       = 1f
+        var saturation: Float = 1f
+
+        // Sentinel: index 0 = "Gốc" (original)
+        const val INDEX_ORIGINAL = 0
     }
 
     lateinit var bmp: Bitmap
 
-    override fun getLayoutRes(): Int {
-        return R.layout.activity_filter_collage
-    }
-
-    override fun getFrame(): Int {
-        return 0
-    }
-
-    override fun getDataFromIntent() {
-
-    }
+    override fun getLayoutRes(): Int = R.layout.activity_filter_collage
+    override fun getFrame(): Int = 0
+    override fun getDataFromIntent() {}
 
     override fun doAfterOnCreate() {
-        if (PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no")
-                .equals("yes")
-        ) {
+        if (PreferenceUtil.getInstance(this)
+                .getValue(Constant.SharePrefKey.BANNER_COL, "no").equals("yes")) {
             initBanner(binding.banner.adViewContainer)
         } else {
             initBanner(binding.adViewContainer)
-            binding.banner.getRoot().visibility = View.GONE
+            binding.banner.root.visibility = View.GONE
         }
     }
 
-    protected override fun onResume() {
+    override fun onResume() {
         super.onResume()
-        if (PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no")
-                .equals("yes")
-        ) {
-        } else {
+        if (!PreferenceUtil.getInstance(this)
+                .getValue(Constant.SharePrefKey.BANNER_COL, "no").equals("yes")) {
             initBanner(binding.adViewContainer)
-            binding.banner.getRoot().visibility = View.GONE
+            binding.banner.root.visibility = View.GONE
         }
     }
 
-    override fun setListener() {
-
-    }
-
-    override fun initFragment(): BaseFragment<*>? {
-        return null
-    }
+    override fun setListener() {}
+    override fun initFragment(): BaseFragment<*>? = null
 
     override fun afterSetContentView() {
         super.afterSetContentView()
@@ -125,248 +101,177 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(),
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val uri = Uri.parse(intent.getStringExtra("image_uri"))
         bmp = BitmapFactory.decodeStream(contentResolver.openInputStream(uri))
         binding.imgCollage.setImageBitmap(bmp)
-        binding.ivBack.setOnClickListener {
-            finish()
-        }
 
+        binding.ivBack.setOnClickListener { finish() }
         binding.btnNext.setOnClickListener {
             checkClick()
             isFromSaved = true
-            val finalBitmap = screenShot
-            val finalUri = saveToGallery(finalBitmap)
-
-            val intent = Intent(this, ShowImageActivity::class.java)
-            intent.putExtra("image_uri", finalUri.toString())
-            startActivity(intent)
+            val finalUri = saveToGallery(screenShot)
+            startActivity(Intent(this, ShowImageActivity::class.java).apply {
+                putExtra("image_uri", finalUri.toString())
+            })
             finish()
         }
 
-        binding.imgCollage.setImageBitmap(bmp)
+        // ── Filter list ────────────────────────────────────
         binding.listFilterstype.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        // ✅ Tạo adapter với danh sách filter + "Gốc" ở đầu
         var filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_clr1)
         binding.listFilterstype.adapter = filter_typeAdapter
 
+        // ✅ Mặc định chọn "Gốc" khi vào màn hình
+        filter_typeAdapter.selectOriginal()
+
+        // ── Filter name tabs ───────────────────────────────
         binding.filterNames.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         val filter_nameAdapter = FilterNameAdapter(this, resources.getStringArray(R.array.filters))
 
         filter_nameAdapter.setOnFilterNameClick(object : FilterNameAdapter.FilterNameClickListener {
             override fun onItemClick(view: View, position: Int) {
-
-                when (position) {
-                    0 -> {
-                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_clr1)
-                        binding.listFilterstype.adapter = filter_typeAdapter
-                    }
-
-                    1 -> {
-                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_clr2)
-                        binding.listFilterstype.adapter = filter_typeAdapter
-                    }
-
-                    2 -> {
-                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_duo)
-                        binding.listFilterstype.adapter = filter_typeAdapter
-                    }
-
-                    3 -> {
-                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_pink)
-                        binding.listFilterstype.adapter = filter_typeAdapter
-                    }
-
-                    4 -> {
-                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_fresh)
-                        binding.listFilterstype.adapter = filter_typeAdapter
-                    }
-
-                    5 -> {
-                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_euro)
-                        binding.listFilterstype.adapter = filter_typeAdapter
-                    }
-
-                    6 -> {
-                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_dark)
-                        binding.listFilterstype.adapter = filter_typeAdapter
-                    }
-
-                    7 -> {
-                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_ins)
-                        binding.listFilterstype.adapter = filter_typeAdapter
-                    }
-
-                    8 -> {
-                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_elegant)
-                        binding.listFilterstype.adapter = filter_typeAdapter
-                    }
-
-                    9 -> {
-                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_golden)
-                        binding.listFilterstype.adapter = filter_typeAdapter
-                    }
-
-                    10 -> {
-                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_tint)
-                        binding.listFilterstype.adapter = filter_typeAdapter
-                    }
-
-                    11 -> {
-                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_film)
-                        binding.listFilterstype.adapter = filter_typeAdapter
-                    }
-
-                    12 -> {
-                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_lomo)
-                        binding.listFilterstype.adapter = filter_typeAdapter
-                    }
-
-                    13 -> {
-                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_movie)
-                        binding.listFilterstype.adapter = filter_typeAdapter
-                    }
-
-                    14 -> {
-                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_retro)
-                        binding.listFilterstype.adapter = filter_typeAdapter
-                    }
-
-                    15 -> {
-                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_bw)
-                        binding.listFilterstype.adapter = filter_typeAdapter
-                    }
-
-                    else -> {
-                        filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_clr1)
-                        binding.listFilterstype.adapter = filter_typeAdapter
-                    }
+                val filters = when (position) {
+                    0  -> AndroidUtils.filter_clr1
+                    1  -> AndroidUtils.filter_clr2
+                    2  -> AndroidUtils.filter_duo
+                    3  -> AndroidUtils.filter_pink
+                    4  -> AndroidUtils.filter_fresh
+                    5  -> AndroidUtils.filter_euro
+                    6  -> AndroidUtils.filter_dark
+                    7  -> AndroidUtils.filter_ins
+                    8  -> AndroidUtils.filter_elegant
+                    9  -> AndroidUtils.filter_golden
+                    10 -> AndroidUtils.filter_tint
+                    11 -> AndroidUtils.filter_film
+                    12 -> AndroidUtils.filter_lomo
+                    13 -> AndroidUtils.filter_movie
+                    14 -> AndroidUtils.filter_retro
+                    15 -> AndroidUtils.filter_bw
+                    else -> AndroidUtils.filter_clr1
                 }
+                filter_typeAdapter = FilterDetailAdapter(filters)
+                binding.listFilterstype.adapter = filter_typeAdapter
+
+                // ✅ Khi chuyển tab → chọn "Gốc" để user biết mình đang ở đâu
+                filter_typeAdapter.selectOriginal()
+
                 filter_nameAdapter.notifyDataSetChanged()
-                filter_typeAdapter.notifyDataSetChanged()
             }
         })
 
         binding.filterNames.adapter = filter_nameAdapter
-
     }
 
+    // ── Save ───────────────────────────────────────────────
+
     private fun saveToGallery(bitmap: Bitmap): Uri {
-        val resolver = contentResolver
-        val contentValues = ContentValues().apply {
+        val values = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, "IMG_${System.currentTimeMillis()}.jpg")
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
             put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/PhotoCollage")
             put(MediaStore.Images.Media.IS_PENDING, 1)
         }
-
-        val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)!!
-
-        val out = resolver.openOutputStream(uri)
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out!!)
-        out.close()
-
-        contentValues.clear()
-        contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
-        contentValues.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
-        resolver.update(uri, contentValues, null, null)
-
+        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)!!
+        contentResolver.openOutputStream(uri)?.use { bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it) }
+        values.clear()
+        values.put(MediaStore.Images.Media.IS_PENDING, 0)
+        values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+        contentResolver.update(uri, values, null, null)
         return uri
     }
 
-    inner class FilterDetailAdapter(filters: Array<FilterData>) :
-        RecyclerView.Adapter<FilterDetailAdapter.FilterDetailHolder>() {
-        var filterType = filters
-        var selectedindex = 0
+    // Thumbnail nhỏ để render nhanh trong filter list (tránh OOM)
+    private val thumbBmp: Bitmap by lazy {
+        val maxSize = 120
+        val scale = maxSize.toFloat() / maxOf(bmp.width, bmp.height)
+        Bitmap.createScaledBitmap(bmp, (bmp.width * scale).toInt(), (bmp.height * scale).toInt(), false)
+    }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilterDetailHolder {
+    // ── Adapter ────────────────────────────────────────────
+
+    inner class FilterDetailAdapter(filters: Array<FilterData>) :
+        RecyclerView.Adapter<FilterDetailAdapter.VH>() {
+
+        private val filterType = filters
+        var selectedIndex = INDEX_ORIGINAL
+
+        fun selectOriginal() {
+            selectedIndex = INDEX_ORIGINAL
+            binding.imgCollage.setImageBitmap(bmp)
+            notifyDataSetChanged()
+        }
+
+        fun applyFilter(filterPos: Int) {
+            if (filterPos < 0 || filterPos >= filterType.size) return
+            selectedIndex = filterPos + 1
+
+            val filter = filterType[filterPos]
+            red        = filter.red
+            green      = filter.green
+            blue       = filter.blue
+            saturation = filter.saturation
+
+            AsyncFilter(bmp, binding.imgCollage)
+                .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, red, green, blue)
+
+            notifyDataSetChanged()
+        }
+
+        override fun getItemCount() = filterType.size + 1
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
             val view = LayoutInflater.from(this@FilterCollageActivity)
                 .inflate(R.layout.item_filter, parent, false)
-            return FilterDetailHolder(view)
+            return VH(view)
         }
 
-        override fun getItemCount(): Int {
-            return filterType.size
-        }
-
-        override fun onBindViewHolder(
-            holder: FilterDetailHolder,
-            @SuppressLint("RecyclerView") position: Int
-        ) {
-
-            if (selectedindex == position) {
-                holder.rl_filteritem.setBackgroundColor(resources.getColor(R.color.darkBrown))
-            } else {
-                holder.rl_filteritem.setBackgroundColor(resources.getColor(R.color.transparent))
-            }
-
-            holder.thumbnail_filter.setImageResource(R.drawable.thumb_filter)
-
-            red = filterType[position].red
-            green = filterType[position].green
-            blue = filterType[position].blue
-            saturation = filterType[position].saturation
-
-            val bitmap = createBitmap(bmp.width, bmp.height)
-            val canvas = Canvas(bitmap)
-
-            val paint = Paint()
-            val colorMatrix = ColorMatrix()
-            colorMatrix.setSaturation(saturation)
-
-            val colorScale = ColorMatrix()
-            colorScale.setScale(
-                red,
-                green,
-                blue, 1F
+        override fun onBindViewHolder(holder: VH, position: Int) {
+            holder.rl_filteritem.setBackgroundResource(
+                if (selectedIndex == position) R.drawable.bg_item_selected
+                else android.R.color.transparent
             )
-            colorMatrix.postConcat(colorScale)
 
-            paint.colorFilter = ColorMatrixColorFilter(colorMatrix)
-            canvas.drawBitmap(bmp, 0F, 0F, paint)
+            if (position == INDEX_ORIGINAL) {
+                // ── "Gốc": hiện thumbnail ảnh gốc ──
+                holder.thumbnail_filter.setImageBitmap(thumbBmp)
+                holder.filterName.text = getString(R.string.original)
+                holder.rl_filteritem.setOnClickListener { selectOriginal() }
+            } else {
+                // ── Filter thực ──
+                val filterPos = position - 1
+                val filter    = filterType[filterPos]
 
-            holder.thumbnail_filter.setImageBitmap(bitmap)
+                // Render thumbnail nhỏ với filter (dùng thumbBmp để nhanh)
+                val thumb  = createBitmap(thumbBmp.width, thumbBmp.height)
+                val canvas = Canvas(thumb)
+                val paint  = Paint()
+                val cm = ColorMatrix().apply { setSaturation(filter.saturation) }
+                val cs = ColorMatrix().apply { setScale(filter.red, filter.green, filter.blue, 1f) }
+                cm.postConcat(cs)
+                paint.colorFilter = ColorMatrixColorFilter(cm)
+                canvas.drawBitmap(thumbBmp, 0f, 0f, paint)
 
-            holder.filterName.text = filterType[position].text
-
-            holder.rl_filteritem.setOnClickListener {
-                val imgCollage = findViewById<ImageView>(R.id.img_collage)
-
-                selectedindex = position
-
-                red = filterType[position].red
-                green = filterType[position].green
-                blue = filterType[position].blue
-                saturation = filterType[position].saturation
-
-                Async_Filter(
-                    bmp,
-                    imgCollage
-                ).executeOnExecutor(
-                    AsyncTask.THREAD_POOL_EXECUTOR,
-                    red,
-                    green,
-                    blue
-                )
-                notifyDataSetChanged()
+                holder.thumbnail_filter.setImageBitmap(thumb)
+                holder.filterName.text = filter.text
+                holder.rl_filteritem.setOnClickListener { applyFilter(filterPos) }
             }
         }
 
-        inner class FilterDetailHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            var thumbnail_filter: ImageView
-            var filterName: TextView
-            var rl_filteritem: RelativeLayout
-
-            init {
-                thumbnail_filter = itemView.findViewById(R.id.thumbnail_filter)
-                filterName = itemView.findViewById(R.id.filterName)
-                rl_filteritem = itemView.findViewById(R.id.rl_filteritem)
-            }
+        inner class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            val thumbnail_filter: ImageView   = itemView.findViewById(R.id.thumbnail_filter)
+            val filterName: TextView          = itemView.findViewById(R.id.filterName)
+            val rl_filteritem: RelativeLayout = itemView.findViewById(R.id.rl_filteritem)
         }
     }
 
-    class Async_Filter() : AsyncTask<Float, Void, Bitmap>() {
+    // ── AsyncTask apply filter ─────────────────────────────
+
+    class AsyncFilter() : AsyncTask<Float, Void, Bitmap>() {
 
         lateinit var originalBitmap: Bitmap
 
@@ -375,36 +280,26 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(),
 
         constructor(originalBitmap: Bitmap, imgMain: ImageView) : this() {
             this.originalBitmap = originalBitmap
-            this.imgMain = imgMain
+            this.imgMain        = imgMain
         }
 
         override fun doInBackground(vararg params: Float?): Bitmap {
-            val r = params[0]
-            val g = params[1]
-            val b = params[2]
-
-            val bitmap = createBitmap(this.originalBitmap.width, this.originalBitmap.height)
+            val r = params[0]!!
+            val g = params[1]!!
+            val b = params[2]!!
+            val bitmap = createBitmap(originalBitmap.width, originalBitmap.height)
             val canvas = Canvas(bitmap)
-
-            val paint = Paint()
-            val colorMatrix = ColorMatrix()
-            colorMatrix.setSaturation(saturation)
-
-            val colorScale = ColorMatrix()
-            colorScale.setScale(r!!, g!!, b!!, 1F)
-            colorMatrix.postConcat(colorScale)
-
-            paint.colorFilter = ColorMatrixColorFilter(colorMatrix)
-            canvas.drawBitmap(this.originalBitmap, 0F, 0F, paint)
-
+            val paint  = Paint()
+            val cm = ColorMatrix().apply { setSaturation(saturation) }
+            val cs = ColorMatrix().apply { setScale(r, g, b, 1f) }
+            cm.postConcat(cs)
+            paint.colorFilter = ColorMatrixColorFilter(cm)
+            canvas.drawBitmap(originalBitmap, 0f, 0f, paint)
             return bitmap
         }
 
         override fun onPostExecute(result: Bitmap?) {
-            super.onPostExecute(result)
-
-            this.imgMain.setImageBitmap(result)
+            imgMain.setImageBitmap(result)
         }
     }
-
 }

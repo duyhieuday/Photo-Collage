@@ -143,5 +143,6 @@
     <string name="template">Template</string>
     <string name="replace">Replace</string>
     <string name="replace_photos">Replace Photos</string>
+    <string name="original">Original</string>
 
 </resources>

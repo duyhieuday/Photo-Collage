@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.example.piceditor.R
 
@@ -47,7 +48,7 @@ class BackgroundAdapter(
         holder.imgFrame.setImageDrawable(drawable)
 
         if (selectedindex == position) {
-            holder.llItemFrame.setBackgroundColor(mContext.resources.getColor(R.color.colorAccent))
+            holder.llItemFrame.setBackgroundResource(R.drawable.bg_item_selected)
         } else {
             holder.llItemFrame.setBackgroundColor(mContext.resources.getColor(R.color.transparent))
         }

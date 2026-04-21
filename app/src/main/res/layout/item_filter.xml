@@ -1,40 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="60dp"
-    android:layout_height="86dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginLeft="2dp"
-    android:padding="5dp"
-    android:id="@+id/rl_filteritem"
-    android:layout_marginRight="2dp"
-    android:orientation="vertical">
-<androidx.cardview.widget.CardView
     android:layout_width="wrap_content"
-    app:cardCornerRadius="4dp"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rl_filteritem"
+    android:padding="4dp"
+    android:layout_marginHorizontal="12dp"
+    android:orientation="vertical">
+
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-    <ImageView
+
+    <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/thumbnail_filter"
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_width="@dimen/dimen_40dp"
+        android:layout_height="60dp"
+        app:riv_corner_radius="6dp"
+        android:layout_centerHorizontal="true"
         android:scaleType="centerCrop" />
 
     <TextView
         android:id="@+id/filterName"
-        android:layout_width="match_parent"
-        android:layout_height="16dp"
-        android:layout_alignParentBottom="true"
-        android:background="@color/white_two"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:ellipsize="end"
-        android:gravity="center"
         android:lines="1"
         android:text="FILTER"
-        android:textAllCaps="true"
-        android:fontFamily="sans-serif-condensed"
-        android:textColor="@color/woodsmoke"
-        android:textSize="9sp" />
+        android:layout_below="@+id/thumbnail_filter"
+        android:textAllCaps="false"
+        android:layout_marginTop="4dp"
+        android:fontFamily="@font/inter_regular"
+        android:layout_centerHorizontal="true"
+        android:textColor="#667085"
+        android:textSize="12sp" />
     </RelativeLayout>
-</androidx.cardview.widget.CardView>
 </RelativeLayout>

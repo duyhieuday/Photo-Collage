@@ -4,12 +4,12 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/ll_itemframe"
+    android:padding="4dp"
     android:orientation="vertical">
 
     <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/img_frame"
         android:layout_width="80dp"
-        android:padding="4dp"
         android:layout_height="80dp"
         app:riv_corner_radius="6dp"
         android:scaleType="centerCrop" />
