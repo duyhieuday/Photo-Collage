@@ -138,5 +138,19 @@
     <string name="recent">Récent</string>
     <string name="no_recent">Aucune récente</string>
     <string name="see_all">Voir tout</string>
+    <string name="delete_drafts">Supprimer les brouillons</string>
+    <string name="drafts_will_be_lost_if_you_unistall">Les brouillons seront perdus si vous désinstallez</string>
+    <string name="delete">Supprimer</string>
+    <string name="template">Modèle</string>
+    <string name="replace">Remplacer</string>
+    <string name="replace_photos">Remplacer les photos</string>
+    <string name="original">Original</string>
+    <string name="permission_title">Autorisation requise</string>
+    <string name="permission_message">Cette application a besoin d\'accéder à vos photos et à votre appareil photo pour créer des collages. Veuillez autoriser l\'accès pour continuer.</string>
+    <string name="permission_denied_title">Accès refusé</string>
+    <string name="permission_denied_message">Vous avez sélectionné « Ne plus demander ». Veuillez vous rendre dans les Paramètres pour accorder l\'autorisation manuellement.</string>
+    <string name="grant_permission">Accorder l\'autorisation</string>
+    <string name="go_to_settings">Accéder aux paramètres</string>
+    <string name="make_another">✨ Faites-en un autre</string>
 
 </resources>

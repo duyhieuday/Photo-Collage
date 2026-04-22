@@ -138,5 +138,19 @@
     <string name="recent">Recent</string>
     <string name="no_recent">No recent</string>
     <string name="see_all">See All</string>
+    <string name="delete_drafts">Delete drafts</string>
+    <string name="drafts_will_be_lost_if_you_unistall">Drafts will be lost if you unistall</string>
+    <string name="delete">Delete</string>
+    <string name="template">Template</string>
+    <string name="replace">Replace</string>
+    <string name="replace_photos">Replace Photos</string>
+    <string name="original">Original</string>
+    <string name="permission_title">Permission Required</string>
+    <string name="permission_message">This app needs access to your photos and camera to create collages. Please grant permission to continue.</string>
+    <string name="permission_denied_title">Permission Denied</string>
+    <string name="permission_denied_message">You have selected "Don\'t ask again". Please go to Settings to grant permission manually.</string>
+    <string name="grant_permission">Grant Permission</string>
+    <string name="go_to_settings">Go to Settings</string>
+    <string name="make_another">✨ Make Another</string>
 
 </resources>

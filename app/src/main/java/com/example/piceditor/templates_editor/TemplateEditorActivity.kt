@@ -1,33 +1,25 @@
 package com.example.piceditor.templates_editor
 
+import android.content.Intent
 import android.content.ContentValues
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
-import android.graphics.ImageDecoder
-import android.graphics.RectF
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
+import android.graphics.*
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IntDef
-import androidx.core.graphics.scale
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.piceditor.R
 import com.example.piceditor.adapters.BackgroundAdapter
-import com.example.piceditor.adapters.ToolAdapter
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityTemplateEditorBinding
@@ -38,6 +30,7 @@ import com.example.piceditor.draw.model.draw.style.PaintStyle
 import com.example.piceditor.draw.model.sticker.StickerData
 import com.example.piceditor.draw.test.Beard
 import com.example.piceditor.draw.test.BeardAdapter
+import com.example.piceditor.adapters.ToolAdapter
 import com.example.piceditor.model.ToolItem
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utils.ImageUtils
@@ -48,9 +41,14 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.io.IOException
 import java.io.InputStreamReader
 import kotlin.math.min
+import androidx.core.graphics.scale
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import com.example.piceditor.ShowImageActivity
 
 class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
     BackgroundAdapter.OnBGClickListener,
@@ -481,20 +479,25 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
 
     private fun onExportClick() {
         lifecycleScope.launch {
-            val saved = withContext(Dispatchers.IO) {
-                runCatching { saveToGallery(binding.templateEditorView.export()) }.isSuccess
+            val savedUri = withContext(Dispatchers.IO) {
+                runCatching { saveToGallery(binding.templateEditorView.export()) }.getOrNull()
             }
-            Toast.makeText(
-                this@TemplateEditorActivity,
-                if (saved) "✅ Đã lưu vào thư viện!" else "❌ Lưu thất bại",
-                Toast.LENGTH_SHORT
-            ).show()
+            if (savedUri != null) {
+                // ✅ Chuyển sang ShowImageActivity với URI vừa lưu
+                startActivity(
+                    Intent(this@TemplateEditorActivity, ShowImageActivity::class.java).apply {
+                        putExtra("image_uri", savedUri.toString())
+                    }
+                )
+            } else {
+                Toast.makeText(this@TemplateEditorActivity, "❌ Save failed", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
-    private fun saveToGallery(bitmap: Bitmap) {
+    private fun saveToGallery(bitmap: Bitmap): Uri {
         val filename = "collage_${System.currentTimeMillis()}.jpg"
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val values = ContentValues().apply {
                 put(MediaStore.Images.Media.DISPLAY_NAME, filename)
                 put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
@@ -508,6 +511,7 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
             values.clear()
             values.put(MediaStore.Images.Media.IS_PENDING, 0)
             contentResolver.update(uri, values, null, null)
+            uri
         } else {
             @Suppress("DEPRECATION")
             val dir = Environment
@@ -519,6 +523,7 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
             MediaScannerConnection.scanFile(
                 this, arrayOf(file.absolutePath), arrayOf("image/jpeg"), null
             )
+            Uri.fromFile(file)
         }
     }
 

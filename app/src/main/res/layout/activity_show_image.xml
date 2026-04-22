@@ -81,7 +81,7 @@
                     android:background="@drawable/bg_btn_next1"
                     android:drawablePadding="8dp"
                     android:gravity="center"
-                    android:text="✨ Make Another"
+                    android:text="@string/make_another"
                     android:textColor="#B7FF00"
                     android:textStyle="bold" />
 

@@ -138,5 +138,19 @@
     <string name="recent">Gần đây</string>
     <string name="no_recent">Không có thông tin gần đây</string>
     <string name="see_all">Xem tất cả</string>
+    <string name="delete_drafts">Xóa bản nháp</string>
+    <string name="drafts_will_be_lost_if_you_unistall">Các bản nháp sẽ bị mất nếu bạn gỡ cài đặt.</string>
+    <string name="delete">Xóa bỏ</string>
+    <string name="template">Bản mẫu</string>
+    <string name="replace">Thay thế</string>
+    <string name="replace_photos">Thay thế ảnh</string>
+    <string name="original">Nguyên bản</string>
+    <string name="permission_title">Cần có sự cho phép</string>
+    <string name="permission_message">Ứng dụng này cần quyền truy cập vào ảnh và camera của bạn để tạo ảnh ghép. Vui lòng cấp quyền để tiếp tục.</string>
+    <string name="permission_denied_title">Quyền truy cập bị từ chối</string>
+    <string name="permission_denied_message">Bạn đã chọn "Không hỏi lại". Vui lòng vào Cài đặt để cấp quyền thủ công.</string>
+    <string name="grant_permission">Cấp quyền</string>
+    <string name="go_to_settings">Vào Cài đặt</string>
+    <string name="make_another">✨ Làm thêm một cái nữa</string>
 
 </resources>

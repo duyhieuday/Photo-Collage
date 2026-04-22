@@ -138,5 +138,19 @@
     <string name="recent">Recente</string>
     <string name="no_recent">Sem novidades</string>
     <string name="see_all">Ver tudo</string>
+    <string name="delete_drafts">Excluir rascunhos</string>
+    <string name="drafts_will_be_lost_if_you_unistall">Os rascunhos serão perdidos se você desinstalar o programa.</string>
+    <string name="delete">Excluir</string>
+    <string name="template">Modelo</string>
+    <string name="replace">Substituir</string>
+    <string name="replace_photos">Substituir fotos</string>
+    <string name="original">Original</string>
+    <string name="permission_title">É necessária autorização.</string>
+    <string name="permission_message">Este aplicativo precisa acessar suas fotos e sua câmera para criar colagens. Por favor, conceda permissão para continuar.</string>
+    <string name="permission_denied_title">Permissão negada</string>
+    <string name="permission_denied_message">Você selecionou "Não perguntar novamente". Acesse as Configurações para conceder permissão manualmente.</string>
+    <string name="grant_permission">Conceder permissão</string>
+    <string name="go_to_settings">Acesse as Configurações.</string>
+    <string name="make_another">✨ Faça outro</string>
 
 </resources>

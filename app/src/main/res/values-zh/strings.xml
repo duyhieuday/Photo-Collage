@@ -138,5 +138,19 @@
     <string name="recent">最近的</string>
     <string name="no_recent">近期无</string>
     <string name="see_all">查看全部</string>
+    <string name="delete_drafts">删除草稿</string>
+    <string name="drafts_will_be_lost_if_you_unistall">卸载后草稿将会丢失</string>
+    <string name="delete">删除</string>
+    <string name="template">模板</string>
+    <string name="replace">代替</string>
+    <string name="replace_photos">替换照片</string>
+    <string name="original">原来的</string>
+    <string name="permission_title">需要获得许可</string>
+    <string name="permission_message">此应用需要访问您的照片和相机才能创建拼贴画。请授予权限以继续。</string>
+    <string name="permission_denied_title">没有权限</string>
+    <string name="permission_denied_message">您已选择“不再询问”。请前往“设置”手动授予权限。</string>
+    <string name="grant_permission">授予许可</string>
+    <string name="go_to_settings">前往设置</string>
+    <string name="make_another">✨再做一个</string>
 
 </resources>

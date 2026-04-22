@@ -123,7 +123,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/listPhotoCell"
                     android:layout_width="match_parent"
-                    android:layout_height="84dp"
+                    android:layout_height="96dp"
                     android:layout_marginHorizontal="@dimen/dimen_16dp"
                     android:layout_marginBottom="@dimen/dimen_16dp" />
 
@@ -269,7 +269,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/list_bg"
                     android:layout_width="match_parent"
-                    android:layout_height="80dp"
+                    android:layout_height="96dp"
                     android:layout_marginHorizontal="@dimen/dimen_16dp"
                     android:layout_marginBottom="@dimen/dimen_16dp" />
             </LinearLayout>
@@ -311,7 +311,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/listSticker"
                     android:layout_width="match_parent"
-                    android:layout_height="80dp"
+                    android:layout_height="96dp"
                     android:layout_marginBottom="@dimen/dimen_16dp" />
             </LinearLayout>
 
