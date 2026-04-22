@@ -191,12 +191,12 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         setUpTemp()
         setUpRecent()
 
-        binding.tvTemplates.setOnClickListener {
-            checkAndRequestPermission()
-            if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
-            mLastClickTime = SystemClock.elapsedRealtime()
-            startActivity(Intent(this, TemplatePickerActivity::class.java))
-        }
+//        binding.tvTemplates.setOnClickListener {
+//            checkAndRequestPermission()
+//            if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
+//            mLastClickTime = SystemClock.elapsedRealtime()
+//            startActivity(Intent(this, TemplatePickerActivity::class.java))
+//        }
     }
 
     // ──────────────────────────────────────────────────────
