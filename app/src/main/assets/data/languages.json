@@ -9,30 +9,30 @@
     "languageId": 2,
     "languageName": "Hindi",
     "flag": "drawable/hindi",
-    "signLanguage": "hi"
+    "signLanguage": "en"
   },
   {
     "languageId": 3,
     "languageName": "French",
     "flag": "drawable/french",
-    "signLanguage": "fr"
+    "signLanguage": "en"
   },
   {
     "languageId": 4,
     "languageName": "Portuguese",
     "flag": "drawable/portuguese",
-    "signLanguage": "pt"
+    "signLanguage": "en"
   },
   {
     "languageId": 5,
     "languageName": "Vietnamese",
     "flag": "drawable/vietnamese",
-    "signLanguage": "vi"
+    "signLanguage": "en"
   },
   {
     "languageId": 6,
     "languageName": "Taiwanese",
     "flag": "drawable/taiwanese",
-    "signLanguage": "zh"
+    "signLanguage": "en"
   }
 ]

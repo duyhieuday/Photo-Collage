@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.Toast
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -29,7 +30,6 @@ import com.ezt.pdfreader.photoeditor.viewmodel.PhotoEditorViewModel
 import com.mct.doc.scanner.view.PerspectiveImageView
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import androidx.core.graphics.drawable.toDrawable
 
 class PhotoCropperFragment : Fragment() {
 
@@ -43,11 +43,6 @@ class PhotoCropperFragment : Fragment() {
         }
     }
 
-    /**
-     * NO_CROP  – user xoá crop, applyToAll = xoá crop tất cả trang
-     * AI       – AI vừa detect, applyToAll = AI crop tất cả trang
-     * MANUAL   – user kéo tay hoặc default, applyToAll = copy crop hiện tại sang tất cả trang
-     */
     private enum class CropMode { MANUAL, NO_CROP, AI }
 
     private var _binding: FragmentPhotoCropperBinding? = null
@@ -59,8 +54,6 @@ class PhotoCropperFragment : Fragment() {
     private var cropMode = CropMode.MANUAL
     private val isSinglePage: Boolean
         get() = arguments?.getBoolean(ARG_SINGLE_PAGE, false) == true
-
-    // ─────────────────────────────────────────────────────────────
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentPhotoCropperBinding.inflate(inflater, container, false)
@@ -80,10 +73,6 @@ class PhotoCropperFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Setup
-    // ─────────────────────────────────────────────────────────────
 
     private fun setupToolbar() {
         binding.toolbar.setNavigationOnClickListener {
@@ -110,7 +99,6 @@ class PhotoCropperFragment : Fragment() {
     }
 
     private fun setupBottomBar() {
-        // ── Rotate ───────────────────────────────────────────────
         binding.btnRotate.setOnClickListener {
             withCurrentPvView { pvView ->
                 pvView.rotateLeft()
@@ -118,7 +106,6 @@ class PhotoCropperFragment : Fragment() {
             }
         }
 
-        // ── Flip ─────────────────────────────────────────────────
         binding.btnFlip.setOnClickListener {
             withCurrentPvView { pvView ->
                 pvView.toggleFlipX()
@@ -126,18 +113,15 @@ class PhotoCropperFragment : Fragment() {
             }
         }
 
-        // ── No Crop ──────────────────────────────────────────────
         binding.btnNoCrop.setOnClickListener {
             viewModel.setFullCrop()
             setCropMode(CropMode.NO_CROP, showApplyToAll = true)
         }
 
-        // ── AI Crop ──────────────────────────────────────────────
         binding.btnAiCrop.setOnClickListener {
-//            viewModel.detectCornersWithAI()
+            // viewModel.detectCornersWithAI()
         }
 
-        // ── Apply to All ─────────────────────────────────────────
         binding.btnApplyToAll.setOnClickListener {
             when (cropMode) {
                 CropMode.NO_CROP -> showApplyAllDialog(
@@ -146,6 +130,8 @@ class PhotoCropperFragment : Fragment() {
                     messageRes = R.string.pe_apply_no_crop_message
                 ) {
                     viewModel.applyNoCropToAllPages()
+                    // ✅ Notify TẤT CẢ trang để update corners từ PageState
+                    pagerAdapter.updateCornersAllPages()
                     Toast.makeText(requireContext(), R.string.pe_apply_to_all, Toast.LENGTH_SHORT).show()
                 }
                 CropMode.AI -> showApplyAllDialog(
@@ -163,7 +149,6 @@ class PhotoCropperFragment : Fragment() {
             }
         }
 
-        // ── Next / Done ─────────────────────────────────────────────
         if (isSinglePage) {
             binding.btnNext.setText(R.string.pe_done)
             binding.btnDeletePage.isVisible = false
@@ -171,17 +156,12 @@ class PhotoCropperFragment : Fragment() {
         binding.btnNext.setOnClickListener {
             syncCornersFromView()
             if (isSinglePage) {
-                // Quay lại filter screen, reload ảnh với crop mới
                 parentFragmentManager.popBackStack()
             } else {
                 (requireActivity() as PhotoEditorActivity).replaceFilter()
             }
         }
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Crop mode UI
-    // ─────────────────────────────────────────────────────────────
 
     private fun setCropMode(mode: CropMode, showApplyToAll: Boolean = false) {
         cropMode = mode
@@ -204,10 +184,6 @@ class PhotoCropperFragment : Fragment() {
             }
         }
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Observe
-    // ─────────────────────────────────────────────────────────────
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -236,10 +212,8 @@ class PhotoCropperFragment : Fragment() {
                         updatePageIndicator()
                         val state = viewModel.pages.value.getOrNull(index) ?: return@collect
                         val initialMode = when {
-
-                            state.corners == null          -> CropMode.NO_CROP
-//                            state.cornersWithAI != null    -> CropMode.AI
-                            else                           -> CropMode.MANUAL
+                            state.corners == null -> CropMode.NO_CROP
+                            else -> CropMode.MANUAL
                         }
                         setCropMode(initialMode)
                     }
@@ -260,17 +234,11 @@ class PhotoCropperFragment : Fragment() {
         val adapterPos = if (isSinglePage) 0 else idx
         when (event) {
             is PhotoEditorEvent.CornersChanged -> {
-                val corners = viewModel.pages.value.getOrNull(idx)?.corners
-                pagerAdapter.updateCorners(corners, adapterPos)
-                // AI detect thành công → chuyển sang AI mode, hiện apply to all
-//                if (corners != null) setCropMode(CropMode.AI, showApplyToAll = true)
+                // ✅ Update UI trang hiện tại — corners lấy từ PageState
+                val idx = viewModel.currentPageIndex.value
+                val adapterPos = if (isSinglePage) 0 else idx
+                pagerAdapter.updateCorners(adapterPos)
             }
-//            is PhotoEditorEvent.AiCropAllDone -> {
-//                setCropMode(CropMode.AI, showApplyToAll = true)
-//                val corners = viewModel.pages.value.getOrNull(idx)?.corners
-//                pagerAdapter.updateCorners(corners, adapterPos)
-//                Toast.makeText(requireContext(), R.string.pe_apply_to_all, Toast.LENGTH_SHORT).show()
-//            }
             is PhotoEditorEvent.ConfirmDeletePage -> showDeleteDialog(event.index)
             is PhotoEditorEvent.PageDeleted ->
                 Toast.makeText(requireContext(), R.string.pe_page_deleted, Toast.LENGTH_SHORT).show()
@@ -281,10 +249,6 @@ class PhotoCropperFragment : Fragment() {
             else -> Unit
         }
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Helpers
-    // ─────────────────────────────────────────────────────────────
 
     private fun updatePageIndicator() {
         if (isSinglePage) {
@@ -317,9 +281,6 @@ class PhotoCropperFragment : Fragment() {
         block(pv)
     }
 
-    /**
-     * Đọc corners hiện tại từ pvView, scale từ bitmap space → original space và lưu vào ViewModel.
-     */
     private fun syncCornersFromView() {
         withCurrentPvView { pvView ->
             val bitmapCorners = pvView.cornersArray ?: return@withCurrentPvView

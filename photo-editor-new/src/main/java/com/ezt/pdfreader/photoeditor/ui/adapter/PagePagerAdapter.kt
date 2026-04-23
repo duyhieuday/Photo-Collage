@@ -26,17 +26,18 @@ class PagePagerAdapter :
     ListAdapter<PageState, PagePagerAdapter.PageViewHolder>(PageDiffCallback()) {
 
     companion object {
-        private const val PAYLOAD_RELOAD     = "payload_reload"      // load lại ảnh (filter thay đổi)
-        private const val PAYLOAD_CORNERS    = "payload_corners"     // corners → cập nhật pvView
-        private const val PAYLOAD_TRANSFORM  = "payload_transform"   // rotation/flip → cập nhật pvView
-        private const val PAYLOAD_ADJUST     = "payload_adjust"      // adjust  → cập nhật pvView
-        private const val PAYLOAD_LOADING    = "payload_loading"
-        private const val PAYLOAD_CROP_MODE  = "payload_crop_mode"   // chỉ ảnh hưởng mask visibility
+        private const val PAYLOAD_RELOAD    = "payload_reload"
+        private const val PAYLOAD_CORNERS   = "payload_corners"
+        private const val PAYLOAD_TRANSFORM = "payload_transform"
+        private const val PAYLOAD_ADJUST    = "payload_adjust"
+        private const val PAYLOAD_LOADING   = "payload_loading"
+        private const val PAYLOAD_CROP_MODE = "payload_crop_mode"
     }
 
     private var cropModeEnabled = false
     private var showLoading = false
-    private var pendingCorners: IntArray? = null
+
+    // ✅ Bỏ pendingCorners shared state — mỗi ViewHolder tự đọc từ PageState
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PageViewHolder {
         val binding = ItemPePageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -59,7 +60,8 @@ class PagePagerAdapter :
         }
         if (PAYLOAD_TRANSFORM in payloads) holder.applyTransform(item)
         if (PAYLOAD_ADJUST in payloads)    holder.applyAdjust(item)
-        if (PAYLOAD_CORNERS in payloads)   holder.applyCorners(pendingCorners, item)
+        // ✅ Corners lấy từ PageState của item, không dùng pendingCorners nữa
+        if (PAYLOAD_CORNERS in payloads)   holder.applyCorners(item)
         if (PAYLOAD_LOADING in payloads)   holder.setLoading(showLoading)
         if (PAYLOAD_CROP_MODE in payloads) holder.updateMaskVisibility()
     }
@@ -78,9 +80,14 @@ class PagePagerAdapter :
         if (position in 0 until itemCount) notifyItemChanged(position, PAYLOAD_TRANSFORM)
     }
 
-    fun updateCorners(corners: IntArray?, position: Int) {
-        pendingCorners = corners
+    // ✅ Update corners cho 1 trang cụ thể — đọc từ PageState
+    fun updateCorners(position: Int) {
         if (position in 0 until itemCount) notifyItemChanged(position, PAYLOAD_CORNERS)
+    }
+
+    // ✅ Update corners cho TẤT CẢ trang — dùng khi applyNoCropToAll / applyCurrentCropToAll
+    fun updateCornersAllPages() {
+        if (itemCount > 0) notifyItemRangeChanged(0, itemCount, PAYLOAD_CORNERS)
     }
 
     fun updateAdjust(position: Int) {
@@ -128,15 +135,12 @@ class PagePagerAdapter :
                 .override(BitmapLoader.PREVIEW_SIZE)
 
             val transforms = mutableListOf<BitmapTransformation>()
-
             if (!cropModeEnabled && state.corners != null) {
                 transforms.add(CropTransform(state.corners!!, state.originalWidth, state.originalHeight))
             }
-
             if (!cropModeEnabled && state.filterType != FilterType.NONE) {
                 transforms.add(FilterTransform(state.filterType, binding.ivPage.context))
             }
-
             if (transforms.isNotEmpty()) {
                 request = request
                     .transform(*transforms.toTypedArray())
@@ -155,8 +159,9 @@ class PagePagerAdapter :
             })
         }
 
-        fun applyCorners(corners: IntArray?, state: PageState) {
-            setCorner(scaleToDisplay(corners, state))
+        // ✅ Đọc corners trực tiếp từ PageState — không phụ thuộc vào pendingCorners nữa
+        fun applyCorners(state: PageState) {
+            setCorner(scaleToDisplay(state.corners, state))
         }
 
         fun applyTransform(state: PageState) {
@@ -172,26 +177,21 @@ class PagePagerAdapter :
             binding.ivPage.warmth = state.warmth
         }
 
-        // ── Internals ──
-
         private fun applyAllToPvView(state: PageState, bitmap: Bitmap) {
-            // Transform
             binding.ivPage.rotationAngle = state.rotation.toFloat()
             binding.ivPage.isFlipX = state.flipX
             binding.ivPage.isFlipY = state.flipY
-            // Adjust
             binding.ivPage.brightness = state.brightness
             binding.ivPage.contrast = state.contrast
             binding.ivPage.saturation = state.saturation
             binding.ivPage.warmth = state.warmth
-            // Corners (scale từ original space → bitmap space)
             setCorner(scaleToDisplay(state.corners, state, bitmap.width, bitmap.height))
         }
 
         private fun setCorner(corners: IntArray?) {
             binding.ivPage.post {
                 if (corners != null) binding.ivPage.cornersArray = corners
-                else binding.ivPage.setCorners()
+                else binding.ivPage.setCorners()  // reset về full (no crop)
             }
         }
 
@@ -217,16 +217,16 @@ class PagePagerAdapter :
 
         override fun areContentsTheSame(oldItem: PageState, newItem: PageState) =
             oldItem.uri == newItem.uri &&
-            oldItem.filterType == newItem.filterType &&
-            oldItem.rotation == newItem.rotation &&
-            oldItem.flipX == newItem.flipX &&
-            oldItem.flipY == newItem.flipY &&
-            oldItem.brightness == newItem.brightness &&
-            oldItem.contrast == newItem.contrast &&
-            oldItem.saturation == newItem.saturation &&
-            oldItem.warmth == newItem.warmth &&
-            nullableArrayEquals(oldItem.corners, newItem.corners) &&
-            nullableArrayEquals(oldItem.cornersWithAI, newItem.cornersWithAI)
+                    oldItem.filterType == newItem.filterType &&
+                    oldItem.rotation == newItem.rotation &&
+                    oldItem.flipX == newItem.flipX &&
+                    oldItem.flipY == newItem.flipY &&
+                    oldItem.brightness == newItem.brightness &&
+                    oldItem.contrast == newItem.contrast &&
+                    oldItem.saturation == newItem.saturation &&
+                    oldItem.warmth == newItem.warmth &&
+                    nullableArrayEquals(oldItem.corners, newItem.corners) &&
+                    nullableArrayEquals(oldItem.cornersWithAI, newItem.cornersWithAI)
 
         private fun nullableArrayEquals(a: IntArray?, b: IntArray?): Boolean {
             if (a == null && b == null) return true

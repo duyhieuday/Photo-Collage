@@ -111,6 +111,7 @@
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_facebook"
                         android:layout_weight="1"
+                        android:visibility="gone"
                         />
 
                     <androidx.appcompat.widget.AppCompatImageView

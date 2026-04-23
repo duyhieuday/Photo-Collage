@@ -215,8 +215,14 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
 
     /** Xoá crop trên tất cả trang. */
     fun applyNoCropToAllPages() {
-        _pages.value =
-            _pages.value.map { page -> page.copy().apply { corners = null; cornersWithAI = null } }
+        _pages.value = _pages.value.map { page ->
+            page.copy().apply {
+                corners = null
+                cornersWithAI = null
+            }
+        }
+        // ✅ Emit CornersChanged để Fragment update UI trang hiện tại
+        emitEvent(PhotoEditorEvent.CornersChanged)
     }
 
     fun applyCurrentCropToAllPages() {
