@@ -149,11 +149,11 @@ dependencies {
     implementation 'com.google.android.gms:play-services-ads:24.8.0'
 
     //mediation
-    implementation  'com.google.ads.mediation:applovin:12.6.1.0'
-    implementation  'com.google.ads.mediation:vungle:7.4.1.0'
-    implementation  'com.google.ads.mediation:facebook:6.17.0.0'
-    implementation  'com.google.ads.mediation:mintegral:16.8.41.0'
-    implementation  'com.google.ads.mediation:pangle:6.2.0.4.0'
+//    implementation  'com.google.ads.mediation:applovin:12.6.1.0'
+//    implementation  'com.google.ads.mediation:vungle:7.4.1.0'
+//    implementation  'com.google.ads.mediation:facebook:6.17.0.0'
+//    implementation  'com.google.ads.mediation:mintegral:16.8.41.0'
+//    implementation  'com.google.ads.mediation:pangle:6.2.0.4.0'
     implementation 'com.facebook.android:facebook-android-sdk:18.0.1'
 
     implementation 'com.google.android.ump:user-messaging-platform:2.1.0'
