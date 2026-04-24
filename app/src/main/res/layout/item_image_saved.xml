@@ -17,7 +17,7 @@
             android:layout_width="152dp"
             android:layout_height="152dp"
             app:riv_corner_radius="8dp"
-            android:layout_margin="4dp"
+            android:padding="8dp"
             android:scaleType="centerCrop"/>
 
         <LinearLayout

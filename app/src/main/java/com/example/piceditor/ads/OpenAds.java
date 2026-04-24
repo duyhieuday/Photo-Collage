@@ -25,7 +25,7 @@ import java.util.Date;
 
 public class OpenAds {
 
-    private static final String OPEN_TEST_ID = "ca-app-pub-3940256099942544/9257395921";
+    private static final String OPEN_TEST_ID = "ca-app-pub-3940256099942544/9999999999";
 
     private static final String OPEN_ID_DEFAULT = "ca-app-pub-3607148519095421/2245171681";
 

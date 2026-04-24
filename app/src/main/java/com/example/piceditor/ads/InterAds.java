@@ -28,7 +28,7 @@ import java.util.Date;
 public class InterAds {
 
 
-    private static final String INTER_TEST_ID = "ca-app-pub-3940256099942544/1033173712";
+    private static final String INTER_TEST_ID = "ca-app-pub-3940256099942544/9999999999";
 
     private static final String INTER_ID_DEFAULT = "ca-app-pub-3607148519095421/2658258742";
 

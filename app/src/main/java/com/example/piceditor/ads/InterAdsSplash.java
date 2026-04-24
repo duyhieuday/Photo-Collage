@@ -25,7 +25,7 @@ import java.util.Date;
 public class InterAdsSplash {
 
     public static boolean firstAction = true;
-    private static final String INTER_TEST_ID = "ca-app-pub-3940256099942544/1033173712";
+    private static final String INTER_TEST_ID = "ca-app-pub-3940256099942544/9999999999";
     private static String currentAdId;
     private static InterstitialAd mInterstitialAd;
     private static boolean isLoading = false;

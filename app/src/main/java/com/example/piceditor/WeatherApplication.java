@@ -23,6 +23,7 @@ import com.android.billingclient.api.QueryPurchasesParams;
 import com.example.piceditor.ads.OpenAdsHelper;
 import com.example.piceditor.ads.Prefs;
 import com.example.piceditor.utilsApp.Constant;
+import com.example.piceditor.utilsApp.LanguageManager;
 import com.example.piceditor.utilsApp.PreferenceUtil;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
@@ -62,6 +63,13 @@ public class WeatherApplication extends Application{
         new OpenAdsHelper().setup(this);
 
         initRemoteConfig();
+
+        LanguageManager languageManager = new LanguageManager(this);
+        languageManager.updateResource("en");
+
+        // Lưu lại để các Activity sau không hỏi lại
+        SharedPreferences prefs = getSharedPreferences("signLanguage", MODE_PRIVATE);
+        prefs.edit().putString("getSignLanguage", "en").apply();
 
         createChannelNotification();
 

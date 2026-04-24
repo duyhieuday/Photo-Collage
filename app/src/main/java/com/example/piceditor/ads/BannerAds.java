@@ -25,7 +25,7 @@ import com.google.android.gms.ads.LoadAdError;
 
 public class BannerAds {
 
-    private static final String BANNER_TEST_ID = "ca-app-pub-3940256099942544/9214589741";
+    private static final String BANNER_TEST_ID = "ca-app-pub-3940256099942544/9999999999";
 
     private static final String BANNER_ID_DEFAULT = "ca-app-pub-3607148519095421/3095218929";
 
