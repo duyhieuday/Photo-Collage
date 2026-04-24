@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.piceditor.adapters.GalleryImageAdapter
 import com.example.piceditor.adapters.SelectedPhotoAdapter
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
@@ -18,112 +19,97 @@ import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utilsApp.Constant
 import com.example.piceditor.utilsApp.PreferenceUtil
 
-class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(), GalleryFragment.OnSelectImageListener,
+class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(),
+    GalleryFragment.OnSelectImageListener,
     SelectedPhotoAdapter.OnDeleteButtonClickListener {
-
-
-    override fun onDeleteButtonClick(str: String) {
-
-        mSelectedImages.remove(str)
-        mSelectedPhotoAdapter.notifyDataSetChanged()
-        val textView = binding.textImageCount
-        val str2 = "Select upto 10 photo(s)"
-        val sb = StringBuilder()
-        sb.append("(")
-        sb.append(this.mSelectedImages.size)
-        sb.append(")")
-        textView.text = str2 + sb.toString()
-    }
 
     private val mSelectedImages = ArrayList<String>()
     private var maxIamgeCount = 10
     private lateinit var mSelectedPhotoAdapter: SelectedPhotoAdapter
     private var mLastClickTime: Long = 0
+
+    // ✅ Reference đến GalleryImageAdapter để sync badge khi xóa
+    private var galleryAdapter: GalleryImageAdapter? = null
+
+    fun setGalleryAdapter(adapter: GalleryImageAdapter) {
+        galleryAdapter = adapter
+    }
+
     fun checkClick() {
-        if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) {
-            return
-        }
+        if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return
         mLastClickTime = SystemClock.elapsedRealtime()
     }
 
+    // ── Callbacks ─────────────────────────────────────────
 
     override fun onSelectImage(str: String) {
-
-        if (mSelectedImages.contains(str)) {
-            // 👉 nếu đã chọn thì bỏ chọn (toggle)
-            mSelectedImages.remove(str)
-        } else {
-            if (mSelectedImages.size == maxIamgeCount) {
-                Toast.makeText(
-                    this,
-                    String.format("You only need %d photo(s)", maxIamgeCount),
-                    Toast.LENGTH_SHORT
-                ).show()
-                return
-            }
-            mSelectedImages.add(str)
+        if (mSelectedImages.size >= maxIamgeCount) {
+            Toast.makeText(
+                this,
+                String.format("You can only select up to %d photo(s)", maxIamgeCount),
+                Toast.LENGTH_SHORT
+            ).show()
+            return  // ← không add, không tăng badge
         }
 
+        // ✅ Được phép chọn → add vào list và tăng badge
+        mSelectedImages.add(str)
+        galleryAdapter?.increaseCount(str)
+
         mSelectedPhotoAdapter.notifyDataSetChanged()
-
-        binding.textImageCount.text =
-            "Select upto 10 photo(s) (${mSelectedImages.size})"
-
-        updateButtonState() // ✅ gọi ở đây
+        binding.textImageCount.text = "Select upto 10 photo(s) (${mSelectedImages.size})"
+        updateButtonState()
     }
+
+    override fun onDeleteButtonClick(str: String) {
+        // Chỉ xóa 1 lần xuất hiện (remove first occurrence)
+        mSelectedImages.remove(str)
+
+        // ✅ Giảm count badge trên gallery
+        galleryAdapter?.decreaseCount(str)
+
+        mSelectedPhotoAdapter.notifyDataSetChanged()
+        binding.textImageCount.text = "Select upto 10 photo(s) (${mSelectedImages.size})"
+        updateButtonState()
+    }
+
+    // ── UI helpers ────────────────────────────────────────
 
     private fun updateButtonState() {
         if (mSelectedImages.isEmpty()) {
-            // disable
             binding.btnNext.setBackgroundResource(R.drawable.bg_btn_next)
             binding.btnNext.setTextColor("#1D2939".toColorInt())
         } else {
-            // enable
             binding.btnNext.setBackgroundResource(R.drawable.bg_btn_next1)
             binding.btnNext.setTextColor("#FCFCFD".toColorInt())
         }
     }
 
-    override fun getLayoutRes(): Int {
-        return R.layout.activity_select_image
-    }
+    // ── BaseActivityNew overrides ─────────────────────────
 
-    override fun getFrame(): Int {
-        return 0
-    }
-
-    override fun getDataFromIntent() {
-
-    }
+    override fun getLayoutRes() = R.layout.activity_select_image
+    override fun getFrame() = 0
+    override fun getDataFromIntent() {}
+    override fun setListener() {}
+    override fun initFragment(): BaseFragment<*>? = null
 
     override fun doAfterOnCreate() {
-        if (PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no")
-                .equals("yes")
-        ) {
+        if (PreferenceUtil.getInstance(this)
+                .getValue(Constant.SharePrefKey.BANNER_COL, "no").equals("yes")) {
             initBanner(binding.banner.adViewContainer)
         } else {
             initBanner(binding.adViewContainer)
-            binding.banner.getRoot().visibility = View.GONE
+            binding.banner.root.visibility = View.GONE
         }
     }
 
-    protected override fun onResume() {
+    override fun onResume() {
         super.onResume()
-        if (PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no")
-                .equals("yes")
-        ) {
-        } else {
+        if (!PreferenceUtil.getInstance(this)
+                .getValue(Constant.SharePrefKey.BANNER_COL, "no").equals("yes")) {
             initBanner(binding.adViewContainer)
-            binding.banner.getRoot().visibility = View.GONE
+            binding.banner.root.visibility = View.GONE
         }
-    }
-
-    override fun setListener() {
-
-    }
-
-    override fun initFragment(): BaseFragment<*>? {
-        return null
     }
 
     override fun afterSetContentView() {
@@ -133,19 +119,19 @@ class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(), Galle
         BarsUtils.setAppearanceLightStatusBars(this, true)
     }
 
+    // ── Lifecycle ─────────────────────────────────────────
+
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         BarsUtils.setHideNavigation(this)
 
-        binding.ivBack.setOnClickListener {
-            finish()
-        }
+        binding.ivBack.setOnClickListener { finish() }
 
         mSelectedPhotoAdapter = SelectedPhotoAdapter(mSelectedImages, this)
-
         binding.listImages.hasFixedSize()
-        binding.listImages.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.listImages.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.listImages.adapter = mSelectedPhotoAdapter
 
         supportFragmentManager.beginTransaction()
@@ -158,20 +144,19 @@ class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(), Galle
         }
     }
 
+    // ── Navigation ────────────────────────────────────────
+
     fun createCollage() {
         if (mSelectedImages.isEmpty()) {
             Toast.makeText(this, "Please select photo(s)", Toast.LENGTH_SHORT).show()
             return
         }
-
         try {
             val intent = Intent(this, CollageActivity::class.java)
             intent.putExtra("imageCount", mSelectedImages.size)
             intent.putExtra("selectedImages", mSelectedImages)
             intent.putExtra("imagesinTemplate", mSelectedImages.size)
             startActivityForResult(intent, 111)
-
-
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -179,14 +164,9 @@ class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(), Galle
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode != Activity.RESULT_OK) {
-            return
-        }
-
+        if (resultCode != Activity.RESULT_OK) return
         if (requestCode == 111) {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, MainActivity::class.java))
             finish()
         }
     }

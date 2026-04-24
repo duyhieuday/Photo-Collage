@@ -13,6 +13,7 @@ import androidx.core.graphics.toColorInt
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.piceditor.R
+import com.example.piceditor.SelectImageActivity
 import com.example.piceditor.adapters.GalleryImageAdapter
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.FragmentGalleryBinding
@@ -38,12 +39,10 @@ class GalleryFragment : BaseFragment<FragmentGalleryBinding>() {
         if (activity is OnSelectImageListener) {
             listener = activity as OnSelectImageListener
         }
-
         loadImages()
     }
 
     override fun setListener() {
-
         binding.tabAll.setOnClickListener {
             adapter.updateData(allImages)
             updateTabUI(binding.tabAll)
@@ -63,14 +62,11 @@ class GalleryFragment : BaseFragment<FragmentGalleryBinding>() {
     }
 
     private fun updateTabUI(selected: TextView) {
-
-        val normalColor = "#98A2B3".toColorInt()
+        val normalColor   = "#98A2B3".toColorInt()
         val selectedColor = "#101828".toColorInt()
-
         binding.tabAll.setTextColor(normalColor)
         binding.tabCamera.setTextColor(normalColor)
         binding.tabDownload.setTextColor(normalColor)
-
         selected.setTextColor(selectedColor)
     }
 
@@ -88,16 +84,13 @@ class GalleryFragment : BaseFragment<FragmentGalleryBinding>() {
 
     private fun loadImages() {
         lifecycleScope.launch {
-
             binding.progressBar.visibility = View.VISIBLE
 
-            val images = withContext(Dispatchers.IO) {
-                getAllImages()
-            }
+            val images = withContext(Dispatchers.IO) { getAllImages() }
 
             binding.progressBar.visibility = View.GONE
 
-            allImages = images
+            allImages    = images
             currentImages = ArrayList(images)
 
             adapter = GalleryImageAdapter(requireContext(), currentImages) { path ->
@@ -105,28 +98,21 @@ class GalleryFragment : BaseFragment<FragmentGalleryBinding>() {
             }
 
             binding.recyclerView.adapter = adapter
+
+            // ✅ Pass adapter lên SelectImageActivity để sync badge khi xóa
+            (activity as? SelectImageActivity)?.setGalleryAdapter(adapter)
         }
     }
 
     @SuppressLint("Range")
     private fun getAllImages(): ArrayList<String> {
-
         val list = ArrayList<String>()
-
         val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-
-        val projection = arrayOf(
-            MediaStore.Images.Media.DATA
-        )
-
+        val projection = arrayOf(MediaStore.Images.Media.DATA)
         val cursor: Cursor? = requireContext().contentResolver.query(
-            uri,
-            projection,
-            null,
-            null,
+            uri, projection, null, null,
             MediaStore.Images.Media.DATE_ADDED + " DESC"
         )
-
         cursor?.use {
             if (it.moveToFirst()) {
                 do {
@@ -135,7 +121,6 @@ class GalleryFragment : BaseFragment<FragmentGalleryBinding>() {
                 } while (it.moveToNext())
             }
         }
-
         return list
     }
 

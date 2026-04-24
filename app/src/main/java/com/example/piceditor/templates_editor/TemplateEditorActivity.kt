@@ -1,25 +1,29 @@
 package com.example.piceditor.templates_editor
 
-import android.content.Intent
 import android.content.ContentValues
+import android.content.Intent
 import android.graphics.*
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IntDef
+import androidx.core.graphics.scale
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.piceditor.R
+import com.example.piceditor.ShowImageActivity
 import com.example.piceditor.adapters.BackgroundAdapter
+import com.example.piceditor.adapters.ToolAdapter
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityTemplateEditorBinding
@@ -30,7 +34,6 @@ import com.example.piceditor.draw.model.draw.style.PaintStyle
 import com.example.piceditor.draw.model.sticker.StickerData
 import com.example.piceditor.draw.test.Beard
 import com.example.piceditor.draw.test.BeardAdapter
-import com.example.piceditor.adapters.ToolAdapter
 import com.example.piceditor.model.ToolItem
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utils.ImageUtils
@@ -41,14 +44,9 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 import java.io.IOException
 import java.io.InputStreamReader
 import kotlin.math.min
-import androidx.core.graphics.scale
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
-import com.example.piceditor.ShowImageActivity
 
 class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
     BackgroundAdapter.OnBGClickListener,
@@ -401,6 +399,17 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
 
                     // Guard: nếu view vẫn chưa có kích thước thì bỏ qua
                     if (viewW <= 0f || viewH <= 0f) return
+
+                    val scale = min(viewW / TEMPLATE_W, viewH / TEMPLATE_H)
+                    val newW  = TEMPLATE_W * scale
+                    val newH  = TEMPLATE_H * scale
+                    val dx    = (viewW - newW) / 2f
+                    val dy    = (viewH - newH) / 2f
+
+                    android.util.Log.d("TemplateDebug",
+                        "viewW=$viewW viewH=$viewH scale=$scale " +
+                                "newW=$newW newH=$newH dx=$dx dy=$dy"
+                    )
 
                     lifecycleScope.launch {
                         val (scaled, mask) = withContext(Dispatchers.IO) {

@@ -1,23 +1,39 @@
-<FrameLayout android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginHorizontal="3dp"
-    android:layout_marginBottom="6dp"
-    >
+    android:layout_marginBottom="6dp">
 
     <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/img"
         android:layout_width="match_parent"
         android:layout_height="128dp"
         app:riv_corner_radius="2dp"
-        android:scaleType="centerCrop"/>
+        android:scaleType="centerCrop" />
 
+    <!-- Overlay tối khi được chọn -->
     <View
         android:id="@+id/overlay"
         android:visibility="gone"
         android:background="#66000000"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
+
+    <!-- ✅ Badge số lượng góc trên phải -->
+    <TextView
+        android:id="@+id/tvCount"
+        android:visibility="gone"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="6dp"
+        android:gravity="center"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:fontFamily="@font/inter_semi_bold"
+        />
 
 </FrameLayout>

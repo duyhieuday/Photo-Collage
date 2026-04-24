@@ -152,17 +152,18 @@ object TemplateRepository {
 
             // ── Temp 9: Hello Summer ──────────────────────────
             // 1 ô Instagram lớn (thẳng) + 3 ô polaroid nhỏ nghiêng ~16°
-            // Tọa độ đo từ thumb_9 (1080x1920) scale về 1125x2000
+            // Tọa độ đo từ thumb_9 và tính ngược về 1125x2000
+            // accounting for dx=14.69, scale=0.813 từ view thực tế
             TemplateData(
                 id          = "temp_9",
                 name        = "Hello Summer",
                 drawableRes = com.example.piceditor.R.drawable.temp_9,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_9,
                 cellRects   = listOf(
-                    RectF(197f, 239f, 639f, 865f),   // Instagram photo (bỏ header)
-                    RectF(487f, 489f, 837f, 687f),   // Polaroid ô 1
-                    RectF(466f, 713f, 844f, 958f),   // Polaroid ô 2
-                    RectF(435f, 997f, 803f, 1265f)   // Polaroid ô 3
+                    RectF(186f, 240f,  642f, 866f),   // Instagram photo
+                    RectF(485f, 490f,  846f, 688f),   // Polaroid ô 1
+                    RectF(464f, 714f,  854f, 958f),   // Polaroid ô 2
+                    RectF(431f, 998f,  811f, 1266f)   // Polaroid ô 3
                 )
             ),
 
