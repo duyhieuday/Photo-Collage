@@ -2,9 +2,12 @@ package com.ezt.pdfreader.photoeditor.viewmodel
 
 import android.app.Application
 import android.content.ContentValues
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.AndroidViewModel
@@ -26,6 +29,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileOutputStream
 
 class PhotoEditorViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -107,7 +111,7 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
                             .override(BitmapLoader.AI_CROP_SIZE).submit()
                         try {
                             val bitmap = futureTarget.get()
-                            val bw = bitmap.width;
+                            val bw = bitmap.width
                             val bh = bitmap.height
                             val result = DocScanUtils.scan(bitmap, DocScanUtils.Mode.PRECISE)
                             if (result.isNotEmpty() && result[0] >= 0)
@@ -213,7 +217,7 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
         emitEvent(PhotoEditorEvent.CornersChanged)
     }
 
-    /** Xoá crop trên tất cả trang. */
+    /** Remove crop on all pages. */
     fun applyNoCropToAllPages() {
         _pages.value = _pages.value.map { page ->
             page.copy().apply {
@@ -221,7 +225,7 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
                 cornersWithAI = null
             }
         }
-        // ✅ Emit CornersChanged để Fragment update UI trang hiện tại
+        // Emit CornersChanged so the Fragment updates UI for the current page
         emitEvent(PhotoEditorEvent.CornersChanged)
     }
 
@@ -261,9 +265,9 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
                             val futureTarget = BitmapLoader.request(context, state.uri)
                                 .override(BitmapLoader.AI_CROP_SIZE).submit()
                             try {
-                                // Scan ảnh gốc (chưa rotate) → original space
+                                // Scan the original (non-rotated) bitmap → original space
                                 val bitmap = futureTarget.get()
-                                val bw = bitmap.width;
+                                val bw = bitmap.width
                                 val bh = bitmap.height
                                 val result = DocScanUtils.scan(bitmap, DocScanUtils.Mode.PRECISE)
                                 if (result.isNotEmpty() && result[0] >= 0)
@@ -358,7 +362,7 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
     fun detectCornersWithAI() {
         val currentState = _pages.value.getOrNull(_currentPageIndex.value) ?: return
 
-        // Dùng cache nếu có
+        // Use cache if available
         if (currentState.cornersWithAI != null) {
             updateCurrentPage { state -> state.copy().apply { corners = cornersWithAI?.copyOf() } }
             emitEvent(PhotoEditorEvent.CornersChanged)
@@ -377,9 +381,9 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
                     val futureTarget = BitmapLoader.request(context, currentState.uri)
                         .override(BitmapLoader.AI_CROP_SIZE).submit()
                     try {
-                        // Scan ảnh GỐC (chưa rotate) → corners trả về luôn trong original bitmap space
+                        // Scan the ORIGINAL (non-rotated) bitmap → corners are returned in original bitmap space
                         val bitmap = futureTarget.get()
-                        val bw = bitmap.width;
+                        val bw = bitmap.width
                         val bh = bitmap.height
                         val result = DocScanUtils.scan(bitmap, DocScanUtils.Mode.PRECISE)
                         if (result.isNotEmpty() && result[0] >= 0)
@@ -433,18 +437,18 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
 
     // ═══════════════════════════════════════════════════════════════
     // Save — uses DocProcUtils for rotate/flip/adjust
+    // Compatible with all Android versions
     // ═══════════════════════════════════════════════════════════════
 
     suspend fun saveEditedPages(onProgress: ((current: Int, total: Int) -> Unit)? = null): List<Uri> =
         withContext(Dispatchers.IO) {
             val context = getApplication<Application>()
-            val cacheDir = File(context.cacheDir, "edited_pages").also { it.mkdirs() }
             val pageList = _pages.value
 
             pageList.mapIndexed { index, state ->
                 var bitmap = BitmapLoader.loadCopy(context, state.uri)
 
-                // 1. Crop trước — corners lưu trong original (pre-rotation) space
+                // 1. Crop first — corners are stored in original (pre-rotation) space
                 state.corners?.let { corners ->
                     val old = bitmap
                     bitmap = DocCropUtils.crop(bitmap, corners)
@@ -462,7 +466,7 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
                     }
                 }
 
-                // 3. Rotate + flip + adjust — DocProcUtils xử lý tất cả cùng lúc
+                // 3. Rotate + flip + adjust — DocProcUtils handles all at once
                 val needsProc = state.rotation != 0 || state.flipX || state.flipY ||
                         state.brightness != 1f || state.contrast != 1f ||
                         state.saturation != 1f || state.warmth != 1f
@@ -478,27 +482,9 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
                     if (old !== bitmap) old.recycle()
                 }
 
-                // 5. Save
-                val resolver = context.contentResolver
-                val contentValues = ContentValues().apply {
-                    put(MediaStore.Images.Media.DISPLAY_NAME, "page_${index}_${System.currentTimeMillis()}.jpg")
-                    put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-                    put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/PhotoCollage")
-                    put(MediaStore.Images.Media.IS_PENDING, 1)
-                }
-
-                val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-
-                uri?.let {
-                    resolver.openOutputStream(it).use { out ->
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out!!)
-                    }
-
-                    contentValues.clear()
-                    contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
-                    contentValues.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
-                    resolver.update(it, contentValues, null, null)
-                }
+                // 4. Save — split logic by Android version
+                val fileName = "page_${index}_${System.currentTimeMillis()}.jpg"
+                val uri = saveBitmapToGallery(context, bitmap, fileName)
 
                 bitmap.recycle()
 
@@ -507,6 +493,74 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
                 uri!!
             }
         }
+
+    // ═══════════════════════════════════════════════════════════════
+    // Save helpers — compatible with all Android versions
+    // ═══════════════════════════════════════════════════════════════
+
+    private fun saveBitmapToGallery(
+        context: Context,
+        bitmap: Bitmap,
+        fileName: String
+    ): Uri? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            saveBitmapQ(context, bitmap, fileName)
+        } else {
+            saveBitmapLegacy(context, bitmap, fileName)
+        }
+    }
+
+    private fun saveBitmapQ(
+        context: Context,
+        bitmap: Bitmap,
+        fileName: String
+    ): Uri? {
+        val resolver = context.contentResolver
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/PhotoCollage")
+            put(MediaStore.Images.Media.IS_PENDING, 1)
+        }
+        val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values) ?: return null
+        resolver.openOutputStream(uri)?.use { out ->
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+        }
+        values.clear()
+        values.put(MediaStore.Images.Media.IS_PENDING, 0)
+        values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+        resolver.update(uri, values, null, null)
+        return uri
+    }
+
+    @Suppress("DEPRECATION")
+    private fun saveBitmapLegacy(
+        context: Context,
+        bitmap: Bitmap,
+        fileName: String
+    ): Uri? {
+        val picturesDir = Environment.getExternalStoragePublicDirectory(
+            Environment.DIRECTORY_PICTURES
+        )
+        val collageDir = File(picturesDir, "PhotoCollage")
+        if (!collageDir.exists()) collageDir.mkdirs()
+
+        val file = File(collageDir, fileName)
+        FileOutputStream(file).use { out ->
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+        }
+
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.DATA, file.absolutePath)
+            put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+            put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+        }
+        return context.contentResolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values
+        ) ?: Uri.fromFile(file)
+    }
 
     // ═══════════════════════════════════════════════════════════════
     // Helpers
@@ -524,11 +578,11 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
         viewModelScope.launch { _events.emit(event) }
     }
 
-    private fun getOriginalDimensions(context: android.content.Context, uri: Uri): Pair<Int, Int> {
+    private fun getOriginalDimensions(context: Context, uri: Uri): Pair<Int, Int> {
         val cr = context.contentResolver
         val opts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         cr.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, opts) }
-        var w = opts.outWidth;
+        var w = opts.outWidth
         var h = opts.outHeight
         try {
             cr.openInputStream(uri)?.use { stream ->

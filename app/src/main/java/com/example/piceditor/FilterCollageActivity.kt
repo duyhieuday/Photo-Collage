@@ -1,8 +1,10 @@
 package com.example.piceditor
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.*
 import android.net.Uri
 import android.os.*
@@ -13,6 +15,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,6 +31,8 @@ import com.example.piceditor.utils.AndroidUtils
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utilsApp.Constant
 import com.example.piceditor.utilsApp.PreferenceUtil
+import java.io.File
+import java.io.FileOutputStream
 
 class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(),
     View.OnClickListener {
@@ -59,7 +65,7 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(),
         var blue: Float       = 1f
         var saturation: Float = 1f
 
-        // Sentinel: index 0 = "Gốc" (original)
+        // Sentinel: index 0 = original image
         const val INDEX_ORIGINAL = 0
     }
 
@@ -109,6 +115,18 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(),
         binding.ivBack.setOnClickListener { finish() }
         binding.btnNext.setOnClickListener {
             checkClick()
+
+            // Check WRITE permission for Android 9 and below before saving
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                if (ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Storage permission required to save image",
+                        Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+            }
+
             isFromSaved = true
             val finalUri = saveToGallery(screenShot)
             startActivity(Intent(this, ShowImageActivity::class.java).apply {
@@ -117,18 +135,18 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(),
             finish()
         }
 
-        // ── Filter list ────────────────────────────────────
+        // Filter list
         binding.listFilterstype.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
-        // ✅ Tạo adapter với danh sách filter + "Gốc" ở đầu
+        // Create adapter with filter list + "Original" at the beginning
         var filter_typeAdapter = FilterDetailAdapter(AndroidUtils.filter_clr1)
         binding.listFilterstype.adapter = filter_typeAdapter
 
-        // ✅ Mặc định chọn "Gốc" khi vào màn hình
+        // By default select "Original" when entering the screen
         filter_typeAdapter.selectOriginal()
 
-        // ── Filter name tabs ───────────────────────────────
+        // Filter name tabs
         binding.filterNames.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         val filter_nameAdapter = FilterNameAdapter(this, resources.getStringArray(R.array.filters))
@@ -157,7 +175,7 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(),
                 filter_typeAdapter = FilterDetailAdapter(filters)
                 binding.listFilterstype.adapter = filter_typeAdapter
 
-                // ✅ Khi chuyển tab → chọn "Gốc" để user biết mình đang ở đâu
+                // When switching tabs, select "Original" so user knows where they are
                 filter_typeAdapter.selectOriginal()
 
                 filter_nameAdapter.notifyDataSetChanged()
@@ -167,17 +185,33 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(),
         binding.filterNames.adapter = filter_nameAdapter
     }
 
-    // ── Save ───────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────
+    // Save to gallery — compatible with all Android versions
+    // ────────────────────────────────────────────────────────
 
     private fun saveToGallery(bitmap: Bitmap): Uri {
+        val fileName = "IMG_${System.currentTimeMillis()}.jpg"
+
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // Android 10+ : use MediaStore with RELATIVE_PATH (scoped storage)
+            saveToGalleryQ(bitmap, fileName)
+        } else {
+            // Android 9- : write directly to file (requires WRITE_EXTERNAL_STORAGE)
+            saveToGalleryLegacy(bitmap, fileName)
+        }
+    }
+
+    private fun saveToGalleryQ(bitmap: Bitmap, fileName: String): Uri {
         val values = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, "IMG_${System.currentTimeMillis()}.jpg")
+            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
             put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/PhotoCollage")
             put(MediaStore.Images.Media.IS_PENDING, 1)
         }
         val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)!!
-        contentResolver.openOutputStream(uri)?.use { bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it) }
+        contentResolver.openOutputStream(uri)?.use {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
+        }
         values.clear()
         values.put(MediaStore.Images.Media.IS_PENDING, 0)
         values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
@@ -185,14 +219,43 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(),
         return uri
     }
 
-    // Thumbnail nhỏ để render nhanh trong filter list (tránh OOM)
+    @Suppress("DEPRECATION")
+    private fun saveToGalleryLegacy(bitmap: Bitmap, fileName: String): Uri {
+        // Create Pictures/PhotoCollage directory
+        val picturesDir = Environment.getExternalStoragePublicDirectory(
+            Environment.DIRECTORY_PICTURES
+        )
+        val collageDir = File(picturesDir, "PhotoCollage")
+        if (!collageDir.exists()) collageDir.mkdirs()
+
+        // Write file to disk
+        val file = File(collageDir, fileName)
+        FileOutputStream(file).use { out ->
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+        }
+
+        // Insert into MediaStore so the image appears in Gallery
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.DATA, file.absolutePath)
+            put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+            put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+        }
+        return contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+            ?: Uri.fromFile(file)
+    }
+
+    // Small thumbnail for fast filter list rendering (avoid OOM)
     private val thumbBmp: Bitmap by lazy {
         val maxSize = 120
         val scale = maxSize.toFloat() / maxOf(bmp.width, bmp.height)
         Bitmap.createScaledBitmap(bmp, (bmp.width * scale).toInt(), (bmp.height * scale).toInt(), false)
     }
 
-    // ── Adapter ────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────
+    // Adapter
+    // ────────────────────────────────────────────────────────
 
     inner class FilterDetailAdapter(filters: Array<FilterData>) :
         RecyclerView.Adapter<FilterDetailAdapter.VH>() {
@@ -237,16 +300,16 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(),
             )
 
             if (position == INDEX_ORIGINAL) {
-                // ── "Gốc": hiện thumbnail ảnh gốc ──
+                // "Original": show thumbnail of the original image
                 holder.thumbnail_filter.setImageBitmap(thumbBmp)
                 holder.filterName.text = getString(R.string.original)
                 holder.rl_filteritem.setOnClickListener { selectOriginal() }
             } else {
-                // ── Filter thực ──
+                // Actual filter
                 val filterPos = position - 1
                 val filter    = filterType[filterPos]
 
-                // Render thumbnail nhỏ với filter (dùng thumbBmp để nhanh)
+                // Render small thumbnail with filter (use thumbBmp for speed)
                 val thumb  = createBitmap(thumbBmp.width, thumbBmp.height)
                 val canvas = Canvas(thumb)
                 val paint  = Paint()
@@ -269,7 +332,9 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(),
         }
     }
 
-    // ── AsyncTask apply filter ─────────────────────────────
+    // ────────────────────────────────────────────────────────
+    // AsyncTask apply filter
+    // ────────────────────────────────────────────────────────
 
     class AsyncFilter() : AsyncTask<Float, Void, Bitmap>() {
 

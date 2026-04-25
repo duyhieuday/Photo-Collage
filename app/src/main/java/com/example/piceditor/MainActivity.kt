@@ -71,26 +71,30 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
             } else {
                 val deniedList = permissions.entries.filter { !it.value }.map { it.key }
 
-                // shouldShowRequestPermissionRationale = true  → từ chối, chưa tick "Không hỏi lại"
-                // shouldShowRequestPermissionRationale = false → có thể là:
-                //   1. Lần đầu tiên (chưa hỏi bao giờ) — đã được track bằng hasRequestedBefore
-                //   2. Đã tick "Không hỏi lại"
+                // shouldShowRequestPermissionRationale = true  -> denied, hasn't ticked "Don't ask again"
+                // shouldShowRequestPermissionRationale = false -> could be either:
+                //   1. First time (never asked before) — tracked by hasRequestedBefore
+                //   2. User has ticked "Don't ask again"
                 val canAskAgain = deniedList.any {
                     ActivityCompat.shouldShowRequestPermissionRationale(this, it)
                 }
 
                 if (canAskAgain) {
+                    // Denied but hasn't ticked "Don't ask again" -> show rationale dialog
                     showPermissionRationaleDialog(deniedList)
                 } else if (hasRequestedBefore()) {
+                    // Asked before + shouldShow = false -> user has ticked "Don't ask again"
                     showGoToSettingsDialog()
                 } else {
+                    // Should not happen, but fallback
                     showPermissionRationaleDialog(deniedList)
                 }
+                // Mark that we've requested at least once
                 markRequestedBefore()
             }
         }
 
-    // ── Track lần đầu request ──────────────────────────────
+    // ── Track first request ────────────────────────────────
     private val PREF_NAME         = "permission_pref"
     private val KEY_HAS_REQUESTED = "has_requested_permission"
 
@@ -126,7 +130,7 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         }
     }
 
-    // ✅ Helper check quyền — dùng chung nhiều chỗ
+    // ✅ Helper to check storage permission — used in multiple places
     private fun hasStoragePermission(): Boolean {
         return getRequiredPermissions().all {
             ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
@@ -138,18 +142,22 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
             ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
         }
 
+        // ✅ Always check if permission is already granted FIRST — even after manual grant
         if (notGranted.isEmpty()) {
             loadData()
             return
         }
 
         when {
+            // Denied but hasn't ticked "Don't ask again" -> show rationale
             notGranted.any {
                 ActivityCompat.shouldShowRequestPermissionRationale(this, it)
             } -> showPermissionRationaleDialog(notGranted)
 
+            // User has ticked "Don't ask again" (asked before + shouldShow = false)
             hasRequestedBefore() -> showGoToSettingsDialog()
 
+            // First time asking
             else -> {
                 markRequestedBefore()
                 permissionLauncher.launch(notGranted.toTypedArray())
@@ -165,7 +173,8 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
             binding.banner.root.visibility = View.GONE
         }
 
-        // ✅ Chỉ setUpRecent khi có permission
+        // ✅ When returning from Settings after manual permission grant,
+        // notGranted.isEmpty() -> loadData(), no dialog shown
         if (hasStoragePermission()) {
             setUpRecent()
             loadData()
@@ -188,9 +197,9 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         setupClick()
         setUpTemp()
 
-        // ✅ Chỉ gọi setUpRecent nếu đã có permission
-        // Nếu chưa có → checkAndRequestPermission() bên trong setupClick() sẽ xin quyền
-        // Sau khi user cấp → loadData() được gọi và sẽ setUpRecent
+        // ✅ Only call setUpRecent if permission is granted
+        // If not granted -> checkAndRequestPermission() inside setupClick() will request it
+        // After the user grants -> loadData() will be called and will setUpRecent
         if (hasStoragePermission()) {
             setUpRecent()
         }
@@ -202,15 +211,24 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
 
     private fun getRequiredPermissions(): List<String> {
         val list = mutableListOf<String>()
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Android 13+ : only need READ_MEDIA_IMAGES
             list.add(Manifest.permission.READ_MEDIA_IMAGES)
-        } else {
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // Android 10–12 : only need READ_EXTERNAL_STORAGE
+            // (WRITE is ignored from Android 10+, scoped storage handles it)
             list.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+        } else {
+            // Android 9 and below : need both READ and WRITE
+            list.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+            list.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
-//        list.add(Manifest.permission.CAMERA)
+
         return list
     }
 
+    // ✅ Custom dialog explaining permission when user denied previously
     private fun showPermissionRationaleDialog(permissions: List<String>) {
         val dialog = android.app.Dialog(this)
         val view = LayoutInflater.from(this).inflate(R.layout.dialog_permission_rationale, null)
@@ -233,6 +251,7 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         if (!isFinishing && !isDestroyed) dialog.show()
     }
 
+    // ✅ Custom dialog guiding user to Settings when they ticked "Don't ask again"
     private fun showGoToSettingsDialog() {
         val dialog = android.app.Dialog(this)
         val view = LayoutInflater.from(this).inflate(R.layout.dialog_permission_setting, null)
@@ -259,7 +278,7 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         if (!isFinishing && !isDestroyed) dialog.show()
     }
 
-    // ✅ Sau khi cấp quyền xong → load lại data cần permission
+    // ✅ Called after permissions are granted — load data that requires permissions
     private fun loadData() {
         setUpRecent()
     }
@@ -269,7 +288,7 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
     // ──────────────────────────────────────────────────────
 
     private fun setUpRecent() {
-        // ✅ Double-check permission để tránh crash trong mọi trường hợp
+        // ✅ Double-check permission to avoid crash in any case
         if (!hasStoragePermission()) {
             binding.llRecent.visibility  = View.VISIBLE
             binding.rcvRecent.visibility = View.GONE
