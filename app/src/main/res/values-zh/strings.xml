@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Photo Editor</string>
+    <string name="app_name">Photo Collage Maker Grid Photo</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">你好，空白片段</string>
     <string name="text_tag_line">让每一张照片都充满乐趣</string>
