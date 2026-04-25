@@ -22,6 +22,7 @@ import com.example.piceditor.adapters.TemplateAdapter
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityMainBinding
+import com.example.piceditor.model.ImageModel
 import com.example.piceditor.templates_editor.Template
 import com.example.piceditor.templates_editor.TemplatePickerActivity
 import com.example.piceditor.utils.BarsUtils
@@ -79,16 +80,12 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
                 }
 
                 if (canAskAgain) {
-                    // Từ chối nhưng chưa tick "Không hỏi lại" → hỏi lại với dialog giải thích
                     showPermissionRationaleDialog(deniedList)
                 } else if (hasRequestedBefore()) {
-                    // Đã hỏi trước đó + shouldShow = false → đã tick "Không hỏi lại"
                     showGoToSettingsDialog()
                 } else {
-                    // Không nên xảy ra, nhưng fallback
                     showPermissionRationaleDialog(deniedList)
                 }
-                // Đánh dấu đã request ít nhất 1 lần
                 markRequestedBefore()
             }
         }
@@ -129,27 +126,30 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         }
     }
 
+    // ✅ Helper check quyền — dùng chung nhiều chỗ
+    private fun hasStoragePermission(): Boolean {
+        return getRequiredPermissions().all {
+            ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
     private fun checkAndRequestPermission() {
         val notGranted = getRequiredPermissions().filter {
             ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
         }
 
-        // ✅ Luôn kiểm tra đã có quyền chưa TRƯỚC TIÊN — kể cả sau khi cấp thủ công
         if (notGranted.isEmpty()) {
             loadData()
             return
         }
 
         when {
-            // Đã từ chối, chưa tick "Không hỏi lại" → giải thích
             notGranted.any {
                 ActivityCompat.shouldShowRequestPermissionRationale(this, it)
             } -> showPermissionRationaleDialog(notGranted)
 
-            // Đã tick "Không hỏi lại" (đã request trước + shouldShow=false)
             hasRequestedBefore() -> showGoToSettingsDialog()
 
-            // Lần đầu hỏi
             else -> {
                 markRequestedBefore()
                 permissionLauncher.launch(notGranted.toTypedArray())
@@ -164,14 +164,12 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
             initBanner(binding.adViewContainer)
             binding.banner.root.visibility = View.GONE
         }
-        setUpRecent()
 
-        // ✅ Khi resume từ Settings sau khi cấp quyền thủ công
-        // notGranted.isEmpty() → loadData(), không hiện bất kỳ dialog nào
-        val notGranted = getRequiredPermissions().filter {
-            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        // ✅ Chỉ setUpRecent khi có permission
+        if (hasStoragePermission()) {
+            setUpRecent()
+            loadData()
         }
-        if (notGranted.isEmpty()) loadData()
     }
 
     override fun afterSetContentView() {
@@ -189,14 +187,13 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         super.onCreate(savedInstanceState)
         setupClick()
         setUpTemp()
-        setUpRecent()
 
-//        binding.tvTemplates.setOnClickListener {
-//            checkAndRequestPermission()
-//            if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
-//            mLastClickTime = SystemClock.elapsedRealtime()
-//            startActivity(Intent(this, TemplatePickerActivity::class.java))
-//        }
+        // ✅ Chỉ gọi setUpRecent nếu đã có permission
+        // Nếu chưa có → checkAndRequestPermission() bên trong setupClick() sẽ xin quyền
+        // Sau khi user cấp → loadData() được gọi và sẽ setUpRecent
+        if (hasStoragePermission()) {
+            setUpRecent()
+        }
     }
 
     // ──────────────────────────────────────────────────────
@@ -214,7 +211,6 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         return list
     }
 
-    // ✅ Custom dialog giải thích khi user từ chối lần trước
     private fun showPermissionRationaleDialog(permissions: List<String>) {
         val dialog = android.app.Dialog(this)
         val view = LayoutInflater.from(this).inflate(R.layout.dialog_permission_rationale, null)
@@ -237,7 +233,6 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         if (!isFinishing && !isDestroyed) dialog.show()
     }
 
-    // ✅ Custom dialog hướng dẫn vào Settings khi user tick "Không hỏi lại"
     private fun showGoToSettingsDialog() {
         val dialog = android.app.Dialog(this)
         val view = LayoutInflater.from(this).inflate(R.layout.dialog_permission_setting, null)
@@ -264,8 +259,9 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         if (!isFinishing && !isDestroyed) dialog.show()
     }
 
+    // ✅ Sau khi cấp quyền xong → load lại data cần permission
     private fun loadData() {
-        // Permission đã được cấp đầy đủ
+        setUpRecent()
     }
 
     // ──────────────────────────────────────────────────────
@@ -273,7 +269,19 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
     // ──────────────────────────────────────────────────────
 
     private fun setUpRecent() {
-        val images = MyDraftActivity.getSavedImages(this)
+        // ✅ Double-check permission để tránh crash trong mọi trường hợp
+        if (!hasStoragePermission()) {
+            binding.llRecent.visibility  = View.VISIBLE
+            binding.rcvRecent.visibility = View.GONE
+            return
+        }
+
+        val images = try {
+            MyDraftActivity.getSavedImages(this)
+        } catch (e: SecurityException) {
+            Log.e("MainActivity", "Permission denied when reading images", e)
+            emptyList()
+        }
 
         if (images.isEmpty()) {
             binding.llRecent.visibility  = View.VISIBLE
@@ -283,7 +291,7 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
             binding.llRecent.visibility  = View.GONE
         }
 
-        val adapter = ImageAdapter(images)
+        val adapter = ImageAdapter(images as MutableList<ImageModel>)
         binding.rcvRecent.setLayoutManager(
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         )

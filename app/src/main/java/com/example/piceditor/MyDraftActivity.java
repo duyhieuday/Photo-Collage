@@ -3,17 +3,20 @@ package com.example.piceditor;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.app.RecoverableSecurityException;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -24,6 +27,7 @@ import androidx.activity.result.IntentSenderRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.example.piceditor.adapters.ImageAdapter;
@@ -249,6 +253,17 @@ public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
     public static List<ImageModel> getSavedImages(Context context) {
         List<ImageModel> list = new ArrayList<>();
 
+        // ✅ Check permission trước khi query — tránh SecurityException
+        String permission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                ? Manifest.permission.READ_MEDIA_IMAGES
+                : Manifest.permission.READ_EXTERNAL_STORAGE;
+
+        if (ContextCompat.checkSelfPermission(context, permission)
+                != PackageManager.PERMISSION_GRANTED) {
+            Log.w("MyDraftActivity", "Permission not granted, returning empty list");
+            return list;
+        }
+
         Uri collection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
         String[] projection = new String[]{
@@ -258,49 +273,67 @@ public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
                 MediaStore.Images.Media.DATE_ADDED
         };
 
-        String selection = MediaStore.Images.Media.RELATIVE_PATH + " LIKE ?";
-        String[] selectionArgs = new String[]{"%Pictures/PhotoCollage%"};
+        // ✅ RELATIVE_PATH chỉ có từ Android 10 (Q) trở lên
+        String selection;
+        String[] selectionArgs;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            selection = MediaStore.Images.Media.RELATIVE_PATH + " LIKE ?";
+            selectionArgs = new String[]{"%Pictures/PhotoCollage%"};
+        } else {
+            // Android < 10: dùng DATA (đường dẫn tuyệt đối)
+            selection = MediaStore.Images.Media.DATA + " LIKE ?";
+            selectionArgs = new String[]{"%/Pictures/PhotoCollage/%"};
+        }
 
         String sortOrder = MediaStore.Images.Media.DATE_TAKEN + " DESC";
 
-        Cursor cursor = context.getContentResolver().query(
-                collection,
-                projection,
-                selection,
-                selectionArgs,
-                sortOrder
-        );
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(
+                    collection,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    sortOrder
+            );
 
-        if (cursor != null) {
-            int idCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
-            int nameCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
-            int dateTakenCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN);
-            int dateAddedCol = cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED);
+            if (cursor != null) {
+                int idCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
+                int nameCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
+                int dateTakenCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN);
+                int dateAddedCol = cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED);
 
-            while (cursor.moveToNext()) {
-                long id = cursor.getLong(idCol);
-                String name = cursor.getString(nameCol);
-                long dateTaken = cursor.getLong(dateTakenCol);
+                while (cursor.moveToNext()) {
+                    long id = cursor.getLong(idCol);
+                    String name = cursor.getString(nameCol);
+                    long dateTaken = cursor.getLong(dateTakenCol);
 
-                long dateAdded = 0;
-                if (dateAddedCol != -1) {
-                    dateAdded = cursor.getLong(dateAddedCol);
+                    long dateAdded = 0;
+                    if (dateAddedCol != -1) {
+                        dateAdded = cursor.getLong(dateAddedCol);
+                    }
+
+                    long finalDate;
+                    if (dateTaken != 0) {
+                        finalDate = dateTaken;
+                    } else if (dateAdded > 0) {
+                        finalDate = dateAdded * 1000;
+                    } else {
+                        finalDate = System.currentTimeMillis();
+                    }
+
+                    Uri uri = ContentUris.withAppendedId(collection, id);
+                    list.add(new ImageModel(uri, name, finalDate));
                 }
-
-                long finalDate;
-                if (dateTaken != 0) {
-                    finalDate = dateTaken;
-                } else if (dateAdded > 0) {
-                    finalDate = dateAdded * 1000;
-                } else {
-                    finalDate = System.currentTimeMillis();
-                }
-
-                Uri uri = ContentUris.withAppendedId(collection, id);
-                list.add(new ImageModel(uri, name, finalDate));
             }
-
-            cursor.close();
+        } catch (SecurityException e) {
+            Log.e("MyDraftActivity", "SecurityException when querying images", e);
+        } catch (Exception e) {
+            Log.e("MyDraftActivity", "Error querying images", e);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
 
         return list;
