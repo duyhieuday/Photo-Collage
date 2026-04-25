@@ -108,6 +108,7 @@ public class Constant {
         public static final String SHOW_REWARD = "SHOW_REWARD";
         public static final String NEW_REWARD = "new_reward";
         public static final String SHOW_INTER = "SHOW_INTER";
+        public static final String INSTALL_REFER = "install_refer";
         public static final String TEST_NATIVE = "test_native";
         public static final String TEST_INTER_V2 = "test_inter_v2";
         public static final String TEST_LANGUAGE = "test_language";

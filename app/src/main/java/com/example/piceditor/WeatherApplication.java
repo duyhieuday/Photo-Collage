@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -22,6 +23,7 @@ import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.QueryPurchasesParams;
 import com.example.piceditor.ads.OpenAdsHelper;
 import com.example.piceditor.ads.Prefs;
+import com.example.piceditor.templates_editor.ABRC;
 import com.example.piceditor.utilsApp.Constant;
 import com.example.piceditor.utilsApp.LanguageManager;
 import com.example.piceditor.utilsApp.PreferenceUtil;
@@ -56,6 +58,14 @@ public class WeatherApplication extends Application{
     @Override
     public void onCreate() {
         super.onCreate();
+        ABRC.INSTANCE.getCountry();
+        ABRC.INSTANCE.getPackageInfo(this);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ABRC.INSTANCE.check(WeatherApplication.this);
+            }
+        }, 1000);
         FirebaseApp.initializeApp(this);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         registerActivityLifecycleCallbacks(new AdjustLifecycleCallbacks());
