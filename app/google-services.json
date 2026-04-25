@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "253325390108",
-    "project_id": "ringtone-fae11",
-    "storage_bucket": "ringtone-fae11.appspot.com"
+    "project_number": "845392955314",
+    "project_id": "flash-light---team-thanhnd",
+    "storage_bucket": "flash-light---team-thanhnd.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:253325390108:android:97e94ec2f9de8859394ad9",
+        "mobilesdk_app_id": "1:845392955314:android:dc74622841b879e83d86ab",
         "android_client_info": {
           "package_name": "com.ezt.photo.collage.maker"
         }
@@ -15,7 +15,45 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDGHtfTT5EJiDKIKgtb6aDOR9askQ_Il50"
+          "current_key": "AIzaSyCNlZQenfzGacXUYsn4sq2tIRE37nkFrkA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:845392955314:android:639b7a44d68800403d86ab",
+        "android_client_info": {
+          "package_name": "com.ezt.photo.collage.maker1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNlZQenfzGacXUYsn4sq2tIRE37nkFrkA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:845392955314:android:07d1318e5a8bd35e3d86ab",
+        "android_client_info": {
+          "package_name": "com.universe.translator"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNlZQenfzGacXUYsn4sq2tIRE37nkFrkA"
         }
       ],
       "services": {

@@ -13,7 +13,7 @@ android {
     compileSdk 36
 
     defaultConfig {
-        applicationId "com.ezt.photo.collage.maker"
+        applicationId "com.ezt.photo.collage.maker1"
         minSdk 24
         targetSdk 36
         versionCode 1

@@ -37,7 +37,7 @@
             android:name=".templates_editor.TemplateEditorActivity"
             android:exported="false" />
         <activity
-            android:name=".splash.SplashActivity"
+            android:name=".splash.SplashActivityTest"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
