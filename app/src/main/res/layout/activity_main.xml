@@ -7,285 +7,322 @@
         android:layout_height="match_parent"
         android:background="@color/white">
 
-        <!-- HEADER -->
-        <LinearLayout
-            android:id="@+id/header"
+        <!-- ── Scrollable content ── -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollView"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:background="@drawable/bg_gradient_green"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            android:overScrollMode="never"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/layoutAds"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <!-- TOP BAR -->
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="44dp"
-                >
-
-                <ImageView
-                    android:id="@+id/btnMenu"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_menu_main"
-                    android:padding="8dp"
-                    android:layout_centerVertical="true"
-                    />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Photo Collage"
-                    android:textSize="32sp"
-                    android:textColor="#1D2939"
-                    android:fontFamily="@font/carterone_regular"
-                    android:layout_centerInParent="true"/>
-            </RelativeLayout>
-
-            <!-- ACTION BUTTONS -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:weightSum="2">
+                android:orientation="vertical">
 
-                <!-- ITEM -->
+                <!-- HEADER -->
                 <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="80dp"
-                    android:layout_weight="1"
+                    android:id="@+id/header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:background="@drawable/bg_card"
+                    android:padding="16dp"
+                    android:background="@drawable/bg_gradient_green">
+
+                    <!-- TOP BAR -->
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="44dp">
+
+                        <ImageView
+                            android:id="@+id/btnMenu"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_menu_main"
+                            android:padding="8dp"
+                            android:layout_centerVertical="true" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Photo Collage"
+                            android:textSize="32sp"
+                            android:textColor="#1D2939"
+                            android:fontFamily="@font/carterone_regular"
+                            android:layout_centerInParent="true" />
+
+                    </RelativeLayout>
+
+                    <!-- ACTION BUTTONS -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:weightSum="2">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="80dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/bg_card"
+                            android:visibility="gone">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_remove_main" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:text="@string/ai_remove"
+                                android:textSize="14sp"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/inter_medium" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/llEdit"
+                            android:layout_width="0dp"
+                            android:layout_height="80dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/bg_card"
+                            android:layout_marginEnd="12dp">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_edit_main" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:text="@string/edit"
+                                android:textSize="14sp"
+                                android:fontFamily="@font/inter_medium"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/llDraft"
+                            android:layout_width="0dp"
+                            android:layout_height="80dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/bg_card"
+                            android:layout_marginStart="12dp">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_draft_main" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:text="@string/my_draft"
+                                android:textSize="14sp"
+                                android:fontFamily="@font/inter_medium"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- PREVIEW CARD -->
+                    <LinearLayout
+                        android:id="@+id/llCollage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:background="@drawable/bg_card_create"
+                        android:padding="12dp"
+                        android:layout_marginTop="16dp">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="180dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/img_collage_main" />
+
+                        <LinearLayout
+                            android:id="@+id/llCreate"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:layout_marginTop="12dp"
+                            android:background="@drawable/bg_btn_main"
+                            android:orientation="horizontal"
+                            android:layout_gravity="center"
+                            android:gravity="center">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_create_main" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/create_new"
+                                android:textColor="@color/white"
+                                android:textSize="16sp"
+                                android:fontFamily="@font/inter_semi_bold"
+                                android:layout_marginStart="12dp" />
+
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- TEMPLATES SECTION -->
+                <RelativeLayout
+                    android:id="@+id/rlTemplate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginHorizontal="16dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvTemplates"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/templates"
+                        android:textSize="16sp"
+                        android:fontFamily="@font/inter_semi_bold"
+                        android:textColor="#1D2939"
+                        android:layout_centerVertical="true" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvSeeAllTemplate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/see_all"
+                        android:textSize="12sp"
+                        android:fontFamily="@font/inter_medium"
+                        android:textColor="#039855"
+                        android:padding="@dimen/dimen_8dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true" />
+
+                </RelativeLayout>
+
+                <!-- LIST TEMPLATES -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcvTemplates"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginHorizontal="4dp"
+                    android:nestedScrollingEnabled="false"
+                    android:visibility="visible" />
+
+                <!-- RECENT SECTION -->
+                <RelativeLayout
+                    android:id="@+id/rlRecent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginHorizontal="16dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvRecent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/recent"
+                        android:textSize="16sp"
+                        android:fontFamily="@font/inter_semi_bold"
+                        android:textColor="#1D2939"
+                        android:layout_centerVertical="true" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvSeeAllRecent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/see_all"
+                        android:textSize="12sp"
+                        android:fontFamily="@font/inter_medium"
+                        android:textColor="#039855"
+                        android:padding="@dimen/dimen_8dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true" />
+
+                </RelativeLayout>
+
+                <!-- LIST RECENT -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcvRecent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginHorizontal="4dp"
+                    android:nestedScrollingEnabled="false"
+                    android:visibility="gone" />
+
+                <!-- EMPTY RECENT -->
+                <LinearLayout
+                    android:id="@+id/llRecent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
                     android:visibility="gone"
-                    >
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_remove_main"/>
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_height="wrap_content"
-                        android:layout_width="wrap_content"
-                        android:text="@string/ai_remove"
-                        android:textSize="14sp"
-                        android:layout_marginTop="4dp"
-                        android:fontFamily="@font/inter_medium"
-                        />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/llEdit"
-                    android:layout_width="0dp"
-                    android:layout_height="80dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:background="@drawable/bg_card"
-                    android:layout_marginEnd="12dp"
-                    >
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_edit_main"/>
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_height="wrap_content"
-                        android:layout_width="wrap_content"
-                        android:text="@string/edit"
-                        android:textSize="14sp"
-                        android:fontFamily="@font/inter_medium"
-                        android:layout_marginTop="4dp"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/llDraft"
-                    android:layout_width="0dp"
-                    android:layout_height="80dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:background="@drawable/bg_card"
-                    android:layout_marginStart="12dp"
-                    >
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_draft_main"/>
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_height="wrap_content"
-                        android:layout_width="wrap_content"
-                        android:text="@string/my_draft"
-                        android:textSize="14sp"
-                        android:fontFamily="@font/inter_medium"
-                        android:layout_marginTop="4dp"/>
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <!-- PREVIEW CARD -->
-            <LinearLayout
-                android:id="@+id/llCollage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card_create"
-                android:padding="12dp"
-                android:layout_marginTop="16dp">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="180dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/img_collage_main"/>
-
-                <LinearLayout
-                    android:id="@+id/llCreate"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_marginTop="12dp"
-                    android:background="@drawable/bg_btn_main"
-                    android:orientation="horizontal"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    >
+                    android:paddingVertical="32dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_create_main"
-                        />
+                        android:src="@drawable/ic_recent"
+                        android:layout_gravity="center" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/create_new"
-                        android:textColor="@color/white"
-                        android:textSize="16sp"
+                        android:text="@string/no_recent"
+                        android:layout_gravity="center"
+                        android:textColor="#475467"
+                        android:textSize="@dimen/font_16sp"
                         android:fontFamily="@font/inter_semi_bold"
-                        android:layout_marginStart="12dp"
-                        />
+                        android:layout_marginTop="@dimen/dimen_16dp" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/let_s_create_your_first_one"
+                        android:layout_gravity="center"
+                        android:textColor="#98A2B3"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/inter_regular"
+                        android:layout_marginTop="4dp" />
 
                 </LinearLayout>
+
             </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
-        </LinearLayout>
-
-        <!-- TEMPLATE TITLE -->
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvTemplates"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/recent"
-            android:textSize="16sp"
-            android:fontFamily="@font/inter_semi_bold"
-            android:textColor="#1D2939"
-            android:layout_marginTop="8dp"
-            android:layout_marginHorizontal="16dp"
-            app:layout_constraintTop_toBottomOf="@id/header"
-            app:layout_constraintStart_toStartOf="parent"/>
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvSeeAll"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/see_all"
-            android:textSize="12sp"
-            android:fontFamily="@font/inter_medium"
-            android:textColor="#039855"
-            android:layout_marginTop="8dp"
-            android:padding="@dimen/dimen_8dp"
-            android:layout_marginHorizontal="16dp"
-            app:layout_constraintTop_toBottomOf="@id/header"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-        <!-- LIST TEMPLATES -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rcvTemplates"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:clipToPadding="false"
-            android:layout_marginTop="8dp"
-            android:layout_marginHorizontal="4dp"
-            android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/tvTemplates"
-            app:layout_constraintBottom_toTopOf="@+id/layoutAds"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rcvRecent"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:clipToPadding="false"
-            android:layout_marginTop="8dp"
-            android:layout_marginHorizontal="4dp"
-            android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/tvTemplates"
-            app:layout_constraintBottom_toTopOf="@+id/layoutAds"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-        <LinearLayout
-            android:id="@+id/llRecent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@id/tvTemplates"
-            app:layout_constraintBottom_toTopOf="@+id/layoutAds"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            >
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_recent"
-                android:layout_gravity="center"
-                />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/no_recent"
-                android:layout_gravity="center"
-                android:textColor="#475467"
-                android:textSize="@dimen/font_16sp"
-                android:fontFamily="@font/inter_semi_bold"
-                android:layout_marginTop="@dimen/dimen_16dp"
-                />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/let_s_create_your_first_one"
-                android:layout_gravity="center"
-                android:textColor="#98A2B3"
-                android:textSize="14sp"
-                android:fontFamily="@font/inter_regular"
-                android:layout_marginTop="4dp"
-                />
-
-
-        </LinearLayout>
-
+        <!-- ── Ads cố định ở dưới ── -->
         <LinearLayout
             android:id="@+id/layoutAds"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:orientation="vertical"
-            android:visibility="visible">
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
             <FrameLayout
                 android:id="@+id/ad_view_container"
@@ -297,6 +334,7 @@
                 android:id="@+id/banner"
                 layout="@layout/banner_ads"
                 android:visibility="visible" />
+
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

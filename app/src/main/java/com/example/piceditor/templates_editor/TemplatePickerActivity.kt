@@ -2,6 +2,7 @@ package com.example.piceditor.templates_editor
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -35,6 +36,7 @@ class TemplatePickerActivity : BaseActivityNew<ActivityTemplatePickerBinding>() 
 
         binding.rvTemplates.adapter = TemplatePickerAdapter(TemplateRepository.all) { template ->
             val intent = Intent(this, TemplateEditorActivity::class.java)
+            Log.e("xcncnajj1", "setUpTemp: " + template.id )
             intent.putExtra(TemplateEditorActivity.Companion.EXTRA_TEMPLATE_ID, template.id)
             startActivity(intent)
         }

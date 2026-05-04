@@ -12,7 +12,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
@@ -24,6 +23,7 @@ import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityMainBinding
 import com.example.piceditor.model.ImageModel
 import com.example.piceditor.templates_editor.Template
+import com.example.piceditor.templates_editor.TemplateEditorActivity
 import com.example.piceditor.templates_editor.TemplatePickerActivity
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utilsApp.Constant
@@ -70,49 +70,36 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
                 loadData()
             } else {
                 val deniedList = permissions.entries.filter { !it.value }.map { it.key }
-
-                // shouldShowRequestPermissionRationale = true  -> denied, hasn't ticked "Don't ask again"
-                // shouldShowRequestPermissionRationale = false -> could be either:
-                //   1. First time (never asked before) — tracked by hasRequestedBefore
-                //   2. User has ticked "Don't ask again"
                 val canAskAgain = deniedList.any {
                     ActivityCompat.shouldShowRequestPermissionRationale(this, it)
                 }
-
                 if (canAskAgain) {
-                    // Denied but hasn't ticked "Don't ask again" -> show rationale dialog
                     showPermissionRationaleDialog(deniedList)
                 } else if (hasRequestedBefore()) {
-                    // Asked before + shouldShow = false -> user has ticked "Don't ask again"
                     showGoToSettingsDialog()
                 } else {
-                    // Should not happen, but fallback
                     showPermissionRationaleDialog(deniedList)
                 }
-                // Mark that we've requested at least once
                 markRequestedBefore()
             }
         }
 
-    // ── Track first request ────────────────────────────────
+    // ── Permission tracking ────────────────────────────────
     private val PREF_NAME         = "permission_pref"
     private val KEY_HAS_REQUESTED = "has_requested_permission"
 
-    private fun hasRequestedBefore(): Boolean {
-        return getSharedPreferences(PREF_NAME, MODE_PRIVATE)
-            .getBoolean(KEY_HAS_REQUESTED, false)
+    private fun hasRequestedBefore() =
+        getSharedPreferences(PREF_NAME, MODE_PRIVATE).getBoolean(KEY_HAS_REQUESTED, false)
+
+    private fun markRequestedBefore() =
+        getSharedPreferences(PREF_NAME, MODE_PRIVATE).edit()
+            .putBoolean(KEY_HAS_REQUESTED, true).apply()
+
+    private fun hasStoragePermission() = getRequiredPermissions().all {
+        ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun markRequestedBefore() {
-        getSharedPreferences(PREF_NAME, MODE_PRIVATE)
-            .edit()
-            .putBoolean(KEY_HAS_REQUESTED, true)
-            .apply()
-    }
-
-    // ──────────────────────────────────────────────────────
-    // BaseActivityNew overrides
-    // ──────────────────────────────────────────────────────
+    // ── BaseActivityNew ────────────────────────────────────
 
     override fun getLayoutRes(): Int = R.layout.activity_main
     override fun getFrame(): Int = 0
@@ -130,41 +117,6 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         }
     }
 
-    // ✅ Helper to check storage permission — used in multiple places
-    private fun hasStoragePermission(): Boolean {
-        return getRequiredPermissions().all {
-            ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
-        }
-    }
-
-    private fun checkAndRequestPermission() {
-        val notGranted = getRequiredPermissions().filter {
-            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
-        }
-
-        // ✅ Always check if permission is already granted FIRST — even after manual grant
-        if (notGranted.isEmpty()) {
-            loadData()
-            return
-        }
-
-        when {
-            // Denied but hasn't ticked "Don't ask again" -> show rationale
-            notGranted.any {
-                ActivityCompat.shouldShowRequestPermissionRationale(this, it)
-            } -> showPermissionRationaleDialog(notGranted)
-
-            // User has ticked "Don't ask again" (asked before + shouldShow = false)
-            hasRequestedBefore() -> showGoToSettingsDialog()
-
-            // First time asking
-            else -> {
-                markRequestedBefore()
-                permissionLauncher.launch(notGranted.toTypedArray())
-            }
-        }
-    }
-
     override fun onResume() {
         super.onResume()
         if (!PreferenceUtil.getInstance(this)
@@ -172,11 +124,8 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
             initBanner(binding.adViewContainer)
             binding.banner.root.visibility = View.GONE
         }
-
-        // ✅ When returning from Settings after manual permission grant,
-        // notGranted.isEmpty() -> loadData(), no dialog shown
+        // Khi quay về từ Settings sau khi cấp quyền thủ công
         if (hasStoragePermission()) {
-            setUpRecent()
             loadData()
         }
     }
@@ -188,47 +137,52 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         BarsUtils.setAppearanceLightStatusBars(this, true)
     }
 
-    // ──────────────────────────────────────────────────────
-    // Lifecycle
-    // ──────────────────────────────────────────────────────
+    // ── Lifecycle ──────────────────────────────────────────
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupClick()
         setUpTemp()
-
-        // ✅ Only call setUpRecent if permission is granted
-        // If not granted -> checkAndRequestPermission() inside setupClick() will request it
-        // After the user grants -> loadData() will be called and will setUpRecent
-        if (hasStoragePermission()) {
-            setUpRecent()
-        }
+        if (hasStoragePermission()) loadData()
     }
 
-    // ──────────────────────────────────────────────────────
-    // Permission
-    // ──────────────────────────────────────────────────────
+    // ── Permission ─────────────────────────────────────────
 
     private fun getRequiredPermissions(): List<String> {
         val list = mutableListOf<String>()
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            // Android 13+ : only need READ_MEDIA_IMAGES
-            list.add(Manifest.permission.READ_MEDIA_IMAGES)
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            // Android 10–12 : only need READ_EXTERNAL_STORAGE
-            // (WRITE is ignored from Android 10+, scoped storage handles it)
-            list.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-        } else {
-            // Android 9 and below : need both READ and WRITE
-            list.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-            list.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
+                list.add(Manifest.permission.READ_MEDIA_IMAGES)
+            else ->
+                list.add(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
-
         return list
     }
 
-    // ✅ Custom dialog explaining permission when user denied previously
+    private fun checkAndRequestPermission() {
+        val notGranted = getRequiredPermissions().filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }
+
+        if (notGranted.isEmpty()) {
+            loadData()
+            return
+        }
+
+        when {
+            notGranted.any {
+                ActivityCompat.shouldShowRequestPermissionRationale(this, it)
+            } -> showPermissionRationaleDialog(notGranted)
+
+            hasRequestedBefore() -> showGoToSettingsDialog()
+
+            else -> {
+                markRequestedBefore()
+                permissionLauncher.launch(notGranted.toTypedArray())
+            }
+        }
+    }
+
     private fun showPermissionRationaleDialog(permissions: List<String>) {
         val dialog = android.app.Dialog(this)
         val view = LayoutInflater.from(this).inflate(R.layout.dialog_permission_rationale, null)
@@ -239,7 +193,6 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
             android.view.ViewGroup.LayoutParams.WRAP_CONTENT
         )
         dialog.setCancelable(false)
-
         view.findViewById<android.widget.Button>(R.id.btnCancel).setOnClickListener {
             dialog.dismiss()
         }
@@ -247,11 +200,9 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
             dialog.dismiss()
             permissionLauncher.launch(permissions.toTypedArray())
         }
-
         if (!isFinishing && !isDestroyed) dialog.show()
     }
 
-    // ✅ Custom dialog guiding user to Settings when they ticked "Don't ask again"
     private fun showGoToSettingsDialog() {
         val dialog = android.app.Dialog(this)
         val view = LayoutInflater.from(this).inflate(R.layout.dialog_permission_setting, null)
@@ -262,7 +213,6 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
             android.view.ViewGroup.LayoutParams.WRAP_CONTENT
         )
         dialog.setCancelable(false)
-
         view.findViewById<android.widget.Button>(R.id.btnCancel).setOnClickListener {
             dialog.dismiss()
         }
@@ -274,21 +224,18 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
                 }
             )
         }
-
         if (!isFinishing && !isDestroyed) dialog.show()
     }
 
-    // ✅ Called after permissions are granted — load data that requires permissions
+    // ── Data ───────────────────────────────────────────────
+
     private fun loadData() {
         setUpRecent()
     }
 
-    // ──────────────────────────────────────────────────────
-    // Setup UI
-    // ──────────────────────────────────────────────────────
+    // ── Setup UI ───────────────────────────────────────────
 
     private fun setUpRecent() {
-        // ✅ Double-check permission to avoid crash in any case
         if (!hasStoragePermission()) {
             binding.llRecent.visibility  = View.VISIBLE
             binding.rcvRecent.visibility = View.GONE
@@ -311,12 +258,11 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         }
 
         val adapter = ImageAdapter(images as MutableList<ImageModel>)
-        binding.rcvRecent.setLayoutManager(
+        binding.rcvRecent.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        )
-        binding.rcvRecent.setAdapter(adapter)
+        binding.rcvRecent.adapter = adapter
 
-        binding.tvSeeAll.setOnClickListener {
+        binding.tvSeeAllRecent.setOnClickListener {
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
             mLastClickTime = SystemClock.elapsedRealtime()
             startActivity(Intent(this, MyDraftActivity::class.java))
@@ -332,18 +278,31 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
             throw RuntimeException(e)
         }
 
-        Log.e("xcncnajh1", "setUpTemp: ${temps?.size}")
-        temps?.forEach { Log.e("TEMP_JSON", "image = ${it?.image}") }
-
-        binding.rcvTemplates.setLayoutManager(
+        binding.rcvTemplates.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        )
+
         templateList    = temps
         templateAdapter = TemplateAdapter()
         templateAdapter?.setData(templateList)
-        binding.rcvTemplates.setAdapter(templateAdapter)
+        binding.rcvTemplates.adapter = templateAdapter
         binding.rcvTemplates.smoothScrollToPosition(0)
-        templateAdapter?.setClickListener { _, _ -> }
+
+        // ✅ Click vào item → mở TemplateEditorActivity với template tương ứng
+        templateAdapter?.setClickListener { position, template ->
+            if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setClickListener
+            mLastClickTime = SystemClock.elapsedRealtime()
+            val intent = Intent(this, TemplateEditorActivity::class.java).apply {
+                Log.e("xcncnajj1", "setUpTemp: " + template.id )
+                putExtra(TemplateEditorActivity.EXTRA_TEMPLATE_ID, template?.id)
+            }
+            startActivity(intent)
+        }
+
+        binding.tvSeeAllTemplate.setOnClickListener {
+            if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
+            mLastClickTime = SystemClock.elapsedRealtime()
+            startActivity(Intent(this, TemplatePickerActivity::class.java))
+        }
     }
 
     private fun setupClick() {
@@ -379,9 +338,7 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         }
     }
 
-    // ──────────────────────────────────────────────────────
-    // Camera / Gallery / Editor
-    // ──────────────────────────────────────────────────────
+    // ── Camera / Gallery / Editor ──────────────────────────
 
     private fun openCamera() {
         val file = File(cacheDir, "camera_${System.currentTimeMillis()}.jpg")

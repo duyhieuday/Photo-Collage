@@ -26,7 +26,7 @@ object TemplateRepository {
             // thumb_1 → temp_1
             // 5 ô: 3 cột trái + 2 cột phải
             TemplateData(
-                id          = "temp_1",
+                id          = "1",
                 name        = "Best Trip",
                 drawableRes = com.example.piceditor.R.drawable.temp_1,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_1,
@@ -44,7 +44,7 @@ object TemplateRepository {
             // thumb_2 → temp_2
             // 6 ô lưới 2x3, nền đen
             TemplateData(
-                id          = "temp_2",
+                id          = "2",
                 name        = "Life is Beautiful",
                 drawableRes = com.example.piceditor.R.drawable.temp_2,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_2,
@@ -63,7 +63,7 @@ object TemplateRepository {
             // thumb_3 → temp_3
             // 3 ô polaroid xếp chéo
             TemplateData(
-                id          = "temp_3",
+                id          = "3",
                 name        = "Happy Birthday",
                 drawableRes = com.example.piceditor.R.drawable.temp_3,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_3,
@@ -79,7 +79,7 @@ object TemplateRepository {
             // thumb_4 → temp_4
             // 2 ô: màn hình máy ảnh + khung Lovers Club
             TemplateData(
-                id          = "temp_4",
+                id          = "4",
                 name        = "Lovers Club",
                 drawableRes = com.example.piceditor.R.drawable.temp_4,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_4,
@@ -94,7 +94,7 @@ object TemplateRepository {
             // thumb_5 → temp_5
             // 2 ô polaroid trên đĩa vinyl
             TemplateData(
-                id          = "temp_5",
+                id          = "5",
                 name        = "Vinyl Memories",
                 drawableRes = com.example.piceditor.R.drawable.temp_5,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_5,
@@ -109,7 +109,7 @@ object TemplateRepository {
             // thumb_6 → temp_6
             // 4 ô scrapbook xanh
             TemplateData(
-                id          = "temp_6",
+                id          = "6",
                 name        = "Happy Day",
                 drawableRes = com.example.piceditor.R.drawable.temp_6,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_6,
@@ -126,7 +126,7 @@ object TemplateRepository {
             // thumb_7 → temp_7
             // 1 ô lớn kiểu music player
             TemplateData(
-                id          = "temp_7",
+                id          = "7",
                 name        = "Music Vibes",
                 drawableRes = com.example.piceditor.R.drawable.temp_7,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_7,
@@ -140,7 +140,7 @@ object TemplateRepository {
             // thumb_8 → temp_8
             // 1 ô vuông lớn, nền xanh navy
             TemplateData(
-                id          = "temp_8",
+                id          = "8",
                 name        = "My Life My Way",
                 drawableRes = com.example.piceditor.R.drawable.temp_8,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_8,
@@ -155,7 +155,7 @@ object TemplateRepository {
             // Tọa độ đo từ thumb_9 và tính ngược về 1125x2000
             // accounting for dx=14.69, scale=0.813 từ view thực tế
             TemplateData(
-                id          = "temp_9",
+                id          = "9",
                 name        = "Hello Summer",
                 drawableRes = com.example.piceditor.R.drawable.temp_9,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_9,
@@ -171,7 +171,7 @@ object TemplateRepository {
             // thumb_10 → temp_10
             // 2 ô tờ giấy trắng trong sổ tay
             TemplateData(
-                id          = "temp_10",
+                id          = "10",
                 name        = "Dear My Darling",
                 drawableRes = com.example.piceditor.R.drawable.temp_10,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_10,
