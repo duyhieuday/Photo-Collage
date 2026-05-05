@@ -57,6 +57,7 @@
             app:layout_constraintTop_toBottomOf="@id/layoutBar">
 
             <RelativeLayout
+                android:id="@+id/layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -132,30 +133,49 @@
 
                 </LinearLayout>
 
-                <!-- TITLE -->
-                <TextView
-                    android:id="@+id/tvTemplates"
-                    android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:id="@+id/rlTemplate"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/llIcons"
-                    android:layout_marginTop="24dp"
-                    android:text="@string/try_new_template"
-                    android:textSize="16sp"
-                    android:textColor="#1D2939"
-                    android:fontFamily="@font/inter_semi_bold"
-                    android:visibility="gone"
-                    />
+                    android:layout_marginTop="26dp"
+                    >
 
-                <!-- LIST TEMPLATE -->
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvTemplates"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/try_new_template"
+                        android:textSize="16sp"
+                        android:fontFamily="@font/inter_semi_bold"
+                        android:textColor="#1D2939"
+                        android:layout_centerVertical="true" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvSeeAllTemplate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/see_all"
+                        android:textSize="12sp"
+                        android:fontFamily="@font/inter_medium"
+                        android:textColor="#039855"
+                        android:padding="@dimen/dimen_8dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true" />
+
+                </RelativeLayout>
+
+                <!-- LIST TEMPLATES -->
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvTemplate"
+                    android:id="@+id/rcvTemplates"
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
-                    android:layout_below="@+id/tvTemplates"
-                    android:layout_marginTop="12dp"
-                    android:orientation="horizontal"
-                    android:visibility="gone"
-                    />
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:layout_marginTop="8dp"
+                    android:nestedScrollingEnabled="false"
+                    android:layout_below="@+id/rlTemplate"
+                    android:visibility="visible" />
 
             </RelativeLayout>
 

@@ -43,22 +43,42 @@ public class DrawView extends View {
         manager.onDraw(canvas);
     }
 
-    private boolean isDrawingEnabled = true;
+    private boolean isDrawingEnabled = false;
+
+    // ✅ Gesture mode: cho phép di chuyển/scale sticker mà không vẽ tay
+    // Mặc định true — sticker luôn di chuyển được dù không ở tab sticker
+    private boolean isGestureEnabled = true;
 
     public void setDrawingEnabled(boolean enabled) {
         isDrawingEnabled = enabled;
     }
 
+    public void setGestureEnabled(boolean enabled) {
+        isGestureEnabled = enabled;
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (!isDrawingEnabled) {
-            return false; // 🔥 nhường cho view dưới
+        if (!isDrawingEnabled && !isGestureEnabled) {
+            return false; // Nhường hoàn toàn cho TemplateEditorView bên dưới
         }
 
-        getParent().requestDisallowInterceptTouchEvent(true);
-        manager.onTouch(event);
-        return true;
-    }
+        if (isDrawingEnabled) {
+            // Tab draw: vẽ tay bình thường
+            getParent().requestDisallowInterceptTouchEvent(true);
+            manager.onTouch(event);
+            return true;
+        }
 
+        // isGestureEnabled = true, isDrawingEnabled = false
+        // Chỉ xử lý nếu chạm đúng vào sticker, không thì nhường cho view dưới
+        boolean stickerHit = manager.isTouchingSticker(event.getX(), event.getY());
+        if (stickerHit) {
+            getParent().requestDisallowInterceptTouchEvent(true);
+            manager.onTouch(event);
+            return true;
+        }
+        return false; // Không chạm sticker → nhường cho TemplateEditorView
+    }
 }

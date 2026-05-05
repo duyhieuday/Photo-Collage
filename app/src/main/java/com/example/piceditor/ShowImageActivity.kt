@@ -4,27 +4,37 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.os.SystemClock
 import android.view.View
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.example.piceditor.adapters.TemplateAdapter
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityShowImageBinding
+import com.example.piceditor.templates_editor.Template
+import com.example.piceditor.templates_editor.TemplateEditorActivity
+import com.example.piceditor.templates_editor.TemplatePickerActivity
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utilsApp.Constant
 import com.example.piceditor.utilsApp.PreferenceUtil
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStreamReader
 
 class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnClickListener {
 
@@ -34,6 +44,9 @@ class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnCl
     // ✅ Cache file share — chỉ ghi 1 lần, reuse cho các lần share sau
     private var cachedShareFile: File? = null
     private var shareJob: Job? = null
+    private var mLastClickTime: Long = 0
+    private var templateAdapter: TemplateAdapter? = null
+    private var templateList: MutableList<Template?>? = null
 
     override fun getLayoutRes(): Int = R.layout.activity_show_image
     override fun getFrame(): Int = 0
@@ -78,6 +91,7 @@ class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnCl
 
         imageUri = intent.getStringExtra("image_uri")?.toUri()
         loadImage()
+        setUpTemp()
 
         binding.btnBack.setOnClickListener { finish() }
 
@@ -97,6 +111,41 @@ class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnCl
         binding.icFaceBook.setOnClickListener  { shareToApp("com.facebook.katana") }
         binding.icTiktok.setOnClickListener    { shareToTikTok() }
         binding.icMore.setOnClickListener      { shareImage() }
+    }
+
+    private fun setUpTemp() {
+        val gson = Gson()
+        val type = object : TypeToken<MutableList<Template?>?>() {}.getType()
+        val temps: MutableList<Template?>? = try {
+            gson.fromJson(InputStreamReader(assets.open("temp.json")), type)
+        } catch (e: IOException) {
+            throw RuntimeException(e)
+        }
+
+        binding.rcvTemplates.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        templateList    = temps
+        templateAdapter = TemplateAdapter()
+        templateAdapter?.setData(templateList)
+        binding.rcvTemplates.adapter = templateAdapter
+        binding.rcvTemplates.smoothScrollToPosition(0)
+
+        // ✅ template.id là Int, TemplateRepository.findById() nhận String → toString()
+        templateAdapter?.setClickListener { position, template ->
+            if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setClickListener
+            mLastClickTime = SystemClock.elapsedRealtime()
+            val intent = Intent(this, TemplateEditorActivity::class.java).apply {
+                putExtra(TemplateEditorActivity.EXTRA_TEMPLATE_ID, template?.id?.toString())
+            }
+            startActivity(intent)
+        }
+
+        binding.tvSeeAllTemplate.setOnClickListener {
+            if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
+            mLastClickTime = SystemClock.elapsedRealtime()
+            startActivity(Intent(this, TemplatePickerActivity::class.java))
+        }
     }
 
     // ✅ Chỉ load ảnh 1 lần — nếu bitmap đã có thì không load lại

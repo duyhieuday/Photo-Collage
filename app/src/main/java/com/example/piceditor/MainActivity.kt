@@ -287,13 +287,12 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         binding.rcvTemplates.adapter = templateAdapter
         binding.rcvTemplates.smoothScrollToPosition(0)
 
-        // ✅ Click vào item → mở TemplateEditorActivity với template tương ứng
+        // ✅ template.id là Int, TemplateRepository.findById() nhận String → toString()
         templateAdapter?.setClickListener { position, template ->
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setClickListener
             mLastClickTime = SystemClock.elapsedRealtime()
             val intent = Intent(this, TemplateEditorActivity::class.java).apply {
-                Log.e("xcncnajj1", "setUpTemp: " + template.id )
-                putExtra(TemplateEditorActivity.EXTRA_TEMPLATE_ID, template?.id)
+                putExtra(TemplateEditorActivity.EXTRA_TEMPLATE_ID, template?.id?.toString())
             }
             startActivity(intent)
         }

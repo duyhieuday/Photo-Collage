@@ -134,9 +134,7 @@ public class DrawerManager {
             @Override
             public void swapData(int i1, int i2) {
                 int size = DrawerManager.this.currentData.getListSticker().size();
-                if (i1 < 0 || i1 >= size || i2 < 0 || i2 >= size) {
-                    return; // invalid indices
-                }
+                if (i1 < 0 || i1 >= size || i2 < 0 || i2 >= size) return;
                 List<StickerData> currentData = DrawerManager.this.currentData.getListSticker();
                 Collections.swap(currentData, i1, i2);
                 stickerDrawer.setData(currentData);
@@ -161,9 +159,7 @@ public class DrawerManager {
     }
 
     public synchronized void setData(DrawData drawData) {
-        if (drawData == null) {
-            return;
-        }
+        if (drawData == null) return;
         currentData.setData(drawData);
         canvasDrawer.setData(currentData.getListPath());
         stickerDrawer.setData(currentData.getListSticker());
@@ -204,18 +200,11 @@ public class DrawerManager {
         long lastTimeCanvasUndo = canvasDrawer.getLastTimeUndo();
         long lastTimeStickerUndo = stickerDrawer.getLastTimeUndo();
         if (lastTimeCanvasUndo == 0 || lastTimeStickerUndo == 0) {
-            if (lastTimeCanvasUndo != 0) {
-                canvasDrawer.undo();
-            }
-            if (lastTimeStickerUndo != 0) {
-                stickerDrawer.undo();
-            }
+            if (lastTimeCanvasUndo != 0) canvasDrawer.undo();
+            if (lastTimeStickerUndo != 0) stickerDrawer.undo();
         } else {
-            if (lastTimeCanvasUndo > lastTimeStickerUndo) {
-                canvasDrawer.undo();
-            } else {
-                stickerDrawer.undo();
-            }
+            if (lastTimeCanvasUndo > lastTimeStickerUndo) canvasDrawer.undo();
+            else stickerDrawer.undo();
         }
     }
 
@@ -223,18 +212,11 @@ public class DrawerManager {
         long lastTimeCanvasRedo = canvasDrawer.getLastTimeRedo();
         long lastTimeStickerRedo = stickerDrawer.getLastTimeRedo();
         if (lastTimeCanvasRedo == 0 || lastTimeStickerRedo == 0) {
-            if (lastTimeCanvasRedo != 0) {
-                canvasDrawer.redo();
-            }
-            if (lastTimeStickerRedo != 0) {
-                stickerDrawer.redo();
-            }
+            if (lastTimeCanvasRedo != 0) canvasDrawer.redo();
+            if (lastTimeStickerRedo != 0) stickerDrawer.redo();
         } else {
-            if (lastTimeCanvasRedo < lastTimeStickerRedo) {
-                canvasDrawer.redo();
-            } else {
-                stickerDrawer.redo();
-            }
+            if (lastTimeCanvasRedo < lastTimeStickerRedo) canvasDrawer.redo();
+            else stickerDrawer.redo();
         }
     }
 
@@ -261,6 +243,7 @@ public class DrawerManager {
     public void setDrawPath(@NonNull DrawPath drawPath) {
         canvasDrawer.setCurrentData(drawPath);
     }
+
     public void clearDrawPath() {
         canvasDrawer.setCurrentData(null);
     }
@@ -280,6 +263,15 @@ public class DrawerManager {
         stickerDrawer.addSticker(sticker);
     }
 
+    // ✅ Check xem tọa độ view (x,y) có đang chạm vào sticker nào không
+    // Dùng bởi DrawView ở gesture mode để quyết định có xử lý touch không
+    public boolean isTouchingSticker(float viewX, float viewY) {
+        if (currentData.getListSticker().isEmpty()) return false;
+        float[] pts = {viewX, viewY};
+        interMatrix.mapPoints(pts);
+        return stickerDrawer.interceptTouchEvent(pts[0], pts[1], MotionEvent.ACTION_DOWN);
+    }
+
     public void copySticker(StickerData sticker) {
         stickerDrawer.copySticker(sticker);
     }
@@ -297,7 +289,6 @@ public class DrawerManager {
     }
 
     public Bitmap exportBitmap(Context context, int width, int height, float cornerRadius) {
-        // obtain background
         Bitmap backgroundLayer;
         try {
             backgroundLayer = Glide.with(context).asBitmap()
@@ -309,26 +300,19 @@ public class DrawerManager {
             backgroundLayer = null;
         }
 
-        // obtain foreground
         Bitmap foregroundLayer = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas drawCanvas = new Canvas(foregroundLayer);
         updateMatrix(width, height);
         onDraw(drawCanvas);
 
-        // create final bitmap
         Bitmap finalBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(finalBitmap);
 
-        // clip corner rect
         Path path = new Path();
         path.addRoundRect(new RectF(0, 0, width, height), cornerRadius, cornerRadius, Path.Direction.CW);
         canvas.clipPath(path);
 
-        // draw background
-        if (backgroundLayer != null) {
-            canvas.drawBitmap(backgroundLayer, 0.0f, 0.0f, null);
-        }
-        // draw foreground
+        if (backgroundLayer != null) canvas.drawBitmap(backgroundLayer, 0.0f, 0.0f, null);
         canvas.drawBitmap(foregroundLayer, 0.0f, 0.0f, null);
 
         return finalBitmap;
@@ -353,23 +337,17 @@ public class DrawerManager {
             ignoreMotionEventTillDown = !isTouchDownSticker && canvasDrawer.isErase() && currentData.getListPath().isEmpty();
         }
 
-        if (ignoreMotionEventTillDown) {
-            return false;
-        }
+        if (ignoreMotionEventTillDown) return false;
 
-        if (action == MotionEvent.ACTION_DOWN) {
-            updateHandler.sendTouchDown();
-        }
-        if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
-            updateHandler.sendTouchUp();
-        }
+        if (action == MotionEvent.ACTION_DOWN) updateHandler.sendTouchDown();
+        if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) updateHandler.sendTouchUp();
 
         if (isTouchDownSticker) {
             stickerDrawer.onTouch(points[0], points[1], action, event.getEventTime() - event.getDownTime());
-            return true; // ✅ đang chạm sticker
+            return true;
         } else {
             canvasDrawer.onTouch(points[0], points[1], action, 0);
-            return false; // ✅ không phải sticker → cho view dưới xử lý
+            return false;
         }
     }
 
@@ -419,51 +397,27 @@ public class DrawerManager {
         @Override
         public void handleMessage(@NonNull Message msg) {
             if (msg.what == MESSAGE_UPDATE_VIEW) {
-                if (updateViewListener != null) {
-                    updateViewListener.run();
-                }
+                if (updateViewListener != null) updateViewListener.run();
                 return;
             }
-            if (drawInteractListeners.isEmpty()) {
-                return;
-            }
+            if (drawInteractListeners.isEmpty()) return;
             switch (msg.what) {
                 case MESSAGE_ON_UNDO_REDO_CHANGE:
-                    for (DrawInteractListener drawInteractListener : drawInteractListeners) {
-                        drawInteractListener.interactUndoRedoChange();
-                    }
+                    for (DrawInteractListener l : drawInteractListeners) l.interactUndoRedoChange();
                     break;
                 case MESSAGE_UPDATE_BACKGROUND:
-                    if (msg.obj instanceof String) {
-                        for (DrawInteractListener drawInteractListener : drawInteractListeners) {
-                            drawInteractListener.interactUpdateBackground((String) msg.obj);
-                        }
-                    } else {
-                        for (DrawInteractListener drawInteractListener : drawInteractListeners) {
-                            drawInteractListener.interactUpdateBackground(null);
-                        }
-                    }
+                    String url = msg.obj instanceof String ? (String) msg.obj : null;
+                    for (DrawInteractListener l : drawInteractListeners) l.interactUpdateBackground(url);
                     break;
                 case MESSAGE_ON_TOUCH_DOWN:
-                    for (DrawInteractListener drawInteractListener : drawInteractListeners) {
-                        drawInteractListener.interactTouchDown();
-                    }
+                    for (DrawInteractListener l : drawInteractListeners) l.interactTouchDown();
                     break;
                 case MESSAGE_ON_TOUCH_UP:
-                    for (DrawInteractListener drawInteractListener : drawInteractListeners) {
-                        drawInteractListener.interactTouchUp();
-                    }
+                    for (DrawInteractListener l : drawInteractListeners) l.interactTouchUp();
                     break;
                 case MESSAGE_ON_STICKER_FOCUS_CHANGE:
-                    if (msg.obj instanceof StickerData) {
-                        for (DrawInteractListener drawInteractListener : drawInteractListeners) {
-                            drawInteractListener.interactStickerFocusChange((StickerData) msg.obj);
-                        }
-                    } else {
-                        for (DrawInteractListener drawInteractListener : drawInteractListeners) {
-                            drawInteractListener.interactStickerFocusChange(null);
-                        }
-                    }
+                    StickerData s = msg.obj instanceof StickerData ? (StickerData) msg.obj : null;
+                    for (DrawInteractListener l : drawInteractListeners) l.interactStickerFocusChange(s);
                     break;
             }
         }

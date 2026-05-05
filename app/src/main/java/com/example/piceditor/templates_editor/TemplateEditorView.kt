@@ -95,22 +95,59 @@ class TemplateEditorView @JvmOverloads constructor(
         return Math.toDegrees(Math.atan2(dy, dx)).toFloat()
     }
 
-    // ── Draw ─────────────────────────────────────────────
+    // ── Kích thước cố định — không thay đổi dù view bị resize ──
+    private var fixedW = 0
+    private var fixedH = 0
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        // ✅ Chỉ lưu lần đầu tiên (khi panel chưa mở)
+        if (fixedW == 0 && fixedH == 0 && w > 0 && h > 0) {
+            fixedW = w
+            fixedH = h
+        }
+    }
+
+    // ── Corner radius cho view ────────────────────────────
+    private val viewCornerRadius = 8f * resources.displayMetrics.density // 8dp
+
+    override fun dispatchDraw(canvas: Canvas) {
+        val w = if (fixedW > 0) fixedW.toFloat() else width.toFloat()
+        val h = if (fixedH > 0) fixedH.toFloat() else height.toFloat()
+        val path = Path().apply {
+            addRoundRect(RectF(0f, 0f, w, h), viewCornerRadius, viewCornerRadius, Path.Direction.CW)
+        }
+        canvas.clipPath(path)
+        super.dispatchDraw(canvas)
+    }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        // 1. Nền trắng mặc định
+        val w = if (fixedW > 0) fixedW.toFloat() else width.toFloat()
+        val h = if (fixedH > 0) fixedH.toFloat() else height.toFloat()
+
+        val path = Path().apply {
+            addRoundRect(RectF(0f, 0f, w, h), viewCornerRadius, viewCornerRadius, Path.Direction.CW)
+        }
+        canvas.clipPath(path)
+
+        // 1. Nền trắng mặc định — fill toàn bộ fixedW x fixedH
         canvas.drawColor(Color.WHITE)
 
-        // 2. Background ảnh (nếu user chọn)
+        // 2. Background ảnh (nếu user chọn) — fill toàn bộ fixed size
         backgroundBitmap?.let {
-            canvas.drawBitmap(it, null,
-                RectF(0f, 0f, width.toFloat(), height.toFloat()), bgPaint)
+            val fw = if (fixedW > 0) fixedW.toFloat() else width.toFloat()
+            val fh = if (fixedH > 0) fixedH.toFloat() else height.toFloat()
+            canvas.drawBitmap(it, null, RectF(0f, 0f, fw, fh), bgPaint)
         }
 
-        // 3. Raw template (background của template như vinyl, sky...)
-        templateBitmapRaw?.let { canvas.drawBitmap(it, 0f, 0f, cellPaint) }
+        // 3. Raw template — vẽ căn giữa theo dy offset
+        templateBitmapRaw?.let {
+            val dy = if (fixedH > 0 && it.height < fixedH)
+                (fixedH - it.height) / 2f else 0f
+            canvas.drawBitmap(it, 0f, dy, cellPaint)
+        }
 
         // 4. Ảnh vào từng cell
         cells.forEach { cell ->
@@ -154,21 +191,6 @@ class TemplateEditorView @JvmOverloads constructor(
 
         // 5. Mask overlay
         templateMaskBitmap?.let { canvas.drawBitmap(it, 0f, 0f, overlayPaint) }
-
-        // 6. Highlight cell active — cũng dùng rounded rect
-        activeCell?.let { cell ->
-            val drawRect = if (cellSpacing > 0f) RectF(
-                cell.rect.left   + cellSpacing, cell.rect.top    + cellSpacing,
-                cell.rect.right  - cellSpacing, cell.rect.bottom - cellSpacing
-            ) else RectF(cell.rect)
-
-            val hp = Paint().apply {
-                color = 0x880099FF.toInt(); style = Paint.Style.STROKE
-                strokeWidth = 5f; isAntiAlias = true
-            }
-            if (cellCorner > 0f) canvas.drawRoundRect(drawRect, cellCorner, cellCorner, hp)
-            else canvas.drawRect(drawRect, hp)
-        }
     }
 
     // ── Touch ─────────────────────────────────────────────
@@ -179,7 +201,8 @@ class TemplateEditorView @JvmOverloads constructor(
 
             // ── 1 ngón chạm xuống ──────────────────────────
             MotionEvent.ACTION_DOWN -> {
-                activeCell = findCell(event.x, event.y)
+                val tappedCell = findCell(event.x, event.y)
+                activeCell = tappedCell  // null nếu tap vào vùng trống
                 lastX  = event.x
                 lastY  = event.y
                 isTap  = true
@@ -266,8 +289,13 @@ class TemplateEditorView @JvmOverloads constructor(
             }
 
             MotionEvent.ACTION_UP -> {
-                if (isTap && activeCell?.bitmap == null) {
-                    activeCell?.let { listener?.invoke(it) }
+                if (isTap) {
+                    val cell = activeCell
+                    if (cell != null && cell.bitmap == null) {
+                        // Tap vào cell trống → mở gallery
+                        listener?.invoke(cell)
+                    }
+                    // Tap vào vùng trống hoặc cell đã có ảnh → không làm gì
                 }
                 isTap = false
             }
@@ -352,11 +380,13 @@ class TemplateEditorView @JvmOverloads constructor(
     // ── Export ────────────────────────────────────────────
 
     fun export(): Bitmap {
-        val result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        // ✅ Dùng fixedW/fixedH — kích thước thực khi template load lần đầu
+        // Không dùng width/height vì có thể bị thay đổi khi panel tool mở
+        val exportW = if (fixedW > 0) fixedW else width
+        val exportH = if (fixedH > 0) fixedH else height
+        val result = Bitmap.createBitmap(exportW, exportH, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(result)
-        // Vẽ template view
         draw(canvas)
-        // Vẽ thêm drawView (sticker/text) lên trên
         drawView?.draw(canvas)
         return result
     }

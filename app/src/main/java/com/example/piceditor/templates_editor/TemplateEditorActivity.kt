@@ -1,29 +1,25 @@
 package com.example.piceditor.templates_editor
 
-import android.content.ContentValues
 import android.content.Intent
+import android.content.ContentValues
 import android.graphics.*
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IntDef
-import androidx.core.graphics.scale
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.piceditor.R
-import com.example.piceditor.ShowImageActivity
 import com.example.piceditor.adapters.BackgroundAdapter
-import com.example.piceditor.adapters.ToolAdapter
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityTemplateEditorBinding
@@ -34,6 +30,7 @@ import com.example.piceditor.draw.model.draw.style.PaintStyle
 import com.example.piceditor.draw.model.sticker.StickerData
 import com.example.piceditor.draw.test.Beard
 import com.example.piceditor.draw.test.BeardAdapter
+import com.example.piceditor.adapters.ToolAdapter
 import com.example.piceditor.model.ToolItem
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utils.ImageUtils
@@ -44,9 +41,14 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.io.IOException
 import java.io.InputStreamReader
 import kotlin.math.min
+import androidx.core.graphics.scale
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import com.example.piceditor.ShowImageActivity
 
 class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
     BackgroundAdapter.OnBGClickListener,
@@ -133,8 +135,9 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
         templateData = TemplateRepository.findById(templateId)
             ?: TemplateRepository.all.first()
 
-        // DrawView tắt drawing mặc định, chỉ bật khi vào tab sticker/draw
+        // ✅ DrawView: tắt drawing mặc định, bật gesture để sticker luôn di chuyển được
         binding.templateEditorView.drawView?.setDrawingEnabled(false)
+        binding.templateEditorView.drawView?.setGestureEnabled(true)
 
         setupToolTabs()
         setupListeners()
@@ -226,7 +229,9 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
             binding.llBg.visibility      = View.GONE
             binding.llDraw.visibility    = View.GONE
             binding.rcvTools.visibility  = View.GONE
+            // ✅ Tắt drawing khi chuyển tab, nhưng GIỮ gesture để sticker luôn di chuyển được
             binding.templateEditorView.drawView?.setDrawingEnabled(false)
+            binding.templateEditorView.drawView?.setGestureEnabled(true)
 
             when (pos) {
                 0 -> { // Ảnh
@@ -253,9 +258,13 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
                     binding.icCheckSticker.setOnClickListener {
                         binding.llSticker.visibility = View.GONE
                         binding.rcvTools.visibility  = View.VISIBLE
+                        // Thoát tab sticker: tắt drawing, giữ gesture
                         binding.templateEditorView.drawView?.setDrawingEnabled(false)
+                        binding.templateEditorView.drawView?.setGestureEnabled(true)
                     }
+                    // Vào tab sticker: bật drawing để add sticker
                     binding.templateEditorView.drawView?.setDrawingEnabled(true)
+                    binding.templateEditorView.drawView?.setGestureEnabled(true)
                     syncUndoRedoUI()
                 }
                 3 -> { // Background
@@ -285,7 +294,9 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
                     binding.icCheckDraw.setOnClickListener {
                         binding.llDraw.visibility = View.GONE
                         binding.rcvTools.visibility = View.VISIBLE
+                        // Thoát tab draw: tắt drawing, giữ gesture cho sticker
                         binding.templateEditorView.drawView?.setDrawingEnabled(false)
+                        binding.templateEditorView.drawView?.setGestureEnabled(true)
                     }
                     updateDraw()
                     syncUndoRedoUI()
@@ -384,58 +395,60 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
     // Template loading
     // ──────────────────────────────────────────────────────
 
+    // ── Kích thước view cố định — chỉ tính 1 lần ─────────
+    private var fixedViewW = 0f
+    private var fixedViewH = 0f
+    private var templateLoaded = false
+
     private fun loadTemplate() {
-        // ViewTreeObserver đảm bảo view đã measure + layout xong hoàn toàn
-        // (post{} có thể chạy trước khi margin được áp dụng)
+        if (templateLoaded) return  // ✅ Chỉ load 1 lần duy nhất
+
         binding.templateEditorView.viewTreeObserver.addOnGlobalLayoutListener(
             object : android.view.ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
-                    // Chỉ chạy 1 lần
-                    binding.templateEditorView.viewTreeObserver
-                        .removeOnGlobalLayoutListener(this)
-
                     val viewW = binding.templateEditorView.width.toFloat()
                     val viewH = binding.templateEditorView.height.toFloat()
 
-                    // Guard: nếu view vẫn chưa có kích thước thì bỏ qua
-                    if (viewW <= 0f || viewH <= 0f) return
+                    if (viewW <= 0f || viewH <= 0f) return  // chưa measure xong
 
-                    val scale = min(viewW / TEMPLATE_W, viewH / TEMPLATE_H)
+                    // ✅ Remove ngay — không chạy lại khi panel mở/đóng thay đổi layout
+                    binding.templateEditorView.viewTreeObserver
+                        .removeOnGlobalLayoutListener(this)
+
+                    if (templateLoaded) return  // double-check
+                    templateLoaded = true
+
+                    // ✅ Lưu cố định — cells sẽ không bị tính lại dù view thay đổi kích thước
+                    fixedViewW = viewW
+                    fixedViewH = viewH
+
+                    val scale = min(fixedViewW / TEMPLATE_W, fixedViewH / TEMPLATE_H)
                     val newW  = TEMPLATE_W * scale
                     val newH  = TEMPLATE_H * scale
-                    val dx    = (viewW - newW) / 2f
-                    val dy    = (viewH - newH) / 2f
+                    val dx    = (fixedViewW - newW) / 2f
+                    val dy    = (fixedViewH - newH) / 2f
 
                     android.util.Log.d("TemplateDebug",
-                        "viewW=$viewW viewH=$viewH scale=$scale " +
+                        "viewW=$fixedViewW viewH=$fixedViewH scale=$scale " +
                                 "newW=$newW newH=$newH dx=$dx dy=$dy"
                     )
 
                     lifecycleScope.launch {
                         val (scaled, mask) = withContext(Dispatchers.IO) {
-                            val raw   = BitmapFactory.decodeResource(resources, templateData.drawableRes)
-                            val scale = min(viewW / TEMPLATE_W, viewH / TEMPLATE_H)
-                            val newW  = (TEMPLATE_W * scale).toInt()
-                            val newH  = (TEMPLATE_H * scale).toInt()
-                            val scaled = raw.scale(newW, newH)
+                            val raw = BitmapFactory.decodeResource(resources, templateData.drawableRes)
+                            val scaledBmp = raw.scale(newW.toInt(), newH.toInt())
                             raw.recycle()
-                            val mask = if (templateData.maskMode == MaskMode.BLACK)
-                                binding.templateEditorView.createMaskFromBlack(scaled)
+                            val maskBmp = if (templateData.maskMode == MaskMode.BLACK)
+                                binding.templateEditorView.createMaskFromBlack(scaledBmp)
                             else
-                                binding.templateEditorView.createMaskFromWhite(scaled)
-                            Pair(scaled, mask)
+                                binding.templateEditorView.createMaskFromWhite(scaledBmp)
+                            Pair(scaledBmp, maskBmp)
                         }
 
                         binding.templateEditorView.templateBitmapRaw  = scaled
                         binding.templateEditorView.templateMaskBitmap = mask
 
-                        // Setup cells dùng cùng viewW/viewH
-                        val scale = min(viewW / TEMPLATE_W, viewH / TEMPLATE_H)
-                        val newW  = TEMPLATE_W * scale
-                        val newH  = TEMPLATE_H * scale
-                        val dx    = (viewW - newW) / 2f
-                        val dy    = (viewH - newH) / 2f
-
+                        // ✅ Dùng fixedViewW/fixedViewH để tính cells — không bao giờ thay đổi
                         binding.templateEditorView.cells = templateData.cellRects.map { rect ->
                             PhotoCell(RectF(
                                 rect.left   * scale + dx,

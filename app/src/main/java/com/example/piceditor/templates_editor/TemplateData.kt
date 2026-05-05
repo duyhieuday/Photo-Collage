@@ -12,174 +12,141 @@ data class TemplateData(
 )
 
 enum class MaskMode {
-    WHITE,  // Ô ảnh là vùng trắng
-    BLACK   // Ô ảnh là vùng đen
+    WHITE,
+    BLACK
 }
 
 // Tọa độ cellRects tính trên không gian 1125 x 2000
+// Đo từ ảnh gốc 3240x5760, scale=0.8391, dx=0, dy=0.39
+// Mỗi cell mở rộng thêm 8px mỗi chiều so với detect gốc
 object TemplateRepository {
 
     val all: List<TemplateData> by lazy {
         listOf(
 
             // ── Temp 1: Best Trip ─────────────────────────────
-            // thumb_1 → temp_1
-            // 5 ô: 3 cột trái + 2 cột phải
             TemplateData(
                 id          = "1",
                 name        = "Best Trip",
                 drawableRes = com.example.piceditor.R.drawable.temp_1,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_1,
                 cellRects   = listOf(
-                    RectF(96f, 179f,  537f,  592f),
-                    RectF(80f, 616f,  515f,  1029f),
-                    RectF(60f,  1053f, 492f,  1466f),
-                    RectF(580f, 755f,  1011f, 1164f),
-                    RectF(595f, 1192f, 1028f, 1602f)
+                    RectF(118f, 174f, 542f,  597f),
+                    RectF(96f,  611f, 520f,  1034f),
+                    RectF(74f,  1048f, 498f, 1471f),
+                    RectF(596f, 750f,  1016f, 1169f),
+                    RectF(614f, 1187f, 1033f, 1607f)
                 ),
-                maskMode    = MaskMode.WHITE
+                maskMode = MaskMode.WHITE
             ),
 
             // ── Temp 2: Life is Beautiful ─────────────────────
-            // thumb_2 → temp_2
-            // 6 ô lưới 2x3, nền đen
             TemplateData(
                 id          = "2",
                 name        = "Life is Beautiful",
                 drawableRes = com.example.piceditor.R.drawable.temp_2,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_2,
                 cellRects   = listOf(
-                    RectF(110f, 344f,  560f,  759f),
-                    RectF(567f, 344f,  1017f, 759f),
-                    RectF(110f, 803f,  559f,  1217f),
-                    RectF(567f, 803f,  1018f, 1217f),
-                    RectF(110f, 1261f, 560f,  1676f),
-                    RectF(567f, 1261f, 1017f, 1676f)
+                    RectF(140f, 339f, 565f,  764f),
+                    RectF(597f, 339f, 1022f, 764f),
+                    RectF(139f, 798f, 564f,  1222f),
+                    RectF(599f, 798f, 1023f, 1222f),
+                    RectF(140f, 1256f, 565f, 1681f),
+                    RectF(597f, 1256f, 1022f, 1681f)
                 ),
-                maskMode    = MaskMode.WHITE
+                maskMode = MaskMode.WHITE
             ),
 
             // ── Temp 3: Happy Birthday Snoopy ─────────────────
-            // thumb_3 → temp_3
-            // 3 ô polaroid xếp chéo
             TemplateData(
                 id          = "3",
                 name        = "Happy Birthday",
                 drawableRes = com.example.piceditor.R.drawable.temp_3,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_3,
                 cellRects   = listOf(
-                    RectF(328f, 421f,  856f,  974f),
-                    RectF(75f,  988f,  560f,  1503f),
-                    RectF(531f, 1355f, 1093f, 1954f)
+                    RectF(342f, 416f, 881f,  972f),
+                    RectF(87f,  983f, 588f,  1508f),
+                    RectF(526f, 1350f, 1114f, 1959f)
                 ),
-                maskMode    = MaskMode.WHITE
+                maskMode = MaskMode.WHITE
             ),
 
             // ── Temp 4: Lovers Club ───────────────────────────
-            // thumb_4 → temp_4
-            // 2 ô: màn hình máy ảnh + khung Lovers Club
             TemplateData(
                 id          = "4",
                 name        = "Lovers Club",
                 drawableRes = com.example.piceditor.R.drawable.temp_4,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_4,
                 cellRects   = listOf(
-                    RectF(420f, 468f,  828f,  986f),
-                    RectF(158f, 1268f, 560f,  1686f)
+                    RectF(444f, 479f, 833f, 971f),
+                    RectF(175f, 1276f, 565f, 1667f)
                 ),
-                maskMode    = MaskMode.WHITE
+                maskMode = MaskMode.WHITE
             ),
 
             // ── Temp 5: Vinyl Memories ────────────────────────
-            // thumb_5 → temp_5
-            // 2 ô polaroid trên đĩa vinyl
             TemplateData(
                 id          = "5",
                 name        = "Vinyl Memories",
                 drawableRes = com.example.piceditor.R.drawable.temp_5,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_5,
                 cellRects   = listOf(
-                    RectF(493f, 186f, 1051f, 734f),
-                    RectF(86f, 974f, 662f,  1538f)
+                    RectF(502f, 176f, 1056f, 741f),
+                    RectF(100f, 969f, 668f,  1543f)
                 ),
-                maskMode    = MaskMode.WHITE
+                maskMode = MaskMode.WHITE
             ),
 
             // ── Temp 6: Happy Day ─────────────────────────────
-            // thumb_6 → temp_6
-            // 4 ô scrapbook xanh
             TemplateData(
                 id          = "6",
                 name        = "Happy Day",
                 drawableRes = com.example.piceditor.R.drawable.temp_6,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_6,
                 cellRects   = listOf(
-                    RectF(66f,  275f,  541f,  899f),
-                    RectF(570f, 399f,  1072f, 1023f),
-                    RectF(30f,  923f,  543f,  1607f),
-                    RectF(560f, 1097f, 1059f, 1721f)
+                    RectF(61f,  270f,  546f,  904f),
+                    RectF(543f, 394f,  1077f, 1040f),
+                    RectF(47f,  906f,  588f,  1612f),
+                    RectF(578f, 1092f, 1064f, 1726f)
                 ),
-                maskMode    = MaskMode.WHITE
+                maskMode = MaskMode.WHITE
             ),
 
-            // ── Temp 7: Music Vibes (Daisy) ───────────────────
-            // thumb_7 → temp_7
-            // 1 ô lớn kiểu music player
+            // ── Temp 7: Music Vibes ───────────────────────────
             TemplateData(
                 id          = "7",
                 name        = "Music Vibes",
                 drawableRes = com.example.piceditor.R.drawable.temp_7,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_7,
                 cellRects   = listOf(
-                    RectF(128f, 212f, 971f, 1023f)
+                    RectF(149f, 207f, 976f, 1040f)
                 ),
-                maskMode    = MaskMode.WHITE
+                maskMode = MaskMode.WHITE
             ),
 
             // ── Temp 8: My Life My Way ────────────────────────
-            // thumb_8 → temp_8
-            // 1 ô vuông lớn, nền xanh navy
             TemplateData(
                 id          = "8",
                 name        = "My Life My Way",
                 drawableRes = com.example.piceditor.R.drawable.temp_8,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_8,
                 cellRects   = listOf(
-                    RectF(222f, 599f, 900f, 1286f)
+                    RectF(246f, 594f, 905f, 1291f)
                 ),
-                maskMode    = MaskMode.WHITE
-            ),
-
-            // ── Temp 9: Hello Summer ──────────────────────────
-            // 1 ô Instagram lớn (thẳng) + 3 ô polaroid nhỏ nghiêng ~16°
-            // Tọa độ đo từ thumb_9 và tính ngược về 1125x2000
-            // accounting for dx=14.69, scale=0.813 từ view thực tế
-            TemplateData(
-                id          = "9",
-                name        = "Hello Summer",
-                drawableRes = com.example.piceditor.R.drawable.temp_9,
-                thumbRes    = com.example.piceditor.R.drawable.thumb_9,
-                cellRects   = listOf(
-                    RectF(186f, 240f,  642f, 866f),   // Instagram photo
-                    RectF(485f, 490f,  846f, 688f),   // Polaroid ô 1
-                    RectF(464f, 714f,  854f, 958f),   // Polaroid ô 2
-                    RectF(431f, 998f,  811f, 1266f)   // Polaroid ô 3
-                )
+                maskMode = MaskMode.WHITE
             ),
 
             // ── Temp 10: Dear My Darling ──────────────────────
-            // thumb_10 → temp_10
-            // 2 ô tờ giấy trắng trong sổ tay
             TemplateData(
                 id          = "10",
                 name        = "Dear My Darling",
                 drawableRes = com.example.piceditor.R.drawable.temp_10,
                 thumbRes    = com.example.piceditor.R.drawable.thumb_10,
                 cellRects   = listOf(
-                    RectF(276f, 581f,  947f,  1143f),
-                    RectF(252f, 1145f, 643f,  1576f)
+                    RectF(293f, 576f, 952f, 1148f),
+                    RectF(274f, 1140f, 664f, 1581f)
                 ),
-                maskMode    = MaskMode.WHITE
+                maskMode = MaskMode.WHITE
             )
         )
     }
