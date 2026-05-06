@@ -11,6 +11,7 @@ import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.piceditor.adapters.GalleryImageAdapter
 import com.example.piceditor.adapters.SelectedPhotoAdapter
+import com.example.piceditor.ads.InterAds
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivitySelectImageBinding
@@ -126,7 +127,9 @@ class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(),
         super.onCreate(savedInstanceState)
         BarsUtils.setHideNavigation(this)
 
-        binding.ivBack.setOnClickListener { finish() }
+        binding.ivBack.setOnClickListener {
+            InterAds.showAdsBreak(this@SelectImageActivity) { finish() }
+        }
 
         mSelectedPhotoAdapter = SelectedPhotoAdapter(mSelectedImages, this)
         binding.listImages.hasFixedSize()
@@ -152,11 +155,13 @@ class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(),
             return
         }
         try {
-            val intent = Intent(this, CollageActivity::class.java)
-            intent.putExtra("imageCount", mSelectedImages.size)
-            intent.putExtra("selectedImages", mSelectedImages)
-            intent.putExtra("imagesinTemplate", mSelectedImages.size)
-            startActivityForResult(intent, 111)
+            InterAds.showAdsBreak(this@SelectImageActivity) {
+                val intent = Intent(this, CollageActivity::class.java)
+                intent.putExtra("imageCount", mSelectedImages.size)
+                intent.putExtra("selectedImages", mSelectedImages)
+                intent.putExtra("imagesinTemplate", mSelectedImages.size)
+                startActivityForResult(intent, 111)
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }

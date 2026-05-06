@@ -27,6 +27,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.piceditor.adapters.BackgroundAdapter
 import com.example.piceditor.adapters.FrameAdapter
 import com.example.piceditor.adapters.ToolAdapter
+import com.example.piceditor.ads.Callback
+import com.example.piceditor.ads.InterAds
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityCollageBinding
@@ -213,12 +215,14 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         when (v!!.id) {
             R.id.btnNext -> {
                 checkClick()
-                val bitmap = createOutputImage()
-                val uri = saveTempBitmap(bitmap)
-                val intent = Intent(this, FilterCollageActivity::class.java)
-                intent.putExtra("image_uri", uri.toString())
-                startActivity(intent)
-                finish()
+                InterAds.showAdsBreak(this@CollageActivity) {
+                    val bitmap = createOutputImage()
+                    val uri = saveTempBitmap(bitmap)
+                    val intent = Intent(this, FilterCollageActivity::class.java)
+                    intent.putExtra("image_uri", uri.toString())
+                    startActivity(intent)
+                    finish()
+                }
             }
         }
     }
@@ -258,7 +262,9 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding.btnBack.setOnClickListener { finish() }
+        binding.btnBack.setOnClickListener {
+            InterAds.showAdsBreak(this@CollageActivity) { finish() }
+        }
 
         setUpTab()
 
@@ -336,7 +342,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
     // ─────────────────────────────────────────────────────────────────────────
 
     private fun saveTempBitmap(bitmap: Bitmap): Uri {
-        val file = File(externalCacheDir, "collage_${System.currentTimeMillis()}.jpg")
+        val file = File(cacheDir, "collage_${System.currentTimeMillis()}.jpg")
         FileOutputStream(file).use { bitmap.compress(Bitmap.CompressFormat.JPEG, 90, it) }
         return FileProvider.getUriForFile(this, "${packageName}.provider", file)
     }

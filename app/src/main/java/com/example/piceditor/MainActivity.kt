@@ -18,6 +18,8 @@ import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.piceditor.adapters.ImageAdapter
 import com.example.piceditor.adapters.TemplateAdapter
+import com.example.piceditor.ads.Callback
+import com.example.piceditor.ads.InterAds
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityMainBinding
@@ -265,7 +267,9 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         binding.tvSeeAllRecent.setOnClickListener {
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
             mLastClickTime = SystemClock.elapsedRealtime()
-            startActivity(Intent(this, MyDraftActivity::class.java))
+            InterAds.showAdsBreak(this@MainActivity) {
+                startActivity(Intent(this, MyDraftActivity::class.java))
+            }
         }
     }
 
@@ -291,16 +295,20 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         templateAdapter?.setClickListener { position, template ->
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setClickListener
             mLastClickTime = SystemClock.elapsedRealtime()
-            val intent = Intent(this, TemplateEditorActivity::class.java).apply {
-                putExtra(TemplateEditorActivity.EXTRA_TEMPLATE_ID, template?.id?.toString())
+            InterAds.showAdsBreak(this@MainActivity) {
+                val intent = Intent(this, TemplateEditorActivity::class.java).apply {
+                    putExtra(TemplateEditorActivity.EXTRA_TEMPLATE_ID, template?.id?.toString())
+                }
+                startActivity(intent)
             }
-            startActivity(intent)
         }
 
         binding.tvSeeAllTemplate.setOnClickListener {
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
             mLastClickTime = SystemClock.elapsedRealtime()
-            startActivity(Intent(this, TemplatePickerActivity::class.java))
+            InterAds.showAdsBreak(this@MainActivity) {
+                startActivity(Intent(this, TemplatePickerActivity::class.java))
+            }
         }
     }
 
@@ -308,7 +316,9 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         checkAndRequestPermission()
 
         binding.btnMenu.setOnClickListener {
-            startActivity(Intent(this, SettingActivity::class.java))
+            InterAds.showAdsBreak(this@MainActivity) {
+                startActivity(Intent(this, SettingActivity::class.java))
+            }
         }
 
         binding.llEdit.setOnClickListener {
@@ -319,21 +329,27 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
             checkAndRequestPermission()
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
             mLastClickTime = SystemClock.elapsedRealtime()
-            startActivity(Intent(this, SelectImageActivity::class.java))
+            InterAds.showAdsBreak(this@MainActivity) {
+                startActivity(Intent(this, SelectImageActivity::class.java))
+            }
         }
 
         binding.llCreate.setOnClickListener {
             checkAndRequestPermission()
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
             mLastClickTime = SystemClock.elapsedRealtime()
-            startActivity(Intent(this, SelectImageActivity::class.java))
+            InterAds.showAdsBreak(this@MainActivity) {
+                startActivity(Intent(this, SelectImageActivity::class.java))
+            }
         }
 
         binding.llDraft.setOnClickListener {
             checkAndRequestPermission()
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
             mLastClickTime = SystemClock.elapsedRealtime()
-            startActivity(Intent(this, MyDraftActivity::class.java))
+            InterAds.showAdsBreak(this@MainActivity) {
+                startActivity(Intent(this, MyDraftActivity::class.java))
+            }
         }
     }
 
@@ -352,8 +368,10 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
     }
 
     private fun openEditor(uris: List<Uri>) {
-        val pages  = uris.map { PageInfo(it) }
-        val intent = PhotoEditorWithBannerActivity.createIntent(this, pages)
-        editorLauncher.launch(intent)
+        InterAds.showAdsBreak(this@MainActivity) {
+            val pages  = uris.map { PageInfo(it) }
+            val intent = PhotoEditorWithBannerActivity.createIntent(this, pages)
+            editorLauncher.launch(intent)
+        }
     }
 }

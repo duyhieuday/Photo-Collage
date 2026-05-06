@@ -20,7 +20,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.IntentSenderRequest;
@@ -31,6 +30,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.example.piceditor.adapters.ImageAdapter;
+import com.example.piceditor.ads.InterAds;
 import com.example.piceditor.base.BaseActivityNew;
 import com.example.piceditor.base.BaseFragment;
 import com.example.piceditor.databinding.ActivityMyDraftBinding;
@@ -116,6 +116,13 @@ public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getBinding().btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                InterAds.showAdsBreak(MyDraftActivity.this, () -> finish());
+            }
+        });
 
         List<ImageModel> images = getSavedImages(this);
 
@@ -285,7 +292,7 @@ public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
             selectionArgs = new String[]{"%/Pictures/PhotoCollage/%"};
         }
 
-        String sortOrder = MediaStore.Images.Media.DATE_TAKEN + " DESC";
+        String sortOrder = MediaStore.Images.Media.DATE_ADDED + " DESC";
 
         Cursor cursor = null;
         try {

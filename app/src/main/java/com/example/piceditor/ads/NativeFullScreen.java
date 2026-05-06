@@ -25,7 +25,7 @@ import com.google.android.gms.ads.nativead.NativeAdView;
 import java.util.ArrayList;
 
 public class NativeFullScreen {
-    private static final String NATIVE_TEST_ID = "ca-app-pub-3940256099942544/9999999999";
+    private static final String NATIVE_TEST_ID = "ca-app-pub-3940256099942544/2247696110";
     private static final String NATIVE_ID = IdAds.NATIVE_IN_APP;
 
     private static final ArrayList<NativeAd> nativeAds = new ArrayList<>();

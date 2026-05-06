@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.example.piceditor.adapters.TemplateAdapter
+import com.example.piceditor.ads.InterAds
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityShowImageBinding
@@ -93,18 +94,24 @@ class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnCl
         loadImage()
         setUpTemp()
 
-        binding.btnBack.setOnClickListener { finish() }
+        binding.btnBack.setOnClickListener {
+            InterAds.showAdsBreak(this@ShowImageActivity) { finish() }
+        }
 
         binding.icHome.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            })
-            finish()
+            InterAds.showAdsBreak(this@ShowImageActivity) {
+                startActivity(Intent(this, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                })
+                finish()
+            }
         }
 
         binding.btnMakeAnother.setOnClickListener {
-            startActivity(Intent(this, SelectImageActivity::class.java))
-            finish()
+            InterAds.showAdsBreak(this@ShowImageActivity) {
+                startActivity(Intent(this, SelectImageActivity::class.java))
+                finish()
+            }
         }
 
         binding.icInstagram.setOnClickListener { shareToApp("com.instagram.android") }
@@ -135,16 +142,20 @@ class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnCl
         templateAdapter?.setClickListener { position, template ->
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setClickListener
             mLastClickTime = SystemClock.elapsedRealtime()
-            val intent = Intent(this, TemplateEditorActivity::class.java).apply {
-                putExtra(TemplateEditorActivity.EXTRA_TEMPLATE_ID, template?.id?.toString())
+            InterAds.showAdsBreak(this@ShowImageActivity) {
+                val intent = Intent(this, TemplateEditorActivity::class.java).apply {
+                    putExtra(TemplateEditorActivity.EXTRA_TEMPLATE_ID, template?.id?.toString())
+                }
+                startActivity(intent)
             }
-            startActivity(intent)
         }
 
         binding.tvSeeAllTemplate.setOnClickListener {
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
             mLastClickTime = SystemClock.elapsedRealtime()
-            startActivity(Intent(this, TemplatePickerActivity::class.java))
+            InterAds.showAdsBreak(this@ShowImageActivity) {
+                startActivity(Intent(this, TemplatePickerActivity::class.java))
+            }
         }
     }
 

@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.piceditor.MainActivity.Companion.isFromSaved
 import com.example.piceditor.adapters.FilterNameAdapter
+import com.example.piceditor.ads.InterAds
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityFilterCollageBinding
@@ -112,7 +113,9 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(),
         bmp = BitmapFactory.decodeStream(contentResolver.openInputStream(uri))
         binding.imgCollage.setImageBitmap(bmp)
 
-        binding.ivBack.setOnClickListener { finish() }
+        binding.ivBack.setOnClickListener {
+            InterAds.showAdsBreak(this@FilterCollageActivity) { finish() }
+        }
         binding.btnNext.setOnClickListener {
             checkClick()
 
@@ -129,10 +132,12 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(),
 
             isFromSaved = true
             val finalUri = saveToGallery(screenShot)
-            startActivity(Intent(this, ShowImageActivity::class.java).apply {
-                putExtra("image_uri", finalUri.toString())
-            })
-            finish()
+            InterAds.showAdsBreak(this@FilterCollageActivity) {
+                startActivity(Intent(this, ShowImageActivity::class.java).apply {
+                    putExtra("image_uri", finalUri.toString())
+                })
+                finish()
+            }
         }
 
         // Filter list

@@ -69,7 +69,7 @@ abstract class PhotoEditorActivity : AppCompatActivity() {
         setupWindowInsets()
         setupPages(savedInstanceState)
         setupBackPress()
-        initBannerAds()
+        initBannerAds(binding.bannerContainer)
     }
 
     override fun onDestroy() {
@@ -77,7 +77,7 @@ abstract class PhotoEditorActivity : AppCompatActivity() {
         viewModel.clearGlideCache()
     }
 
-    abstract fun initBannerAds()
+    abstract fun initBannerAds(container: android.view.ViewGroup)
     abstract fun isPremium(): Boolean
     abstract fun openPaywall()
 

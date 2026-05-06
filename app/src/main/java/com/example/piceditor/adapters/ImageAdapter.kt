@@ -1,5 +1,6 @@
 package com.example.piceditor.adapters
 
+import android.app.Activity
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,7 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.piceditor.MyDraftActivity.formatDateTime
 import com.example.piceditor.R
+import com.example.piceditor.SelectImageActivity
 import com.example.piceditor.ShowImageActivity
+import com.example.piceditor.ads.InterAds
 import com.example.piceditor.databinding.ItemImageSavedBinding
 import com.example.piceditor.model.ImageModel
 
@@ -61,11 +64,13 @@ class ImageAdapter(
             } else {
                 // ✅ Normal mode: mở ShowImageActivity với URI của ảnh
                 val context = holder.itemView.context
-                context.startActivity(
-                    Intent(context, ShowImageActivity::class.java).apply {
-                        putExtra("image_uri", item.uri.toString())
-                    }
-                )
+                InterAds.showAdsBreak(context as Activity?) {
+                    context.startActivity(
+                        Intent(context, ShowImageActivity::class.java).apply {
+                            putExtra("image_uri", item.uri.toString())
+                        }
+                    )
+                }
             }
         }
 
