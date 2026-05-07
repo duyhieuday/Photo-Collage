@@ -100,9 +100,9 @@ public abstract class BaseActivityNew<T extends ViewDataBinding> extends BaseAct
     }
 
     public void initBanner(ViewGroup viewGroup){
-        if(!PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.HEHE, false)){
-            return;
-        }
+//        if(!PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.HEHE, false)){
+//            return;
+//        }
         Log.e("TAG", "initBanner: " );
         if(PreferenceUtil.getInstance(this).getValue(Constant.SharePrefKey.BANNER_COL, "no").equals("yes")){
             int isPro = new Prefs(WeatherApplication.get()).getPremium();

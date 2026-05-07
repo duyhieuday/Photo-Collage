@@ -67,7 +67,7 @@
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/imgShow"
                     android:layout_width="match_parent"
-                    android:layout_height="320dp"
+                    android:layout_height="400dp"
                     android:background="#EAEAEA"
                     android:layout_marginHorizontal="14dp"
                     android:scaleType="centerCrop" />

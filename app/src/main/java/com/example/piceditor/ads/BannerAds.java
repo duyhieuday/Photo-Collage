@@ -146,9 +146,9 @@ public class BannerAds {
     }
 
     public static void initBannerAdsOptimize(Activity ctx) {
-        if(!PreferenceUtil.getInstance(ctx).getValue(Constant.SharePrefKey.HEHE, false)){
-            return;
-        }
+//        if(!PreferenceUtil.getInstance(ctx).getValue(Constant.SharePrefKey.HEHE, false)){
+//            return;
+//        }
         if (!isInitBanner) {
             try {
                 viewRoot = LayoutInflater.from(ctx).inflate(R.layout.ab_banner_ads, null);
