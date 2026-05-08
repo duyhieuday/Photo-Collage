@@ -33,7 +33,6 @@ import com.example.piceditor.draw.test.BeardAdapter
 import com.example.piceditor.adapters.ToolAdapter
 import com.example.piceditor.model.ToolItem
 import com.example.piceditor.utils.BarsUtils
-import com.example.piceditor.utils.ImageUtils
 import com.example.piceditor.utilsApp.Constant
 import com.example.piceditor.utilsApp.PreferenceUtil
 import com.google.gson.Gson
@@ -41,14 +40,12 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 import java.io.IOException
 import java.io.InputStreamReader
-import kotlin.math.min
-import androidx.core.graphics.scale
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import com.example.piceditor.ShowImageActivity
+import androidx.core.graphics.scale
 
 class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
     BackgroundAdapter.OnBGClickListener,
@@ -68,8 +65,9 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
     // ── Template state ─────────────────────────────────────
     private var selectedCell: PhotoCell? = null
     private lateinit var templateData: TemplateData
+
+    // Width chuẩn của logic space — height sẽ tính theo aspect ratio bitmap thật
     private val TEMPLATE_W = 1125f
-    private val TEMPLATE_H = 2000f
 
     // ── Draw / sticker state ───────────────────────────────
     @DrawType private var drawType = TYPE_GESTURE
@@ -84,6 +82,9 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
     // ── Background ─────────────────────────────────────────
     private var backgroundBitmap: Bitmap? = null
 
+    // ── Template loading flag ──────────────────────────────
+    private var templateLoaded = false
+
     // ── Gallery launcher ───────────────────────────────────
     private val pickImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -97,6 +98,7 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
     override fun getDataFromIntent() {}
     override fun setListener() {}
     override fun initFragment(): BaseFragment<*>? = null
+
     override fun doAfterOnCreate() {
         if (PreferenceUtil.getInstance(this)
                 .getValue(Constant.SharePrefKey.BANNER_COL, "no").equals("yes")) {
@@ -135,7 +137,7 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
         templateData = TemplateRepository.findById(templateId)
             ?: TemplateRepository.all.first()
 
-        // ✅ DrawView: tắt drawing mặc định, bật gesture để sticker luôn di chuyển được
+        // DrawView setup
         binding.templateEditorView.drawView?.setDrawingEnabled(false)
         binding.templateEditorView.drawView?.setGestureEnabled(true)
 
@@ -143,7 +145,6 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
         setupListeners()
         loadTemplate()
 
-        // Đăng ký undo/redo listener
         binding.templateEditorView.drawView?.drawManager?.addDrawInteractListener(this)
         syncUndoRedoUI()
     }
@@ -153,6 +154,8 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
         binding.templateEditorView.cells.forEach { cell ->
             cell.bitmap?.takeIf { !it.isRecycled }?.recycle()
         }
+        binding.templateEditorView.templateBitmapRaw?.takeIf { !it.isRecycled }?.recycle()
+        binding.templateEditorView.templateMaskBitmap?.takeIf { !it.isRecycled }?.recycle()
     }
 
     // ──────────────────────────────────────────────────────
@@ -206,7 +209,6 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
             binding.templateEditorView.drawView?.drawManager?.redo()
         }
 
-        // Tap cell trống → mở gallery
         binding.templateEditorView.setOnCellClickListener { cell ->
             selectedCell = cell
             openGallery()
@@ -229,12 +231,11 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
             binding.llBg.visibility      = View.GONE
             binding.llDraw.visibility    = View.GONE
             binding.rcvTools.visibility  = View.GONE
-            // ✅ Tắt drawing khi chuyển tab, nhưng GIỮ gesture để sticker luôn di chuyển được
             binding.templateEditorView.drawView?.setDrawingEnabled(false)
             binding.templateEditorView.drawView?.setGestureEnabled(true)
 
             when (pos) {
-                0 -> { // Ảnh
+                0 -> {
                     binding.llPhoto.visibility = View.VISIBLE
                     refreshPhotoCellList()
                     binding.icCheckPhoto.setOnClickListener {
@@ -242,7 +243,7 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
                         binding.rcvTools.visibility = View.VISIBLE
                     }
                 }
-                1 -> { // Border
+                1 -> {
                     binding.llBorder.visibility = View.VISIBLE
                     binding.tvGrid.text   = binding.seekbarSpace.progress.toString()
                     binding.tvCorner.text = binding.seekbarCorner.progress.toString()
@@ -252,22 +253,20 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
                     }
                     setupBorderSeekbars()
                 }
-                2 -> { // Sticker
+                2 -> {
                     binding.llSticker.visibility = View.VISIBLE
                     loadStickers()
                     binding.icCheckSticker.setOnClickListener {
                         binding.llSticker.visibility = View.GONE
                         binding.rcvTools.visibility  = View.VISIBLE
-                        // Thoát tab sticker: tắt drawing, giữ gesture
                         binding.templateEditorView.drawView?.setDrawingEnabled(false)
                         binding.templateEditorView.drawView?.setGestureEnabled(true)
                     }
-                    // Vào tab sticker: bật drawing để add sticker
                     binding.templateEditorView.drawView?.setDrawingEnabled(true)
                     binding.templateEditorView.drawView?.setGestureEnabled(true)
                     syncUndoRedoUI()
                 }
-                3 -> { // Background
+                3 -> {
                     binding.llBg.visibility = View.VISIBLE
                     binding.listBg.layoutManager =
                         LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
@@ -277,7 +276,7 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
                         binding.rcvTools.visibility = View.VISIBLE
                     }
                 }
-                4 -> { // Text / Draw
+                4 -> {
                     binding.llDraw.visibility = View.VISIBLE
                     binding.icBrush.setOnClickListener {
                         binding.icBrush.setBackgroundResource(R.drawable.bg_icon_draw)
@@ -294,7 +293,6 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
                     binding.icCheckDraw.setOnClickListener {
                         binding.llDraw.visibility = View.GONE
                         binding.rcvTools.visibility = View.VISIBLE
-                        // Thoát tab draw: tắt drawing, giữ gesture cho sticker
                         binding.templateEditorView.drawView?.setDrawingEnabled(false)
                         binding.templateEditorView.drawView?.setGestureEnabled(true)
                     }
@@ -317,7 +315,7 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
         binding.seekbarSpace.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
                 binding.tvGrid.text = progress.toString()
-                val space = ImageUtils.pxFromDp(this@TemplateEditorActivity, progress * 0.1f)
+                val space = progress.toFloat() * 0.5f
                 binding.templateEditorView.setCellSpacing(space)
             }
             override fun onStartTrackingTouch(sb: SeekBar?) {}
@@ -327,7 +325,7 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
         binding.seekbarCorner.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
                 binding.tvCorner.text = progress.toString()
-                val corner = ImageUtils.pxFromDp(this@TemplateEditorActivity, progress * 0.3f)
+                val corner = progress.toFloat() * 1.5f
                 binding.templateEditorView.setCellCorner(corner)
             }
             override fun onStartTrackingTouch(sb: SeekBar?) {}
@@ -359,7 +357,6 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
     private fun refreshPhotoCellList() {
         val cells = binding.templateEditorView.cells
         val adapter = PhotoCellAdapter(cells) { cell ->
-            // User tap vào 1 cell trong panel → chọn cell đó và mở gallery
             selectedCell = cell
             openGallery()
         }
@@ -373,7 +370,7 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
     // ──────────────────────────────────────────────────────
 
     private fun loadStickers() {
-        if (beardAdapter != null) return // đã load rồi
+        if (beardAdapter != null) return
         val gson  = Gson()
         val type  = object : TypeToken<MutableList<Beard?>?>() {}.getType()
         val beards: MutableList<Beard?>? = try {
@@ -392,78 +389,106 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
     }
 
     // ──────────────────────────────────────────────────────
-    // Template loading
+    // Template loading — dùng aspect ratio thật của bitmap
     // ──────────────────────────────────────────────────────
 
-    // ── Kích thước view cố định — chỉ tính 1 lần ─────────
-    private var fixedViewW = 0f
-    private var fixedViewH = 0f
-    private var templateLoaded = false
-
     private fun loadTemplate() {
-        if (templateLoaded) return  // ✅ Chỉ load 1 lần duy nhất
+        if (templateLoaded) return
 
         binding.templateEditorView.viewTreeObserver.addOnGlobalLayoutListener(
             object : android.view.ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
-                    val viewW = binding.templateEditorView.width.toFloat()
-                    val viewH = binding.templateEditorView.height.toFloat()
+                    val viewW = binding.templateEditorView.width
+                    val viewH = binding.templateEditorView.height
 
-                    if (viewW <= 0f || viewH <= 0f) return  // chưa measure xong
+                    if (viewW <= 0 || viewH <= 0) return
 
-                    // ✅ Remove ngay — không chạy lại khi panel mở/đóng thay đổi layout
                     binding.templateEditorView.viewTreeObserver
                         .removeOnGlobalLayoutListener(this)
 
-                    if (templateLoaded) return  // double-check
+                    if (templateLoaded) return
                     templateLoaded = true
 
-                    // ✅ Lưu cố định — cells sẽ không bị tính lại dù view thay đổi kích thước
-                    fixedViewW = viewW
-                    fixedViewH = viewH
-
-                    val scale = min(fixedViewW / TEMPLATE_W, fixedViewH / TEMPLATE_H)
-                    val newW  = TEMPLATE_W * scale
-                    val newH  = TEMPLATE_H * scale
-                    val dx    = (fixedViewW - newW) / 2f
-                    val dy    = (fixedViewH - newH) / 2f
-
-                    android.util.Log.d("TemplateDebug",
-                        "viewW=$fixedViewW viewH=$fixedViewH scale=$scale " +
-                                "newW=$newW newH=$newH dx=$dx dy=$dy"
-                    )
+                    Log.d("TemplateEditor", "Loading: viewW=$viewW viewH=$viewH")
 
                     lifecycleScope.launch {
-                        val (scaled, mask) = withContext(Dispatchers.IO) {
-                            val raw = BitmapFactory.decodeResource(resources, templateData.drawableRes)
-                            val scaledBmp = raw.scale(newW.toInt(), newH.toInt())
-                            raw.recycle()
+                        val result = withContext(Dispatchers.IO) {
+                            // Đọc kích thước gốc trước
+                            val opts = BitmapFactory.Options().apply {
+                                inJustDecodeBounds = true
+                            }
+                            BitmapFactory.decodeResource(resources, templateData.drawableRes, opts)
+                            val origW = opts.outWidth
+                            val origH = opts.outHeight
+
+                            Log.d("TemplateEditor",
+                                "Template ${templateData.id} original: ${origW}x${origH}")
+
+                            // Sample size để giảm RAM
+                            var sampleSize = 1
+                            while (origW / sampleSize > 1500) {
+                                sampleSize *= 2
+                            }
+                            opts.inJustDecodeBounds = false
+                            opts.inSampleSize = sampleSize
+
+                            val rawDecoded = BitmapFactory.decodeResource(
+                                resources, templateData.drawableRes, opts
+                            )
+
+                            // Scale về width = TEMPLATE_W (1125), height giữ aspect ratio
+                            val targetW = TEMPLATE_W.toInt()
+                            val targetH = (TEMPLATE_W * rawDecoded.height / rawDecoded.width).toInt()
+
+                            val rawBmp = if (rawDecoded.width != targetW) {
+                                val scaled = rawDecoded.scale(targetW, targetH)
+                                if (scaled != rawDecoded) rawDecoded.recycle()
+                                scaled
+                            } else {
+                                rawDecoded
+                            }
+
                             val maskBmp = if (templateData.maskMode == MaskMode.BLACK)
-                                binding.templateEditorView.createMaskFromBlack(scaledBmp)
+                                binding.templateEditorView.createMaskFromBlack(rawBmp)
                             else
-                                binding.templateEditorView.createMaskFromWhite(scaledBmp)
-                            Pair(scaledBmp, maskBmp)
+                                binding.templateEditorView.createMaskFromWhite(rawBmp)
+
+                            TemplateLoadResult(rawBmp, maskBmp, targetW.toFloat(), targetH.toFloat())
                         }
 
-                        binding.templateEditorView.templateBitmapRaw  = scaled
-                        binding.templateEditorView.templateMaskBitmap = mask
+                        Log.d("TemplateEditor",
+                            "Final bitmap: ${result.raw.width}x${result.raw.height}, " +
+                                    "logic: ${result.logicW}x${result.logicH}")
 
-                        // ✅ Dùng fixedViewW/fixedViewH để tính cells — không bao giờ thay đổi
+                        // Set logic space theo aspect ratio thật của bitmap
+                        binding.templateEditorView.templateLogicW = result.logicW
+                        binding.templateEditorView.templateLogicH = result.logicH
+
+                        binding.templateEditorView.templateBitmapRaw  = result.raw
+                        binding.templateEditorView.templateMaskBitmap = result.mask
+
+                        // Cells dùng tọa độ logic gốc
                         binding.templateEditorView.cells = templateData.cellRects.map { rect ->
-                            PhotoCell(RectF(
-                                rect.left   * scale + dx,
-                                rect.top    * scale + dy,
-                                rect.right  * scale + dx,
-                                rect.bottom * scale + dy
-                            ))
+                            PhotoCell(RectF(rect))
                         }.toMutableList()
 
+                        // Trigger remeasure để view tự co lại đúng aspect ratio
+                        binding.templateEditorView.requestLayout()
                         binding.templateEditorView.invalidate()
                     }
                 }
             }
         )
     }
+
+    // Helper class để return 4 giá trị
+    // Helper class
+    private data class TemplateLoadResult(
+        val raw: Bitmap,
+        val mask: Bitmap,
+        val logicW: Float,
+        val logicH: Float
+    )
 
     // ──────────────────────────────────────────────────────
     // Gallery
@@ -505,7 +530,6 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
                 runCatching { saveToGallery(binding.templateEditorView.export()) }.getOrNull()
             }
             if (savedUri != null) {
-                // ✅ Chuyển sang ShowImageActivity với URI vừa lưu
                 startActivity(
                     Intent(this@TemplateEditorActivity, ShowImageActivity::class.java).apply {
                         putExtra("image_uri", savedUri.toString())

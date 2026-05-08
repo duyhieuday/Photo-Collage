@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "845392955314",
-    "project_id": "flash-light---team-thanhnd",
-    "storage_bucket": "flash-light---team-thanhnd.firebasestorage.app"
+    "project_number": "875905310391",
+    "project_id": "ezt-photo-collage",
+    "storage_bucket": "ezt-photo-collage.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:845392955314:android:dc74622841b879e83d86ab",
+        "mobilesdk_app_id": "1:875905310391:android:1bcf819199e711a3dcb732",
         "android_client_info": {
           "package_name": "com.ezt.photo.collage.maker"
         }
@@ -15,45 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCNlZQenfzGacXUYsn4sq2tIRE37nkFrkA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:845392955314:android:639b7a44d68800403d86ab",
-        "android_client_info": {
-          "package_name": "com.ezt.photo.collage.maker1"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCNlZQenfzGacXUYsn4sq2tIRE37nkFrkA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:845392955314:android:07d1318e5a8bd35e3d86ab",
-        "android_client_info": {
-          "package_name": "com.universe.translator"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCNlZQenfzGacXUYsn4sq2tIRE37nkFrkA"
+          "current_key": "AIzaSyCCORVkiB_6hs1fyOoVT3VYXk_1C7XOs4U"
         }
       ],
       "services": {

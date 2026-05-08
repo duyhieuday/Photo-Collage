@@ -80,7 +80,7 @@ public class SplashActivity extends BaseActivityNew<ActivitySplashBinding> {
     private void intent(String debug) {
         boolean isFirstRun = Prefs.getBoolean(Prefs.Key.KEY_LANGUAGE, true);
         if (!isIntented) {
-            if (PreferenceUtil.getInstance(getApplicationContext()).getValue(Constant.SharePrefKey.HEHE, false)) {
+            if (!PreferenceUtil.getInstance(getApplicationContext()).getValue(Constant.SharePrefKey.HEHE, false)) {
                 if (isFirstRun) {
                     startActivity(new Intent(this, LanguageActivity.class));
                     finish();

@@ -87,14 +87,18 @@ public class ABOnBoardingFragment5 extends Fragment {
         BarsUtils.setAppearanceLightStatusBars(requireActivity(), true);
 
         refreshAd();
+        Log.e("xncns1", "onClick: " );
 
         TextView buttonNext = view.findViewById(R.id.buttonNext);
         buttonNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.e("xncns1", "onClick: " );
+                Log.e("xncns1", "BUTTON CLICKED!");
+                android.widget.Toast.makeText(getContext(), "Clicked!", android.widget.Toast.LENGTH_SHORT).show();
                 if (navigationHost != null) {
                     navigationHost.navigateToNext();
+                } else {
+                    Log.e("xncns1", "navigationHost is NULL!");
                 }
             }
         });

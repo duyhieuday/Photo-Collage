@@ -30,7 +30,7 @@ public class InterAds {
 
     private static final String INTER_TEST_ID = "ca-app-pub-3940256099942544/1033173712";
 
-    private static final String INTER_ID_DEFAULT = "ca-app-pub-3607148519095421/2658258742";
+    private static final String INTER_ID_DEFAULT = "ca-app-pub-1484248692768692/3618982318";
 
     private static InterstitialAd mInterstitialAd;
     private static boolean isLoading = false;
@@ -127,10 +127,10 @@ public class InterAds {
 
     public static void showAdsBreak(Activity activity, Callback callback) {
 
-//        if(!PreferenceUtil.getInstance(WeatherApplication.get()).getValue(Constant.SharePrefKey.HEHE, false)){
-//            callback.callback();
-//            return;
-//        }
+        if(!PreferenceUtil.getInstance(WeatherApplication.get()).getValue(Constant.SharePrefKey.HEHE, false)){
+            callback.callback();
+            return;
+        }
 
         try {
             int isPro = new Prefs(WeatherApplication.get()).getPremium();

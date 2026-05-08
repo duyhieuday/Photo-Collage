@@ -127,7 +127,7 @@ public class WeatherApplication extends Application{
 
     //////////////////////
     private void initAdjust() {
-        String appToken = "ujai0r3ht9ts";
+        String appToken = "aetq6mq7kwsg";
         String environment = BuildConfig.DEBUG ? AdjustConfig.ENVIRONMENT_SANDBOX : AdjustConfig.ENVIRONMENT_PRODUCTION;
         AdjustConfig config = new AdjustConfig(this, appToken, environment);
         Adjust.onCreate(config);

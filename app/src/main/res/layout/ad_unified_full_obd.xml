@@ -116,8 +116,9 @@
                     android:background="@drawable/bg_ad1"
                     android:gravity="center"
                     android:text="Install"
+                    android:fontFamily="@font/inter_medium"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                    android:textColor="@color/white" />
+                    android:textColor="#B3FF10" />
             </RelativeLayout>
         </com.google.android.gms.ads.nativead.NativeAdView>
 

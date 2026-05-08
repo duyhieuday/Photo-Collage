@@ -37,7 +37,7 @@
                             android:layout_marginHorizontal="24dp"
                             android:text="ok"
                             android:fontFamily="@font/inter_bold"
-                            android:textColor="#fff"
+                            android:textColor="#B3FF10"
                             android:background="@drawable/bg_ad1"
                             android:id="@+id/ad_call_to_action"
                             android:layout_width="match_parent"

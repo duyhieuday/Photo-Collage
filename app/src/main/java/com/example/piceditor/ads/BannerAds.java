@@ -27,7 +27,7 @@ public class BannerAds {
 
     private static final String BANNER_TEST_ID = "ca-app-pub-3940256099942544/2014213617";
 
-    private static final String BANNER_ID_DEFAULT = "ca-app-pub-3607148519095421/3095218929";
+    private static final String BANNER_ID_DEFAULT = "ca-app-pub-1484248692768692/3173702719";
 
     public static AdSize getAdSize(Activity activity) {
         Display display = activity.getWindowManager().getDefaultDisplay();
@@ -146,9 +146,9 @@ public class BannerAds {
     }
 
     public static void initBannerAdsOptimize(Activity ctx) {
-//        if(!PreferenceUtil.getInstance(ctx).getValue(Constant.SharePrefKey.HEHE, false)){
-//            return;
-//        }
+        if(!PreferenceUtil.getInstance(ctx).getValue(Constant.SharePrefKey.HEHE, false)){
+            return;
+        }
         if (!isInitBanner) {
             try {
                 viewRoot = LayoutInflater.from(ctx).inflate(R.layout.ab_banner_ads, null);

@@ -8,6 +8,7 @@ import android.view.*
 import com.example.piceditor.draw.DrawView
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.min
 
 class TemplateEditorView @JvmOverloads constructor(
     context: Context,
@@ -16,10 +17,13 @@ class TemplateEditorView @JvmOverloads constructor(
 ) : ViewGroup(context, attrs, defStyleAttr) {
 
     // ── Child views ───────────────────────────────────────
-    // DrawView để vẽ sticker/text lên trên template
     val drawView: DrawView? by lazy {
         try { DrawView(context) } catch (e: Exception) { null }
     }
+
+    // ── Logic space của template (set bởi activity sau khi load bitmap) ──
+    var templateLogicW: Float = 1125f
+    var templateLogicH: Float = 2000f
 
     // ── Data ──────────────────────────────────────────────
     var cells: MutableList<PhotoCell> = mutableListOf()
@@ -30,10 +34,8 @@ class TemplateEditorView @JvmOverloads constructor(
     var templateMaskBitmap: Bitmap? = null
         set(value) { field = value; invalidate() }
 
-    // Background riêng (set từ BackgroundAdapter)
     private var backgroundBitmap: Bitmap? = null
 
-    // Border: spacing và corner giữa mask và ảnh
     private var cellSpacing: Float = 0f
     private var cellCorner: Float  = 0f
 
@@ -53,30 +55,40 @@ class TemplateEditorView @JvmOverloads constructor(
         drawView?.let { addView(it) }
     }
 
-    // ── Layout ────────────────────────────────────────────
-
-    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        drawView?.layout(0, 0, r - l, b - t)
-    }
+    // ── Layout: tự co lại đúng aspect ratio template ──────
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         drawView?.measure(widthMeasureSpec, heightMeasureSpec)
     }
 
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        drawView?.layout(0, 0, r - l, b - t)
+    }
+
+    // ── Transform: logic space → view space ──────────────
+    private fun currentTransform(): FloatArray {
+        val viewW = width.toFloat()
+        val viewH = height.toFloat()
+        if (viewW <= 0f || viewH <= 0f) return floatArrayOf(1f, 0f, 0f)
+
+        // ✅ FILL: scale theo cạnh lớn hơn → template fill kín view, có thể bị crop nhẹ
+        val scale = max(viewW / templateLogicW, viewH / templateLogicH)
+        val dx = (viewW - templateLogicW * scale) / 2f
+        val dy = (viewH - templateLogicH * scale) / 2f
+        return floatArrayOf(scale, dx, dy)
+    }
+
     // ── Gesture state ─────────────────────────────────────
-    // Xử lý drag + zoom + rotate bằng raw touch — 1 handler duy nhất, không dùng ScaleGestureDetector
-    // để tránh conflict và đảm bảo mượt mà
 
     private var lastX = 0f
     private var lastY = 0f
     private var isTap = false
 
-    // 2-finger state
-    private var lastMidX   = 0f   // midpoint giữa 2 ngón
+    private var lastMidX   = 0f
     private var lastMidY   = 0f
-    private var lastSpan   = 0f   // khoảng cách 2 ngón
-    private var lastAngle  = 0f   // góc 2 ngón
+    private var lastSpan   = 0f
+    private var lastAngle  = 0f
 
     private fun midPoint(e: MotionEvent) = Pair(
         (e.getX(0) + e.getX(1)) / 2f,
@@ -95,27 +107,15 @@ class TemplateEditorView @JvmOverloads constructor(
         return Math.toDegrees(Math.atan2(dy, dx)).toFloat()
     }
 
-    // ── Kích thước cố định — không thay đổi dù view bị resize ──
-    private var fixedW = 0
-    private var fixedH = 0
-
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
-        // ✅ Chỉ lưu lần đầu tiên (khi panel chưa mở)
-        if (fixedW == 0 && fixedH == 0 && w > 0 && h > 0) {
-            fixedW = w
-            fixedH = h
-        }
-    }
-
     // ── Corner radius cho view ────────────────────────────
     private val viewCornerRadius = 8f * resources.displayMetrics.density // 8dp
 
     override fun dispatchDraw(canvas: Canvas) {
-        val w = if (fixedW > 0) fixedW.toFloat() else width.toFloat()
-        val h = if (fixedH > 0) fixedH.toFloat() else height.toFloat()
         val path = Path().apply {
-            addRoundRect(RectF(0f, 0f, w, h), viewCornerRadius, viewCornerRadius, Path.Direction.CW)
+            addRoundRect(
+                RectF(0f, 0f, width.toFloat(), height.toFloat()),
+                viewCornerRadius, viewCornerRadius, Path.Direction.CW
+            )
         }
         canvas.clipPath(path)
         super.dispatchDraw(canvas)
@@ -124,34 +124,46 @@ class TemplateEditorView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        val w = if (fixedW > 0) fixedW.toFloat() else width.toFloat()
-        val h = if (fixedH > 0) fixedH.toFloat() else height.toFloat()
+        val w = width.toFloat()
+        val h = height.toFloat()
 
         val path = Path().apply {
             addRoundRect(RectF(0f, 0f, w, h), viewCornerRadius, viewCornerRadius, Path.Direction.CW)
         }
         canvas.clipPath(path)
 
-        // 1. Nền trắng mặc định — fill toàn bộ fixedW x fixedH
+        // 1. Nền trắng
         canvas.drawColor(Color.WHITE)
 
-        // 2. Background ảnh (nếu user chọn) — fill toàn bộ fixed size
+        // 2. Background ảnh — fill toàn bộ view
         backgroundBitmap?.let {
-            val fw = if (fixedW > 0) fixedW.toFloat() else width.toFloat()
-            val fh = if (fixedH > 0) fixedH.toFloat() else height.toFloat()
-            canvas.drawBitmap(it, null, RectF(0f, 0f, fw, fh), bgPaint)
+            canvas.drawBitmap(it, null, RectF(0f, 0f, w, h), bgPaint)
         }
 
-        // 3. Raw template — vẽ căn giữa theo dy offset
+        // ✅ Tính transform hiện tại
+        val tf = currentTransform()
+        val scale = tf[0]
+        val dx = tf[1]
+        val dy = tf[2]
+
+        // ✅ DEBUG LOG (có thể xóa sau khi test xong)
+        Log.d("TemplateDebug",
+            "viewW=$w viewH=$h | logic=${templateLogicW}x${templateLogicH} | " +
+                    "scale=$scale dx=$dx dy=$dy | " +
+                    "rawBmp=${templateBitmapRaw?.width}x${templateBitmapRaw?.height}")
+
+        // Vẽ template + cells + mask trong cùng 1 transform
+        canvas.save()
+        canvas.translate(dx, dy)
+        canvas.scale(scale, scale)
+
+        // 3. Template bitmap — fill logic space
         templateBitmapRaw?.let {
-            val dy = if (fixedH > 0 && it.height < fixedH)
-                (fixedH - it.height) / 2f else 0f
-            canvas.drawBitmap(it, 0f, dy, cellPaint)
+            canvas.drawBitmap(it, null, RectF(0f, 0f, templateLogicW, templateLogicH), cellPaint)
         }
 
-        // 4. Ảnh vào từng cell
+        // 4. Cells
         cells.forEach { cell ->
-            // ✅ Tính drawRect theo spacing
             val drawRect = if (cellSpacing > 0f) RectF(
                 cell.rect.left   + cellSpacing, cell.rect.top    + cellSpacing,
                 cell.rect.right  - cellSpacing, cell.rect.bottom - cellSpacing
@@ -159,7 +171,6 @@ class TemplateEditorView @JvmOverloads constructor(
 
             canvas.save()
 
-            // ✅ Clip rounded — áp dụng cho CẢ ảnh lẫn placeholder
             if (cellCorner > 0f) {
                 canvas.clipPath(Path().apply {
                     addRoundRect(drawRect, cellCorner, cellCorner, Path.Direction.CW)
@@ -169,18 +180,18 @@ class TemplateEditorView @JvmOverloads constructor(
             }
 
             cell.bitmap?.let { bmp ->
-                // ✅ CenterCrop: translate về gốc drawRect rồi concat matrix
                 canvas.translate(drawRect.left, drawRect.top)
                 canvas.concat(cell.matrix)
                 canvas.drawBitmap(bmp, 0f, 0f, cellPaint)
             } ?: run {
-                // Placeholder khi chưa có ảnh
                 canvas.drawRect(drawRect, Paint().apply { color = 0x44888888; style = Paint.Style.FILL })
                 canvas.drawText(
                     "+", drawRect.centerX(), drawRect.centerY() + 20f,
                     Paint().apply {
-                        color = 0xAAFFFFFF.toInt(); textSize = 56f
-                        textAlign = Paint.Align.CENTER; isAntiAlias = true
+                        color = 0xAAFFFFFF.toInt()
+                        textSize = 56f
+                        textAlign = Paint.Align.CENTER
+                        isAntiAlias = true
                         typeface = Typeface.DEFAULT_BOLD
                     }
                 )
@@ -189,29 +200,34 @@ class TemplateEditorView @JvmOverloads constructor(
             canvas.restore()
         }
 
-        // 5. Mask overlay
-        templateMaskBitmap?.let { canvas.drawBitmap(it, 0f, 0f, overlayPaint) }
+        // 5. Mask overlay — fill logic space
+        templateMaskBitmap?.let {
+            canvas.drawBitmap(it, null, RectF(0f, 0f, templateLogicW, templateLogicH), overlayPaint)
+        }
+
+        canvas.restore()
     }
 
     // ── Touch ─────────────────────────────────────────────
-    // Unified handler: drag (1 ngón) + zoom+rotate (2 ngón) cùng lúc, mượt mà
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        val tf = currentTransform()
+        val scale = tf[0]
+        val dx = tf[1]
+        val dy = tf[2]
+
         when (event.actionMasked) {
 
-            // ── 1 ngón chạm xuống ──────────────────────────
             MotionEvent.ACTION_DOWN -> {
                 val tappedCell = findCell(event.x, event.y)
-                activeCell = tappedCell  // null nếu tap vào vùng trống
+                activeCell = tappedCell
                 lastX  = event.x
                 lastY  = event.y
                 isTap  = true
             }
 
-            // ── Ngón thứ 2 chạm xuống ──────────────────────
             MotionEvent.ACTION_POINTER_DOWN -> {
                 if (event.pointerCount == 2) {
-                    // Snapshot trạng thái 2 ngón lúc bắt đầu
                     val (mx, my) = midPoint(event)
                     lastMidX  = mx
                     lastMidY  = my
@@ -221,52 +237,42 @@ class TemplateEditorView @JvmOverloads constructor(
                 isTap = false
             }
 
-            // ── Di chuyển ──────────────────────────────────
             MotionEvent.ACTION_MOVE -> {
                 val cell = activeCell ?: return true
 
                 if (event.pointerCount == 1) {
-                    // ── Drag ──
-                    val dx = event.x - lastX
-                    val dy = event.y - lastY
-                    if (abs(dx) > 8f || abs(dy) > 8f) isTap = false
-                    cell.matrix.postTranslate(dx, dy)
+                    val ddx = (event.x - lastX) / scale
+                    val ddy = (event.y - lastY) / scale
+                    if (abs(event.x - lastX) > 8f || abs(event.y - lastY) > 8f) isTap = false
+                    cell.matrix.postTranslate(ddx, ddy)
                     lastX = event.x
                     lastY = event.y
                     invalidate()
 
                 } else if (event.pointerCount >= 2) {
-                    // ── Zoom + Rotate + Drag 2 ngón cùng lúc ──
                     isTap = false
 
                     val (curMidX, curMidY) = midPoint(event)
                     val curSpan  = spacing(event)
                     val curAngle = angle(event)
 
-                    // Scale: tỉ lệ span mới / span cũ
                     val scaleFactor = if (lastSpan > 0f) curSpan / lastSpan else 1f
 
-                    // Rotate: delta góc
                     var dAngle = curAngle - lastAngle
-                    // Normalize về [-180, 180] để tránh nhảy góc
                     if (dAngle > 180f)  dAngle -= 360f
                     if (dAngle < -180f) dAngle += 360f
 
-                    // Drag: midpoint 2 ngón dịch chuyển
-                    val dMidX = curMidX - lastMidX
-                    val dMidY = curMidY - lastMidY
+                    val dMidX = (curMidX - lastMidX) / scale
+                    val dMidY = (curMidY - lastMidY) / scale
 
-                    // Tâm transform = midpoint 2 ngón (trên không gian view)
-                    // Cần chuyển về không gian cell (trừ cell.rect.left/top)
-                    val pivotX = curMidX - cell.rect.left
-                    val pivotY = curMidY - cell.rect.top
+                    val pivotLogicX = (curMidX - dx) / scale - cell.rect.left
+                    val pivotLogicY = (curMidY - dy) / scale - cell.rect.top
 
-                    // Áp dụng: translate → scale → rotate, tất cả quanh pivot
                     cell.matrix.apply {
                         postTranslate(dMidX, dMidY)
-                        postScale(scaleFactor, scaleFactor, pivotX, pivotY)
-                        if (abs(dAngle) < 30f) {           // guard tránh giật lớn
-                            postRotate(dAngle, pivotX, pivotY)
+                        postScale(scaleFactor, scaleFactor, pivotLogicX, pivotLogicY)
+                        if (abs(dAngle) < 30f) {
+                            postRotate(dAngle, pivotLogicX, pivotLogicY)
                         }
                     }
 
@@ -278,10 +284,7 @@ class TemplateEditorView @JvmOverloads constructor(
                 }
             }
 
-            // ── Nhấc ngón ──────────────────────────────────
             MotionEvent.ACTION_POINTER_UP -> {
-                // Khi nhấc 1 trong 2 ngón → reset về trạng thái 1 ngón
-                // Lấy vị trí ngón còn lại làm lastX/lastY để drag tiếp mượt
                 val remainIndex = if (event.actionIndex == 0) 1 else 0
                 lastX     = event.getX(remainIndex)
                 lastY     = event.getY(remainIndex)
@@ -292,10 +295,8 @@ class TemplateEditorView @JvmOverloads constructor(
                 if (isTap) {
                     val cell = activeCell
                     if (cell != null && cell.bitmap == null) {
-                        // Tap vào cell trống → mở gallery
                         listener?.invoke(cell)
                     }
-                    // Tap vào vùng trống hoặc cell đã có ảnh → không làm gì
                 }
                 isTap = false
             }
@@ -307,7 +308,18 @@ class TemplateEditorView @JvmOverloads constructor(
         }
         return true
     }
-    private fun findCell(x: Float, y: Float) = cells.find { it.rect.contains(x, y) }
+
+    // Convert touch point (view space) → logic space
+    private fun findCell(x: Float, y: Float): PhotoCell? {
+        val tf = currentTransform()
+        val scale = tf[0]
+        val dx = tf[1]
+        val dy = tf[2]
+        if (scale <= 0f) return null
+        val logicX = (x - dx) / scale
+        val logicY = (y - dy) / scale
+        return cells.find { it.rect.contains(logicX, logicY) }
+    }
 
     // ── Public API ────────────────────────────────────────
 
@@ -355,36 +367,28 @@ class TemplateEditorView @JvmOverloads constructor(
     }
 
     // ── Set ảnh vào cell ──────────────────────────────────
-
     fun setImageToCell(cell: PhotoCell, bitmap: Bitmap) {
         Log.d("TemplateEditorView", "setImageToCell: ${bitmap.width}x${bitmap.height}")
         cell.bitmap = bitmap
 
-        // ✅ Tính drawRect theo spacing — giống onDraw
         val drawRect = if (cellSpacing > 0f) RectF(
             cell.rect.left   + cellSpacing, cell.rect.top    + cellSpacing,
             cell.rect.right  - cellSpacing, cell.rect.bottom - cellSpacing
         ) else RectF(cell.rect)
 
-        // ✅ CenterCrop: scale vừa khít drawRect, căn giữa
-        val scale = max(drawRect.width() / bitmap.width, drawRect.height() / bitmap.height)
-        val dx = (drawRect.width()  - bitmap.width  * scale) / 2f
-        val dy = (drawRect.height() - bitmap.height * scale) / 2f
+        val s = max(drawRect.width() / bitmap.width, drawRect.height() / bitmap.height)
+        val dx = (drawRect.width()  - bitmap.width  * s) / 2f
+        val dy = (drawRect.height() - bitmap.height * s) / 2f
 
         cell.matrix.reset()
-        cell.matrix.postScale(scale, scale)
+        cell.matrix.postScale(s, s)
         cell.matrix.postTranslate(dx, dy)
         invalidate()
     }
 
     // ── Export ────────────────────────────────────────────
-
     fun export(): Bitmap {
-        // ✅ Dùng fixedW/fixedH — kích thước thực khi template load lần đầu
-        // Không dùng width/height vì có thể bị thay đổi khi panel tool mở
-        val exportW = if (fixedW > 0) fixedW else width
-        val exportH = if (fixedH > 0) fixedH else height
-        val result = Bitmap.createBitmap(exportW, exportH, Bitmap.Config.ARGB_8888)
+        val result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(result)
         draw(canvas)
         drawView?.draw(canvas)
