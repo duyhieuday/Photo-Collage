@@ -248,6 +248,11 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         }
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        InterAds.showAdsBreak(this@CollageActivity) { finish() }
+    }
+
     override fun setListener() {}
     override fun initFragment(): BaseFragment<*>? = null
 

@@ -98,6 +98,12 @@ public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        InterAds.showAdsBreak(this, super::onBackPressed);
+    }
+
+    @Override
     public void setListener() {}
 
     @Override
@@ -148,9 +154,6 @@ public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
             }
             return null;
         });
-
-        // Nút Back
-        getBinding().btnBack.setOnClickListener(v -> finish());
 
         // Nút Select
         getBinding().btnNext.setOnClickListener(v -> {

@@ -42,6 +42,11 @@ class TemplatePickerActivity : BaseActivityNew<ActivityTemplatePickerBinding>() 
         }
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        InterAds.showAdsBreak(this@TemplatePickerActivity) { finish() }
+    }
+
     override fun setListener() {}
     override fun initFragment(): BaseFragment<*>? = null
 

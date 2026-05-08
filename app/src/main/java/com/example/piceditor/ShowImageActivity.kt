@@ -215,7 +215,7 @@ class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnCl
         // File chưa sẵn sàng (bitmap vẫn đang load) → fallback ghi file rồi share
         val bmp = bitmap
         if (bmp == null) {
-            Toast.makeText(this, "Image not ready, please wait", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.image_not_ready), Toast.LENGTH_SHORT).show()
             return
         }
         shareJob?.cancel()
@@ -241,7 +241,7 @@ class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnCl
         // MediaStore URI không cần FileProvider và không bị ảnh hưởng bởi restart
         val shareUri = getDirectShareUri()
         if (shareUri == null) {
-            Toast.makeText(this, "Image not ready, please wait", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.image_not_ready), Toast.LENGTH_SHORT).show()
             return
         }
         try {
@@ -252,7 +252,7 @@ class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnCl
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             })
         } catch (e: Exception) {
-            Toast.makeText(this, "App not installed", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.app_not_installed), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -275,14 +275,14 @@ class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnCl
         val packages = listOf("com.zhiliaoapp.musically", "com.ss.android.ugc.trill")
         val shareUri = getDirectShareUri()
         if (shareUri == null) {
-            Toast.makeText(this, "Image not ready, please wait", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.image_not_ready), Toast.LENGTH_SHORT).show()
             return
         }
         val pkg = packages.firstOrNull {
             packageManager.getLaunchIntentForPackage(it) != null
         }
         if (pkg == null) {
-            Toast.makeText(this, "App not installed", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.app_not_installed), Toast.LENGTH_SHORT).show()
             return
         }
         startActivity(Intent(Intent.ACTION_SEND).apply {

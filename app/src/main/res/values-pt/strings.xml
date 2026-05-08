@@ -152,5 +152,7 @@
     <string name="grant_permission">Conceder permissão</string>
     <string name="go_to_settings">Acesse as Configurações.</string>
     <string name="make_another">✨ Faça outro</string>
+    <string name="image_not_ready">A imagem ainda não está pronta, aguarde.</string>
+    <string name="app_not_installed">Aplicativo não instalado</string>
 
 </resources>

@@ -152,5 +152,7 @@
     <string name="grant_permission">अनुमति प्रदान करें</string>
     <string name="go_to_settings">सेटिंग्स पर जाएं</string>
     <string name="make_another">✨ एक और बनाएं</string>
+    <string name="image_not_ready">छवि तैयार नहीं है, कृपया प्रतीक्षा करें</string>
+    <string name="app_not_installed">ऐप इंस्टॉल नहीं हुआ</string>
 
 </resources>

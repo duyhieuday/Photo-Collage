@@ -152,5 +152,7 @@
     <string name="grant_permission">Cấp quyền</string>
     <string name="go_to_settings">Vào Cài đặt</string>
     <string name="make_another">✨ Làm thêm một cái nữa</string>
+    <string name="image_not_ready">Hình ảnh chưa sẵn sàng, vui lòng chờ.</string>
+    <string name="app_not_installed">Ứng dụng chưa được cài đặt</string>
 
 </resources>

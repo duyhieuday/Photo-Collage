@@ -61,6 +61,12 @@ public class SettingActivity extends BaseActivityNew<ActivitySettingBinding> {
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        InterAds.showAdsBreak(this, super::onBackPressed);
+    }
+
+    @Override
     public void setListener() {
 
     }
@@ -76,11 +82,6 @@ public class SettingActivity extends BaseActivityNew<ActivitySettingBinding> {
         BarsUtils.setStatusBarColor(this, Color.parseColor("#01000000"));
         BarsUtils.setAppearanceLightStatusBars(this, true);
         BarsUtils.setHideNavigation(SettingActivity.this);
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
     }
 
     @Override

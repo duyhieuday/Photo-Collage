@@ -46,6 +46,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import com.example.piceditor.ShowImageActivity
 import androidx.core.graphics.scale
+import com.example.piceditor.ads.InterAds
 
 class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
     BackgroundAdapter.OnBGClickListener,
@@ -116,6 +117,11 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
             initBanner(binding.adViewContainer)
             binding.banner.root.visibility = View.GONE
         }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        InterAds.showAdsBreak(this@TemplateEditorActivity) { finish() }
     }
 
     override fun afterSetContentView() {

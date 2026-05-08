@@ -113,6 +113,11 @@ class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(),
         }
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        InterAds.showAdsBreak(this@SelectImageActivity) { finish() }
+    }
+
     override fun afterSetContentView() {
         super.afterSetContentView()
         BarsUtils.setHideNavigation(this)

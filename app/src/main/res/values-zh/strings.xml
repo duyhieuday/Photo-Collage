@@ -152,5 +152,7 @@
     <string name="grant_permission">授予许可</string>
     <string name="go_to_settings">前往设置</string>
     <string name="make_another">✨再做一个</string>
+    <string name="image_not_ready">图片尚未准备就绪，请稍候。</string>
+    <string name="app_not_installed">应用未安装</string>
 
 </resources>

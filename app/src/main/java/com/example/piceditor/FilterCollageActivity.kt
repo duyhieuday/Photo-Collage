@@ -95,6 +95,11 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(),
         }
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        InterAds.showAdsBreak(this@FilterCollageActivity) { finish() }
+    }
+
     override fun setListener() {}
     override fun initFragment(): BaseFragment<*>? = null
 
