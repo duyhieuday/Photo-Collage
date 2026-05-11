@@ -90,8 +90,8 @@ object ABRC {
                                     referrer.contains("apps.instagram.com")
                                 ) {
                                     WeatherApplication.trackingEvent("hehehe_true")
-//                                    PreferenceUtil.getInstance(context)
-//                                        .setValue(Constant.SharePrefKey.HEHE, true)
+                                    PreferenceUtil.getInstance(context)
+                                        .setValue(Constant.SharePrefKey.HEHE, true)
                                 } else {
                                     WeatherApplication.trackingEvent("hehehe_false")
                                 }
@@ -106,8 +106,8 @@ object ABRC {
                     }
 
                     if(countryName == "Vietnam"){
-//                        PreferenceUtil.getInstance(context)
-//                            .setValue(Constant.SharePrefKey.HEHE, true)
+                        PreferenceUtil.getInstance(context)
+                            .setValue(Constant.SharePrefKey.HEHE, true)
                     }
 
 

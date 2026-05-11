@@ -171,7 +171,7 @@ public class SettingActivity extends BaseActivityNew<ActivitySettingBinding> {
     private void feedBack() {
             Intent Email = new Intent(Intent.ACTION_SEND);
             Email.setType("text/email");
-            Email.putExtra(Intent.EXTRA_EMAIL, new String[]{"duyhieuworks@gmail.com"});
+            Email.putExtra(Intent.EXTRA_EMAIL, new String[]{"store@eztechglobal.com"});
             Email.putExtra(Intent.EXTRA_SUBJECT, "Feedback Photo Collage");
             Email.putExtra(Intent.EXTRA_TEXT, "Message: ");
 

@@ -80,23 +80,30 @@ public class SplashActivity extends BaseActivityNew<ActivitySplashBinding> {
     private void intent(String debug) {
         boolean isFirstRun = Prefs.getBoolean(Prefs.Key.KEY_LANGUAGE, true);
         if (!isIntented) {
-            if (PreferenceUtil.getInstance(getApplicationContext()).getValue(Constant.SharePrefKey.HEHE, false)) {
-                if (isFirstRun) {
-                    startActivity(new Intent(this, LanguageActivity.class));
-                    finish();
-                } else {
-                    if(PreferenceUtil.getInstance(getApplicationContext()).getValue(Constant.SharePrefKey.FIRST_FLOW, "no").equals("yes")){
-                        startActivity(new Intent(this, LanguageActivity.class));
-                        finish();
-                    }else {
-                        startActivity(new Intent(this, MainActivity.class));
-                        finish();
-                    }
-                }
-            } else {
-                startActivity(new Intent(this, MainActivity.class));
-                finish();
-            }
+//            if (PreferenceUtil.getInstance(getApplicationContext()).getValue(Constant.SharePrefKey.HEHE, false)) {
+//                if (isFirstRun) {
+//                    startActivity(new Intent(this, LanguageActivity.class));
+//                    finish();
+//                } else {
+//                    if(PreferenceUtil.getInstance(getApplicationContext()).getValue(Constant.SharePrefKey.FIRST_FLOW, "no").equals("yes")){
+//                        startActivity(new Intent(this, LanguageActivity.class));
+//                        finish();
+//                    }else {
+//                        startActivity(new Intent(this, MainActivity.class));
+//                        finish();
+//                    }
+//                }
+//            } else {
+//                startActivity(new Intent(this, MainActivity.class));
+//                finish();
+//            }
+
+
+
+
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+
             isIntented = true;
         }
     }
