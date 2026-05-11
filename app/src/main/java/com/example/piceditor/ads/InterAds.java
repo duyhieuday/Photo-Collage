@@ -265,11 +265,11 @@ public class InterAds {
     public static void startDelay() {
 
         String s = PreferenceUtil.getInstance(WeatherApplication.get()).getValue(Constant.SharePrefKey.INTER_TIME, "20000");
-        int inter_time = 20000;
+        int inter_time = 45000;
         try {
             inter_time = Integer.parseInt(s);
         } catch (Exception e) {
-            inter_time = 20000;
+            inter_time = 45000;
         }
 
 
