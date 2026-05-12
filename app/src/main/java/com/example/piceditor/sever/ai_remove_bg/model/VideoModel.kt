@@ -1,5 +1,6 @@
-package com.huann305.app.data.sever.model
+package com.example.piceditor.sever.ai_remove_bg.model
 
+import com.example.piceditor.sever.ai_remove_bg.Url
 import com.google.gson.annotations.SerializedName
 
 /**

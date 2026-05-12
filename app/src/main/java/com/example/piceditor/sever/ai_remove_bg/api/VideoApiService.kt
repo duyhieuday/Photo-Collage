@@ -1,14 +1,12 @@
-package com.huann305.app.data.sever.api
+package com.example.piceditor.sever.ai_remove_bg.api
 
+import com.example.piceditor.sever.ai_remove_bg.model.VideoCategoryRoot
+import com.example.piceditor.sever.ai_remove_bg.model.VideoModelRoot
 import com.google.gson.annotations.SerializedName
-import com.huann305.app.data.sever.model.VideoCategoryRoot
-import com.huann305.app.data.sever.model.VideoModelRoot
-import kotlinx.serialization.Serializable
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
@@ -85,22 +83,18 @@ data class AiVideoApiParams(
     val url: String? = null,
 )
 
-@Serializable
 data class NewChapterPromptGenArtResponse(
     val data: NewChapterPromptGenArtResponseData
 )
 
-@Serializable
 data class NewChapterPromptGenArtResponseData(
     val id: Int
 )
 
-@Serializable
 data class QueueResponseRoot(
     val data: QueueResponseData
 )
 
-@Serializable
 data class QueueResponseData(
     val id: Int,
     val type: Int,
@@ -108,7 +102,6 @@ data class QueueResponseData(
     val status: Int
 )
 
-@Serializable
 data class QueueResponseValue(
     val path: String,
     val type: String,

@@ -1,7 +1,7 @@
-package com.huann305.app.data.sever.repository
+package com.example.piceditor.sever.ai_remove_bg.repository
 
-import com.huann305.app.data.sever.api.CreditsEncryptedRequest
-import com.huann305.app.data.sever.api.WalletApi
+import com.example.piceditor.sever.ai_remove_bg.api.CreditsEncryptedRequest
+import com.example.piceditor.sever.ai_remove_bg.api.WalletApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

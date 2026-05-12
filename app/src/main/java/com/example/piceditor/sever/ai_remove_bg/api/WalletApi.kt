@@ -1,4 +1,4 @@
-package com.huann305.app.data.sever.api
+package com.example.piceditor.sever.ai_remove_bg.api
 
 import com.google.gson.annotations.SerializedName
 import retrofit2.http.Body

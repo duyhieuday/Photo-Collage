@@ -1,11 +1,11 @@
 package com.example.piceditor.sever.ai_remove_bg.api;
 
+import com.example.piceditor.sever.ai_remove_bg.model.CategoryModel;
+import com.example.piceditor.sever.ai_remove_bg.model.Data;
+import com.example.piceditor.sever.ai_remove_bg.model.GenArtModel;
+import com.example.piceditor.sever.ai_remove_bg.model.GenArtResult;
+import com.example.piceditor.sever.ai_remove_bg.model.PaginationData;
 import com.google.gson.JsonObject;
-import com.huann305.app.data.sever.model.Data;
-import com.huann305.app.data.sever.model.PaginationData;
-import com.huann305.app.model.genart.CategoryModel;
-import com.huann305.app.model.genart.GenArtModel;
-import com.huann305.app.model.genart.GenArtResult;
 
 import java.util.List;
 

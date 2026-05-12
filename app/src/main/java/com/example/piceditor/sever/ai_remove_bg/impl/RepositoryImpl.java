@@ -2,8 +2,8 @@ package com.example.piceditor.sever.ai_remove_bg.impl;
 
 import android.content.Context;
 
-import com.huann305.app.data.sever.repository.Repository;
-import com.huann305.app.data.sever.repository.WorkRepository;
+import com.example.piceditor.sever.ai_remove_bg.repository.Repository;
+import com.example.piceditor.sever.ai_remove_bg.repository.WorkRepository;
 
 public class RepositoryImpl implements Repository {
     private final Context context;

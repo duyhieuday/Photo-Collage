@@ -1,9 +1,9 @@
 package com.example.piceditor.sever.ai_remove_bg;
 
 
-import com.huann305.app.App;
-import com.huann305.app.data.sever.impl.RepositoryImpl;
-import com.huann305.app.data.sever.repository.Repository;
+import com.example.piceditor.WeatherApplication;
+import com.example.piceditor.sever.ai_remove_bg.impl.RepositoryImpl;
+import com.example.piceditor.sever.ai_remove_bg.repository.Repository;
 
 public class DataInjection {
 
@@ -12,7 +12,7 @@ public class DataInjection {
     }
 
     private static final class RepositoryHolder {
-        static final Repository HOLDER = new RepositoryImpl(App.Companion.getInstance());
+        static final Repository HOLDER = new RepositoryImpl(WeatherApplication.getInstance());
     }
 
     private DataInjection() {

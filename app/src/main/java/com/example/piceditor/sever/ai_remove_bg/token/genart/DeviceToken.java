@@ -6,9 +6,9 @@ import android.util.Base64;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.example.piceditor.WeatherApplication;
+import com.example.piceditor.utilsApp.PrefsKot;
 import com.google.gson.Gson;
-import com.huann305.app.App;
-import com.huann305.app.utils.Prefs;
 
 import java.nio.charset.StandardCharsets;
 
@@ -16,7 +16,7 @@ public class DeviceToken {
     private static final String SECRET_KEY = "YCRLIVHEKCVYMUIGJTPXKYVCTXSHBWDSWZFHLUWEBOLNSQKHUIQVTCMESLBIHMGSNGHEAFTANSTUNCYBVTIBJXSHQWJEFGMVNQOQ";
 
     public static String getAccessToken() {
-        Prefs sharedPre = Prefs.Companion.getInstance();
+        PrefsKot sharedPre = PrefsKot.Companion.getInstance();
         String token = sharedPre.getTokenGenArt();
         if (token.equals("failed")) {
             token = generateAccessToken();
@@ -68,6 +68,6 @@ public class DeviceToken {
 
     @SuppressLint("HardwareIds")
     private static String getDeviceId() {
-        return Settings.Secure.getString(App.Companion.getInstance().getContentResolver(), Settings.Secure.ANDROID_ID);
+        return Settings.Secure.getString(WeatherApplication.getInstance().getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 }

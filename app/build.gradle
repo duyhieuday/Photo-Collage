@@ -107,11 +107,6 @@ dependencies {
     //Lottie
     implementation 'com.airbnb.android:lottie:5.2.0'
 
-    //collage
-    //implementation 'jp.co.cyberagent.android:gpuimage:2.1.0'
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-
     implementation 'com.github.bumptech.glide:glide:4.15.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
 
@@ -170,5 +165,13 @@ dependencies {
     implementation project(':photo-editor-new')
     implementation 'com.squareup.okhttp3:okhttp:4.9.2'
 
+    implementation("com.github.MCT-LIB:BaseUi-Binding:1.1.1")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.retrofit2:adapter-rxjava3:2.9.0")
+    implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
+    implementation("io.reactivex.rxjava3:rxjava:3.1.7")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2")
+    implementation("com.auth0:java-jwt:4.4.0")
 
 }

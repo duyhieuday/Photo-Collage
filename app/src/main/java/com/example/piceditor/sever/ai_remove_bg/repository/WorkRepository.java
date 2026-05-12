@@ -1,8 +1,8 @@
 package com.example.piceditor.sever.ai_remove_bg.repository;
 
-import com.huann305.app.data.sever.model.PaginationData;
-import com.huann305.app.model.genart.CategoryModel;
-import com.huann305.app.model.genart.GenArtModel;
+import com.example.piceditor.sever.ai_remove_bg.model.CategoryModel;
+import com.example.piceditor.sever.ai_remove_bg.model.GenArtModel;
+import com.example.piceditor.sever.ai_remove_bg.model.PaginationData;
 
 import java.util.List;
 

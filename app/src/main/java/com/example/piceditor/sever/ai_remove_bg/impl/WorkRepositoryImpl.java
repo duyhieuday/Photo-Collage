@@ -2,13 +2,13 @@ package com.example.piceditor.sever.ai_remove_bg.impl;
 
 import androidx.annotation.NonNull;
 
-import com.huann305.app.data.sever.RetrofitClient;
-import com.huann305.app.data.sever.model.Data;
-import com.huann305.app.data.sever.model.PaginationData;
-import com.huann305.app.data.sever.repository.WorkRepository;
-import com.huann305.app.data.sever.token.genart.DeviceToken;
-import com.huann305.app.model.genart.CategoryModel;
-import com.huann305.app.model.genart.GenArtModel;
+import com.example.piceditor.sever.ai_remove_bg.RetrofitClient;
+import com.example.piceditor.sever.ai_remove_bg.model.CategoryModel;
+import com.example.piceditor.sever.ai_remove_bg.model.Data;
+import com.example.piceditor.sever.ai_remove_bg.model.GenArtModel;
+import com.example.piceditor.sever.ai_remove_bg.model.PaginationData;
+import com.example.piceditor.sever.ai_remove_bg.repository.WorkRepository;
+import com.example.piceditor.sever.ai_remove_bg.token.genart.DeviceToken;
 
 import java.util.List;
 
@@ -41,7 +41,7 @@ public class WorkRepositoryImpl implements WorkRepository {
 
     @NonNull
     private <T> SingleObserver<Data<T>> createObserver(SingleEmitter<T> emitter) {
-        return new SingleObserver<>() {
+        return new SingleObserver<Data<T>>() {
             @Override
             public void onSubscribe(@NonNull Disposable d) {
                 emitter.setDisposable(d);
@@ -63,27 +63,4 @@ public class WorkRepositoryImpl implements WorkRepository {
         };
     }
 
-    @NonNull
-    private <T> SingleObserver<T> createObserver2(SingleEmitter<T> emitter) {
-        return new SingleObserver<>() {
-            @Override
-            public void onSubscribe(@NonNull Disposable d) {
-                emitter.setDisposable(d);
-            }
-
-            @Override
-            public void onSuccess(@NonNull T t) {
-                if (!emitter.isDisposed()) {
-                    emitter.onSuccess(t);
-                }
-            }
-
-            @Override
-            public void onError(@NonNull Throwable e) {
-                if (!emitter.isDisposed()) {
-                    emitter.onError(e);
-                }
-            }
-        };
-    }
 }

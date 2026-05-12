@@ -3,14 +3,13 @@ package com.example.piceditor.sever.ai_remove_bg;
 
 import androidx.annotation.NonNull;
 
+import com.example.piceditor.sever.ai_remove_bg.api.GenArtApiService;
+import com.example.piceditor.sever.ai_remove_bg.token.genart.DeviceToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.huann305.app.data.sever.UnsafeOkHttpClient;
 import com.example.piceditor.sever.ai_remove_bg.api.DeviceApiService;
-import com.huann305.app.data.sever.api.GenArtApiService;
-import com.huann305.app.data.sever.api.VideoApiService;
-import com.huann305.app.data.sever.api.WalletApi;
-import com.huann305.app.data.sever.token.genart.DeviceToken;
+import com.example.piceditor.sever.ai_remove_bg.api.VideoApiService;
+import com.example.piceditor.sever.ai_remove_bg.api.WalletApi;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
