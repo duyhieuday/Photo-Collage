@@ -277,9 +277,9 @@ public class InterAds {
         flagQC = 0;
         handler.removeCallbacks(runnable);
         if (PreferenceUtil.getInstance(WeatherApplication.get()).getValue(Constant.SharePrefKey.HEHE, false)) {
-            handler.postDelayed(runnable, BuildConfig.DEBUG ? 1000 : inter_time);
+            handler.postDelayed(runnable, BuildConfig.DEBUG ? 100000 : inter_time);
         }else {
-            handler.postDelayed(runnable, BuildConfig.DEBUG ? 1000 : 45000);
+            handler.postDelayed(runnable, BuildConfig.DEBUG ? 100000 : 45000);
         }
 
 //        Toast.makeText(WeatherApplication.get(), inter_time+"", Toast.LENGTH_SHORT).show();

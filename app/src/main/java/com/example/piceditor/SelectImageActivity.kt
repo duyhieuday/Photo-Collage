@@ -24,8 +24,14 @@ class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(),
     GalleryFragment.OnSelectImageListener,
     SelectedPhotoAdapter.OnDeleteButtonClickListener {
 
+    companion object {
+        const val EXTRA_MAX_IMAGE_COUNT = "max_image_count"
+        const val EXTRA_FROM_REMOVE     = "from_remove"
+    }
+
     private val mSelectedImages = ArrayList<String>()
-    private var maxIamgeCount = 10
+    private var maxIamgeCount = 10        // default: collage flow
+    private var fromRemove = false        // flow đến từ AI Remove?
     private lateinit var mSelectedPhotoAdapter: SelectedPhotoAdapter
     private var mLastClickTime: Long = 0
 
@@ -45,12 +51,13 @@ class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(),
 
     override fun onSelectImage(str: String) {
         if (mSelectedImages.size >= maxIamgeCount) {
-            Toast.makeText(
-                this,
-                String.format("You can only select up to %d photo(s)", maxIamgeCount),
-                Toast.LENGTH_SHORT
-            ).show()
-            return  // ← không add, không tăng badge
+            val msg = if (maxIamgeCount == 1) {
+                "You can only select 1 photo"
+            } else {
+                String.format("You can only select up to %d photo(s)", maxIamgeCount)
+            }
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+            return
         }
 
         // ✅ Được phép chọn → add vào list và tăng badge
@@ -58,23 +65,36 @@ class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(),
         galleryAdapter?.increaseCount(str)
 
         mSelectedPhotoAdapter.notifyDataSetChanged()
-        binding.textImageCount.text = "Select upto 10 photo(s) (${mSelectedImages.size})"
+        updateImageCountText()
         updateButtonState()
+
+        // ✅ Auto next khi chỉ chọn 1 ảnh (AI Remove flow)
+        if (maxIamgeCount == 1 && mSelectedImages.size == 1) {
+            binding.btnNext.postDelayed({ createCollage() }, 300)
+        }
     }
 
     override fun onDeleteButtonClick(str: String) {
-        // Chỉ xóa 1 lần xuất hiện (remove first occurrence)
+        // Chỉ xóa 1 lần xuất hiện
         mSelectedImages.remove(str)
 
         // ✅ Giảm count badge trên gallery
         galleryAdapter?.decreaseCount(str)
 
         mSelectedPhotoAdapter.notifyDataSetChanged()
-        binding.textImageCount.text = "Select upto 10 photo(s) (${mSelectedImages.size})"
+        updateImageCountText()
         updateButtonState()
     }
 
     // ── UI helpers ────────────────────────────────────────
+
+    private fun updateImageCountText() {
+        binding.textImageCount.text = if (maxIamgeCount == 1) {
+            "Select 1 photo (${mSelectedImages.size})"
+        } else {
+            "Select upto $maxIamgeCount photo(s) (${mSelectedImages.size})"
+        }
+    }
 
     private fun updateButtonState() {
         if (mSelectedImages.isEmpty()) {
@@ -132,6 +152,13 @@ class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(),
         super.onCreate(savedInstanceState)
         BarsUtils.setHideNavigation(this)
 
+        // ✅ Đọc Intent extras
+        maxIamgeCount = intent.getIntExtra(EXTRA_MAX_IMAGE_COUNT, 10)
+        fromRemove    = intent.getBooleanExtra(EXTRA_FROM_REMOVE, false)
+
+        // ✅ Hiển thị text ban đầu theo max
+        updateImageCountText()
+
         binding.ivBack.setOnClickListener {
             InterAds.showAdsBreak(this@SelectImageActivity) { finish() }
         }
@@ -161,10 +188,19 @@ class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(),
         }
         try {
             InterAds.showAdsBreak(this@SelectImageActivity) {
-                val intent = Intent(this, CollageActivity::class.java)
-                intent.putExtra("imageCount", mSelectedImages.size)
-                intent.putExtra("selectedImages", mSelectedImages)
-                intent.putExtra("imagesinTemplate", mSelectedImages.size)
+                val intent = if (fromRemove) {
+                    // ✅ Flow AI Remove — chỉ truyền 1 ảnh
+                    Intent(this, AiRemoveActivity::class.java).apply {
+                        putExtra("image_path", mSelectedImages[0])
+                    }
+                } else {
+                    // ✅ Flow Collage (mặc định)
+                    Intent(this, CollageActivity::class.java).apply {
+                        putExtra("imageCount", mSelectedImages.size)
+                        putExtra("selectedImages", mSelectedImages)
+                        putExtra("imagesinTemplate", mSelectedImages.size)
+                    }
+                }
                 startActivityForResult(intent, 111)
             }
         } catch (e: Exception) {

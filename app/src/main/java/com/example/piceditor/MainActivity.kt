@@ -351,6 +351,19 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
                 startActivity(Intent(this, MyDraftActivity::class.java))
             }
         }
+
+        binding.llRemove.setOnClickListener {
+            checkAndRequestPermission()
+            if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
+            mLastClickTime = SystemClock.elapsedRealtime()
+            InterAds.showAdsBreak(this@MainActivity) {
+                val intent = Intent(this, SelectImageActivity::class.java).apply {
+                    putExtra("max_image_count", 1)
+                    putExtra("from_remove", true)
+                }
+                startActivity(intent)
+            }
+        }
     }
 
     // ── Camera / Gallery / Editor ──────────────────────────
