@@ -67,11 +67,6 @@ class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(),
         mSelectedPhotoAdapter.notifyDataSetChanged()
         updateImageCountText()
         updateButtonState()
-
-        // ✅ Auto next khi chỉ chọn 1 ảnh (AI Remove flow)
-        if (maxIamgeCount == 1 && mSelectedImages.size == 1) {
-            binding.btnNext.postDelayed({ createCollage() }, 300)
-        }
     }
 
     override fun onDeleteButtonClick(str: String) {
@@ -189,12 +184,10 @@ class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(),
         try {
             InterAds.showAdsBreak(this@SelectImageActivity) {
                 val intent = if (fromRemove) {
-                    // ✅ Flow AI Remove — chỉ truyền 1 ảnh
                     Intent(this, AiRemoveActivity::class.java).apply {
-                        putExtra("image_path", mSelectedImages[0])
+                        putExtra(AiRemoveActivity.EXTRA_IMAGE_PATH, mSelectedImages[0])
                     }
                 } else {
-                    // ✅ Flow Collage (mặc định)
                     Intent(this, CollageActivity::class.java).apply {
                         putExtra("imageCount", mSelectedImages.size)
                         putExtra("selectedImages", mSelectedImages)

@@ -8,7 +8,7 @@
         android:layout_height="match_parent"
         android:background="@color/bg_color"
         android:orientation="vertical"
-        tools:context=".CollageActivity">
+        tools:context=".AiRemoveActivity">
 
         <RelativeLayout
             android:id="@+id/layoutBar"
@@ -61,6 +61,7 @@
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
                 android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
                 android:orientation="horizontal" />
 
         </RelativeLayout>
