@@ -49,6 +49,7 @@ class SelectImageActivity : BaseActivityNew<ActivitySelectImageBinding>(),
 
     // ── Callbacks ─────────────────────────────────────────
 
+    @SuppressLint("DefaultLocale")
     override fun onSelectImage(str: String) {
         if (mSelectedImages.size >= maxIamgeCount) {
             val msg = if (maxIamgeCount == 1) {
