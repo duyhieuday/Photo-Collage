@@ -1,223 +1,215 @@
-package com.example.piceditor;
+package com.example.piceditor
 
-import android.content.ContentResolver;
-import android.graphics.Color;
-import android.net.Uri;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Toast;
+import android.content.ContentResolver
+import android.content.Intent
+import android.graphics.Color
+import android.net.Uri
+import android.os.Bundle
+import android.view.View
+import android.widget.Toast
+import com.bumptech.glide.Glide
+import com.example.piceditor.ads.InterAds
+import com.example.piceditor.base.BaseActivityNew
+import com.example.piceditor.base.BaseFragment
+import com.example.piceditor.databinding.ActivityAiRemoveBinding
+import com.example.piceditor.sever.ai_remove_bg.presenter.WorkPresenter
+import com.example.piceditor.utils.BarsUtils
+import com.example.piceditor.utilsApp.Constant
+import com.example.piceditor.utilsApp.PreferenceUtil
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
 
-import com.bumptech.glide.Glide;
-import com.example.piceditor.ads.InterAds;
-import com.example.piceditor.base.BaseActivityNew;
-import com.example.piceditor.base.BaseFragment;
-import com.example.piceditor.databinding.ActivityAiRemoveBinding;
-import com.example.piceditor.sever.ai_remove_bg.presenter.WorkPresenter;
-import com.example.piceditor.utils.BarsUtils;
-import com.example.piceditor.utilsApp.Constant;
-import com.example.piceditor.utilsApp.PreferenceUtil;
+class AiRemoveActivity : BaseActivityNew<ActivityAiRemoveBinding>() {
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-public class AiRemoveActivity extends BaseActivityNew<ActivityAiRemoveBinding> {
-
-    private String imagePath;
-    private WorkPresenter workPresenter;
-    private boolean isProcessing = false;
-    public static final String EXTRA_IMAGE_PATH = "image_path";
-
-    @Override
-    public int getLayoutRes() {
-        return R.layout.activity_ai_remove;
+    companion object {
+        const val EXTRA_IMAGE_PATH = "image_path"
     }
 
-    @Override
-    public int getFrame() {
-        return 0;
+    private var imagePath: String? = null
+    private var workPresenter: WorkPresenter? = null
+    private var isProcessing = false
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // BaseActivityNew overrides
+    // ─────────────────────────────────────────────────────────────────────────
+
+    override fun getLayoutRes(): Int = R.layout.activity_ai_remove
+    override fun getFrame(): Int = 0
+
+    override fun getDataFromIntent() {
+        imagePath = intent?.getStringExtra(EXTRA_IMAGE_PATH)
     }
 
-    @Override
-    public void getDataFromIntent() {
-        // ✅ Lấy đường dẫn ảnh từ Intent
-        if (getIntent() != null) {
-            imagePath = getIntent().getStringExtra(EXTRA_IMAGE_PATH);
-        }
-    }
-
-    @Override
-    public void doAfterOnCreate() {
+    override fun doAfterOnCreate() {
         if (PreferenceUtil.getInstance(this)
                 .getValue(Constant.SharePrefKey.BANNER_COL, "no").equals("yes")) {
-            initBanner(getBinding().banner.adViewContainer);
+            initBanner(binding.banner.adViewContainer)
         } else {
-            initBanner(getBinding().adViewContainer);
-            getBinding().banner.getRoot().setVisibility(View.GONE);
+            initBanner(binding.adViewContainer)
+            binding.banner.root.visibility = View.GONE
         }
     }
 
-    @Override
-    public void setListener() {
-        getBinding().btnBack.setOnClickListener(v -> {
+    override fun setListener() {
+        binding.btnBack.setOnClickListener {
             if (isProcessing) {
-                Toast.makeText(this, "Đang xử lý, vui lòng đợi...", Toast.LENGTH_SHORT).show();
-                return;
+                Toast.makeText(this, "Đang xử lý, vui lòng đợi...", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
-            InterAds.showAdsBreak(AiRemoveActivity.this, this::finish);
-        });
+            InterAds.showAdsBreak(this@AiRemoveActivity) { finish() }
+        }
 
-        getBinding().btnNext.setOnClickListener(v -> {
-            // TODO: xử lý remove background ở đây
-            // Ví dụ: chuyển sang activity xử lý kết quả, hoặc gọi API, v.v.
-            if (imagePath == null || imagePath.isEmpty()) {
-                android.widget.Toast.makeText(this,
-                        "Chưa có ảnh để xử lý", android.widget.Toast.LENGTH_SHORT).show();
-                return;
+        binding.btnNext.setOnClickListener {
+            if (imagePath.isNullOrEmpty()) {
+                Toast.makeText(this, "Chưa có ảnh để xử lý", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
-            startRemoveBackground();
-        });
+            startRemoveBackground()
+        }
     }
 
-    @Override
-    public BaseFragment initFragment() {
-        return null;
+    override fun initFragment(): BaseFragment<*>? = null
+
+    override fun afterSetContentView() {
+        super.afterSetContentView()
+        BarsUtils.setHideNavigation(this)
+        BarsUtils.setStatusBarColor(this, Color.parseColor("#01000000"))
+        BarsUtils.setAppearanceLightStatusBars(this, true)
     }
 
-    @Override
-    public void afterSetContentView() {
-        super.afterSetContentView();
-        BarsUtils.setHideNavigation(this);
-        BarsUtils.setStatusBarColor(this, Color.parseColor("#01000000"));
-        BarsUtils.setAppearanceLightStatusBars(this, true);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
+    override fun onResume() {
+        super.onResume()
         if (!PreferenceUtil.getInstance(this)
                 .getValue(Constant.SharePrefKey.BANNER_COL, "no").equals("yes")) {
-            initBanner(getBinding().adViewContainer);
-            getBinding().banner.getRoot().setVisibility(View.GONE);
+            initBanner(binding.adViewContainer)
+            binding.banner.root.visibility = View.GONE
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        if (workPresenter != null) {
-            workPresenter.dispose();
-        }
-        super.onDestroy();
+    override fun onDestroy() {
+        workPresenter?.dispose()
+        super.onDestroy()
     }
 
-    @Override
-    public void onBackPressed() {
+    override fun onBackPressed() {
         if (isProcessing) {
-            Toast.makeText(this, "Đang xử lý, vui lòng đợi...", Toast.LENGTH_SHORT).show();
-            return;
+            Toast.makeText(this, "Đang xử lý, vui lòng đợi...", Toast.LENGTH_SHORT).show()
+            return
         }
-        InterAds.showAdsBreak(this, super::onBackPressed);
-        super.onBackPressed();
+        InterAds.showAdsBreak(this) { super.onBackPressed() }
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        workPresenter = new WorkPresenter();
-        // ✅ Hiển thị ảnh bằng Glide
-        loadImageToView();
+    // ─────────────────────────────────────────────────────────────────────────
+    // Lifecycle
+    // ─────────────────────────────────────────────────────────────────────────
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        workPresenter = WorkPresenter()
+        loadImageToView()
     }
 
-    private void loadImageToView() {
-        if (imagePath == null || imagePath.isEmpty()) {
-            android.widget.Toast.makeText(this,
-                    "Không tìm thấy ảnh", android.widget.Toast.LENGTH_SHORT).show();
-            finish();
-            return;
+    // ─────────────────────────────────────────────────────────────────────────
+    // Image loading
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun loadImageToView() {
+        val path = imagePath
+        if (path.isNullOrEmpty()) {
+            Toast.makeText(this, "Không tìm thấy ảnh", Toast.LENGTH_SHORT).show()
+            finish()
+            return
         }
 
-        // Load ảnh từ path (có thể là file path hoặc content URI)
-        Object source;
-        if (imagePath.startsWith("content://") || imagePath.startsWith("file://")) {
-            source = android.net.Uri.parse(imagePath);
+        val source: Any = if (path.startsWith("content://") || path.startsWith("file://")) {
+            Uri.parse(path)
         } else {
-            source = new File(imagePath);
+            File(path)
         }
 
-        Glide.with(this)
-                .load(source)
-                .into(getBinding().imgBackground);
+        Glide.with(this).load(source).into(binding.imgBackground)
     }
 
-    private void setLoading(boolean loading) {
-        if (isDestroyed() || isFinishing()) return;  // ✅ Safety check
-        isProcessing = loading;
-        getBinding().progressLoading.setVisibility(loading ? View.VISIBLE : View.GONE);
-        getBinding().btnNext.setEnabled(!loading);
-        getBinding().btnNext.setAlpha(loading ? 0.5f : 1f);
-    }
-    private void startRemoveBackground() {
-        setLoading(true);                          // show ProgressBar, disable btnNext
+    // ─────────────────────────────────────────────────────────────────────────
+    // Remove background processing
+    // ─────────────────────────────────────────────────────────────────────────
 
-        new Thread(() -> {
+    private fun setLoading(loading: Boolean) {
+        if (isDestroyed || isFinishing) return
+        isProcessing = loading
+        binding.progressLoading.visibility = if (loading) View.VISIBLE else View.GONE
+        binding.btnNext.isEnabled = !loading
+        binding.btnNext.alpha = if (loading) 0.5f else 1f
+    }
+
+    private fun startRemoveBackground() {
+        setLoading(true)
+
+        Thread {
             try {
-                File inputFile = prepareInputFile();       // I/O off main thread
-                runOnUiThread(() -> callRemoveBgApi(inputFile));
-            } catch (IOException e) {
-                runOnUiThread(() -> {
-                    setLoading(false);
-                    Toast.makeText(AiRemoveActivity.this,
-                            "Không đọc được file ảnh", Toast.LENGTH_SHORT ).show();
-                });
-            }
-        }).start();
-    }
-
-    private File prepareInputFile() throws IOException {
-        if (imagePath.startsWith("content://")) {
-            Uri uri = Uri.parse(imagePath);
-            ContentResolver resolver = getContentResolver();
-            File outFile = new File(getCacheDir(),
-                    "ai_remove_input_" + System.currentTimeMillis() + ".jpg");
-            try (InputStream in = resolver.openInputStream(uri);
-                 FileOutputStream out = new FileOutputStream(outFile)) {
-                if (in == null) throw new IOException("Cannot open input stream for " + uri);
-                byte[] buf = new byte[8192];
-                int n;
-                while ((n = in.read(buf)) > 0) {
-                    out.write(buf, 0, n);
+                val inputFile = prepareInputFile()
+                runOnUiThread { callRemoveBgApi(inputFile) }
+            } catch (e: IOException) {
+                runOnUiThread {
+                    setLoading(false)
+                    Toast.makeText(this, "Không đọc được file ảnh", Toast.LENGTH_SHORT).show()
                 }
             }
-            return outFile;
-        }
-        if (imagePath.startsWith("file://")) {
-            String path = Uri.parse(imagePath).getPath();
-            if (path == null) throw new IOException("Invalid file uri: " + imagePath);
-            return new File(path);
-        }
-        return new File(imagePath);
+        }.start()
     }
 
-    private void callRemoveBgApi(File inputFile) {
-        workPresenter.removeBg(inputFile, result -> {
-            setLoading(false);
+    @Throws(IOException::class)
+    private fun prepareInputFile(): File {
+        val path = imagePath ?: throw IOException("imagePath is null")
 
-            // ✅ Check chặt chẽ hơn
-            if (result == null || result.getValue().getUrl().isEmpty()) {
-                Toast.makeText(AiRemoveActivity.this,
-                        "Remove background thất bại", Toast.LENGTH_SHORT).show();
-                return;
+        return when {
+            path.startsWith("content://") -> {
+                val uri = Uri.parse(path)
+                val resolver: ContentResolver = contentResolver
+                val outFile = File(
+                    cacheDir,
+                    "ai_remove_input_${System.currentTimeMillis()}.jpg"
+                )
+                resolver.openInputStream(uri)?.use { input: InputStream ->
+                    FileOutputStream(outFile).use { output ->
+                        val buf = ByteArray(8192)
+                        var n: Int
+                        while (input.read(buf).also { n = it } > 0) {
+                            output.write(buf, 0, n)
+                        }
+                    }
+                } ?: throw IOException("Cannot open input stream for $uri")
+                outFile
+            }
+            path.startsWith("file://") -> {
+                val filePath = Uri.parse(path).path ?: throw IOException("Invalid file uri: $path")
+                File(filePath)
+            }
+            else -> File(path)
+        }
+    }
+
+    private fun callRemoveBgApi(inputFile: File) {
+        workPresenter?.removeBg(inputFile) { result ->
+            setLoading(false)
+
+            if (result == null
+                || result.value == null
+                || result.value.url.isNullOrEmpty()) {
+                Toast.makeText(this, "Remove background thất bại", Toast.LENGTH_SHORT).show()
+                return@removeBg
             }
 
-            String resultUrl = result.getValue().getUrl();
-            Glide.with(AiRemoveActivity.this)
-                    .load(resultUrl)
-                    .into(getBinding().imgBackground);
+            val resultUrl = result.value.url
 
-            Toast.makeText(AiRemoveActivity.this,
-                    "Xóa nền thành công", Toast.LENGTH_SHORT).show();
-        });
+            // ✅ Remove BG thành công → chuyển sang AfterRemoveActivity
+            val intent = Intent(this, AfterRemoveActivity::class.java).apply {
+                putExtra(AfterRemoveActivity.EXTRA_SUBJECT_URL, resultUrl)
+            }
+            startActivity(intent)
+            finish()
+        }
     }
-
 }

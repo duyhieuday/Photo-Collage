@@ -7,18 +7,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/bg_color"
-        android:orientation="vertical"
         tools:context=".AiRemoveActivity">
 
+        <!-- Toolbar -->
         <RelativeLayout
             android:id="@+id/layoutBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/dimen_16dp"
-            android:layout_marginTop="44dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_marginTop="44dp">
 
             <ImageView
                 android:id="@+id/btn_back"
@@ -45,15 +42,17 @@
 
         </RelativeLayout>
 
+        <!-- Image preview + loading -->
         <RelativeLayout
             android:id="@+id/rl_container"
             android:layout_width="match_parent"
-            android:layout_height="420dp"
+            android:layout_height="410dp"
             android:layout_below="@+id/layoutBar"
             android:layout_centerInParent="true"
             android:layout_marginHorizontal="@dimen/dimen_16dp"
             android:layout_marginTop="60dp"
-            android:layout_marginBottom="@dimen/dimen_16dp">
+            android:layout_marginBottom="@dimen/dimen_16dp"
+            >
 
             <ImageView
                 android:id="@+id/img_background"
@@ -61,26 +60,25 @@
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
                 android:adjustViewBounds="true"
-                android:scaleType="centerCrop"
-                android:orientation="horizontal" />
+                android:scaleType="fitCenter" />
 
             <ProgressBar
                 android:id="@+id/progress_loading"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_centerInParent="true"
+                android:indeterminate="true"
                 android:visibility="gone" />
 
         </RelativeLayout>
 
+        <!-- Ads -->
         <LinearLayout
             android:id="@+id/layoutAds"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:orientation="vertical"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent">
+            android:orientation="vertical">
 
             <FrameLayout
                 android:id="@+id/ad_view_container"
@@ -93,7 +91,6 @@
                 layout="@layout/banner_ads"
                 android:visibility="visible" />
         </LinearLayout>
-
 
     </RelativeLayout>
 </layout>
