@@ -5,6 +5,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.Toast
 import com.bumptech.glide.Glide
@@ -30,6 +32,13 @@ class AiRemoveActivity : BaseActivityNew<ActivityAiRemoveBinding>() {
     private var imagePath: String? = null
     private var workPresenter: WorkPresenter? = null
     private var isProcessing = false
+    private var bgRemoved = false
+    private var resultUrl: String? = null
+
+    // Handler cho fake progress
+    private val progressHandler = Handler(Looper.getMainLooper())
+    private var progressRunnable: Runnable? = null
+    private var fakeProgress = 0
 
     // ─────────────────────────────────────────────────────────────────────────
     // BaseActivityNew overrides
@@ -66,7 +75,18 @@ class AiRemoveActivity : BaseActivityNew<ActivityAiRemoveBinding>() {
                 Toast.makeText(this, "Chưa có ảnh để xử lý", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            startRemoveBackground()
+
+            if (!bgRemoved) {
+                // Chưa remove BG → bắt đầu xử lý
+                startRemoveBackground()
+            } else {
+                // Đã remove BG → chuyển sang AfterRemoveActivity
+                val intent = Intent(this, AfterRemoveActivity::class.java).apply {
+                    putExtra(AfterRemoveActivity.EXTRA_SUBJECT_URL, resultUrl)
+                }
+                startActivity(intent)
+                finish()
+            }
         }
     }
 
@@ -90,6 +110,7 @@ class AiRemoveActivity : BaseActivityNew<ActivityAiRemoveBinding>() {
 
     override fun onDestroy() {
         workPresenter?.dispose()
+        stopFakeProgress()
         super.onDestroy()
     }
 
@@ -133,19 +154,78 @@ class AiRemoveActivity : BaseActivityNew<ActivityAiRemoveBinding>() {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
+    // UI: Processing / Done
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun showProcessingUI() {
+        binding.llProcessing.visibility = View.VISIBLE
+        binding.tvDone.visibility = View.GONE
+        binding.lottieProcessing.playAnimation()
+        startFakeProgress()
+    }
+
+    private fun showDoneUI() {
+        binding.llProcessing.visibility = View.GONE
+        binding.lottieProcessing.cancelAnimation()
+        binding.tvDone.visibility = View.VISIBLE
+        stopFakeProgress()
+    }
+
+    private fun hideAllOverlay() {
+        binding.llProcessing.visibility = View.GONE
+        binding.lottieProcessing.cancelAnimation()
+        binding.tvDone.visibility = View.GONE
+        stopFakeProgress()
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Fake progress 0 → 95% (chờ API trả về thì lên 100%)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun startFakeProgress() {
+        fakeProgress = 0
+        binding.tvProgress.text = "AI is working on it ...0%"
+
+        progressRunnable = object : Runnable {
+            override fun run() {
+                if (fakeProgress < 95) {
+                    // Tăng nhanh ở đầu, chậm dần về sau
+                    val increment = when {
+                        fakeProgress < 30 -> 3
+                        fakeProgress < 60 -> 2
+                        fakeProgress < 85 -> 1
+                        else -> 1
+                    }
+                    fakeProgress += increment
+                    binding.tvProgress.text = "AI is working on it ...${fakeProgress}%"
+                    progressHandler.postDelayed(this, 150)
+                }
+            }
+        }
+        progressHandler.postDelayed(progressRunnable!!, 150)
+    }
+
+    private fun stopFakeProgress() {
+        progressRunnable?.let { progressHandler.removeCallbacks(it) }
+        progressRunnable = null
+    }
+
+    private fun finishProgress() {
+        // Khi API trả về → nhảy lên 100%
+        stopFakeProgress()
+        fakeProgress = 100
+        binding.tvProgress.text = "AI is working on it ...100%"
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
     // Remove background processing
     // ─────────────────────────────────────────────────────────────────────────
 
-    private fun setLoading(loading: Boolean) {
-        if (isDestroyed || isFinishing) return
-        isProcessing = loading
-        binding.progressLoading.visibility = if (loading) View.VISIBLE else View.GONE
-        binding.btnNext.isEnabled = !loading
-        binding.btnNext.alpha = if (loading) 0.5f else 1f
-    }
-
     private fun startRemoveBackground() {
-        setLoading(true)
+        isProcessing = true
+        binding.btnNext.isEnabled = false
+        binding.btnNext.alpha = 0.5f
+        showProcessingUI()
 
         Thread {
             try {
@@ -153,8 +233,7 @@ class AiRemoveActivity : BaseActivityNew<ActivityAiRemoveBinding>() {
                 runOnUiThread { callRemoveBgApi(inputFile) }
             } catch (e: IOException) {
                 runOnUiThread {
-                    setLoading(false)
-                    Toast.makeText(this, "Không đọc được file ảnh", Toast.LENGTH_SHORT).show()
+                    onProcessingFailed("Không đọc được file ảnh")
                 }
             }
         }.start()
@@ -193,23 +272,43 @@ class AiRemoveActivity : BaseActivityNew<ActivityAiRemoveBinding>() {
 
     private fun callRemoveBgApi(inputFile: File) {
         workPresenter?.removeBg(inputFile) { result ->
-            setLoading(false)
+            if (isDestroyed || isFinishing) return@removeBg
 
             if (result == null
                 || result.value == null
                 || result.value.url.isNullOrEmpty()) {
-                Toast.makeText(this, "Remove background thất bại", Toast.LENGTH_SHORT).show()
+                onProcessingFailed("Remove background thất bại")
                 return@removeBg
             }
 
-            val resultUrl = result.value.url
+            val url = result.value.url
+            resultUrl = url
 
-            // ✅ Remove BG thành công → chuyển sang AfterRemoveActivity
-            val intent = Intent(this, AfterRemoveActivity::class.java).apply {
-                putExtra(AfterRemoveActivity.EXTRA_SUBJECT_URL, resultUrl)
-            }
-            startActivity(intent)
-            finish()
+            // ✅ Hiện progress 100% trước khi load ảnh
+            finishProgress()
+
+            Glide.with(this)
+                .load(url)
+                .into(binding.imgBackground)
+
+            // Đợi 1 chút cho user thấy "100%" rồi mới hiện badge Done
+            progressHandler.postDelayed({
+                if (!isDestroyed && !isFinishing) {
+                    isProcessing = false
+                    bgRemoved = true
+                    binding.btnNext.isEnabled = true
+                    binding.btnNext.alpha = 1f
+                    showDoneUI()
+                }
+            }, 500)
         }
+    }
+
+    private fun onProcessingFailed(message: String) {
+        isProcessing = false
+        binding.btnNext.isEnabled = true
+        binding.btnNext.alpha = 1f
+        hideAllOverlay()
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

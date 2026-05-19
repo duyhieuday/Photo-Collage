@@ -1,13 +1,22 @@
 package com.example.piceditor
 
+import android.Manifest
+import android.content.ContentValues
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.view.View
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.piceditor.adapters.BackgroundAdapter
@@ -30,6 +39,8 @@ import com.example.piceditor.utilsApp.Constant
 import com.example.piceditor.utilsApp.PreferenceUtil
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStreamReader
 
@@ -83,7 +94,31 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
         }
 
         binding.btnNext.setOnClickListener {
-            exportAndProceed()
+            // ✅ Check WRITE permission cho Android 9 trở xuống
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                if (ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Cần quyền lưu trữ để lưu ảnh",
+                        Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+            }
+
+            InterAds.showAdsBreak(this@AfterRemoveActivity) {
+                try {
+                    MainActivity.isFromSaved = true
+                    val bitmap = exportComposite()
+                    val finalUri = saveToGallery(bitmap)
+                    startActivity(Intent(this, ShowImageActivity::class.java).apply {
+                        putExtra("image_uri", finalUri.toString())
+                    })
+                    finish()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Toast.makeText(this, "Lưu ảnh thất bại", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
@@ -116,22 +151,18 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Drawing tắt mặc định
         binding.drawView.setDrawingEnabled(false)
 
-        // Setup
         setupBackgroundList()
         loadImageBeards()
         setUpTab()
 
-        // Đăng ký undo/redo listener
         binding.drawView.drawManager.addDrawInteractListener(this)
         syncUndoRedoUI()
 
         binding.btnUndo.setOnClickListener { getDrawerManager()?.undo() }
         binding.btnRedo.setOnClickListener { getDrawerManager()?.redo() }
 
-        // Load subject (ảnh đã remove BG) lên layer subject
         loadSubjectImage()
     }
 
@@ -146,10 +177,6 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
             return
         }
 
-        // BG mặc định trắng
-        binding.imgBackground.setBackgroundColor(Color.WHITE)
-
-        // Load ảnh transparent vào layer subject
         Glide.with(this).load(subjectUrl).into(binding.imgSubject)
     }
 
@@ -308,7 +335,7 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
     override fun interactUpdateBackground(url: String?) {}
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Export
+    // Export composite — composite cả 3 layer (BG + Subject + DrawView)
     // ─────────────────────────────────────────────────────────────────────────
 
     private fun exportComposite(): Bitmap {
@@ -321,9 +348,59 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
         return bitmap
     }
 
-    private fun exportAndProceed() {
-        val bitmap = exportComposite()
-        // TODO: save bitmap rồi chuyển sang activity tiếp theo (ShowImage, Save, v.v.)
-        Toast.makeText(this, "Export composite (TODO)", Toast.LENGTH_SHORT).show()
+    // ─────────────────────────────────────────────────────────────────────────
+    // Save to gallery — compatible với mọi Android version (copy từ FilterCollageActivity)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun saveToGallery(bitmap: Bitmap): Uri {
+        val fileName = "IMG_${System.currentTimeMillis()}.jpg"
+
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            saveToGalleryQ(bitmap, fileName)
+        } else {
+            saveToGalleryLegacy(bitmap, fileName)
+        }
+    }
+
+    private fun saveToGalleryQ(bitmap: Bitmap, fileName: String): Uri {
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/PhotoCollage")
+            put(MediaStore.Images.Media.IS_PENDING, 1)
+        }
+        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)!!
+        contentResolver.openOutputStream(uri)?.use {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
+        }
+        values.clear()
+        values.put(MediaStore.Images.Media.IS_PENDING, 0)
+        values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+        contentResolver.update(uri, values, null, null)
+        return uri
+    }
+
+    @Suppress("DEPRECATION")
+    private fun saveToGalleryLegacy(bitmap: Bitmap, fileName: String): Uri {
+        val picturesDir = Environment.getExternalStoragePublicDirectory(
+            Environment.DIRECTORY_PICTURES
+        )
+        val collageDir = File(picturesDir, "PhotoCollage")
+        if (!collageDir.exists()) collageDir.mkdirs()
+
+        val file = File(collageDir, fileName)
+        FileOutputStream(file).use { out ->
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+        }
+
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.DATA, file.absolutePath)
+            put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+            put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+        }
+        return contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+            ?: Uri.fromFile(file)
     }
 }

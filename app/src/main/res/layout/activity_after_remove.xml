@@ -59,7 +59,7 @@
                 android:elevation="0dp"
                 android:fontFamily="@font/inter_medium"
                 android:stateListAnimator="@null"
-                android:text="@string/next"
+                android:text="@string/save"
                 android:textAllCaps="false"
                 android:textColor="#B3FF10"
                 android:textSize="14sp" />
@@ -83,7 +83,9 @@
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
                 android:adjustViewBounds="true"
-                android:scaleType="centerCrop" />
+                android:scaleType="centerCrop"
+                android:background="@drawable/img_remove_bg"
+                />
 
             <ImageView
                 android:id="@+id/img_subject"
