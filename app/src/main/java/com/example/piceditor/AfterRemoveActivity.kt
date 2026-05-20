@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -19,6 +20,8 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.example.piceditor.adapters.BackgroundAdapter
 import com.example.piceditor.adapters.ToolAdapter
 import com.example.piceditor.ads.InterAds
@@ -39,6 +42,10 @@ import com.example.piceditor.utilsApp.Constant
 import com.example.piceditor.utilsApp.PreferenceUtil
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.yalantis.ucrop.UCrop
+import com.yalantis.ucrop.UCropFragment
+import com.yalantis.ucrop.UCropFragmentCallback
+import com.yalantis.ucrop.view.GestureCropImageView
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -46,12 +53,14 @@ import java.io.InputStreamReader
 
 class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
     BackgroundAdapter.OnBGClickListener,
-    DrawInteractListener {
+    DrawInteractListener,
+    UCropFragmentCallback {
 
     companion object {
         const val EXTRA_SUBJECT_URL = "subject_url"
         const val TYPE_GESTURE = 0
         const val TYPE_ERASER  = 2
+        private const val CROP_FRAGMENT_TAG = "ucrop_fragment"
     }
 
     private var subjectUrl: String? = null
@@ -66,6 +75,16 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
     // ── Sticker state ─────────────────────────────────────
     private var beardAdapter: BeardAdapter? = null
     private var beardList: MutableList<Beard?>? = null
+
+    // ── Transform state cho imgSubject ────────────────────
+    private var subjectBitmap: Bitmap? = null
+    private var subjectRotation = 0f
+    private var subjectFlipH = false
+    private var subjectFlipV = false
+
+    // ── Crop (UCropFragment nhúng) ────────────────────────
+    private var cropFragment: UCropFragment? = null
+    private var cropDestUri: Uri? = null
 
     // ─────────────────────────────────────────────────────────────────────────
     // BaseActivityNew overrides
@@ -94,7 +113,6 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
         }
 
         binding.btnNext.setOnClickListener {
-            // ✅ Check WRITE permission cho Android 9 trở xuống
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                 if (ContextCompat.checkSelfPermission(this,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -120,6 +138,21 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
                 }
             }
         }
+
+        // ── Crop overlay listeners ──
+        // ── Crop overlay listeners ──
+        binding.cropBtnCancel.setOnClickListener { closeCropOverlay() }
+        binding.cropBtnDone.setOnClickListener { confirmCrop() }
+        binding.cropBtnReset.setOnClickListener { resetCrop() }
+
+        binding.ratioFree.setOnClickListener { selectRatio(it, 0f, 0f) }
+        binding.ratio11.setOnClickListener  { selectRatio(it, 1f, 1f) }
+        binding.ratio45.setOnClickListener  { selectRatio(it, 4f, 5f) }
+        binding.ratio54.setOnClickListener  { selectRatio(it, 5f, 4f) }
+        binding.ratio23.setOnClickListener  { selectRatio(it, 2f, 3f) }
+        binding.ratio916.setOnClickListener { selectRatio(it, 9f, 16f) }
+        binding.ratio169.setOnClickListener { selectRatio(it, 16f, 9f) }
+        binding.ratio12.setOnClickListener  { selectRatio(it, 1f, 2f) }
     }
 
     override fun initFragment(): BaseFragment<*>? = null
@@ -141,6 +174,10 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
     }
 
     override fun onBackPressed() {
+        if (binding.flCropContainer.visibility == View.VISIBLE) {
+            closeCropOverlay()
+            return
+        }
         InterAds.showAdsBreak(this) { super.onBackPressed() }
     }
 
@@ -177,7 +214,238 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
             return
         }
 
-        Glide.with(this).load(subjectUrl).into(binding.imgSubject)
+        Glide.with(this)
+            .asBitmap()
+            .load(subjectUrl)
+            .into(object : CustomTarget<Bitmap>() {
+                override fun onResourceReady(
+                    resource: Bitmap,
+                    transition: Transition<in Bitmap>?
+                ) {
+                    subjectBitmap = resource
+                    binding.imgSubject.setImageBitmap(resource)
+                    binding.imgSubject.post { applySubjectTransform() }
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {}
+            })
+    }
+
+    private fun loadCroppedSubject(uri: Uri) {
+        Glide.with(this)
+            .asBitmap()
+            .load(uri)
+            .skipMemoryCache(true)
+            .into(object : CustomTarget<Bitmap>() {
+                override fun onResourceReady(
+                    resource: Bitmap,
+                    transition: Transition<in Bitmap>?
+                ) {
+                    subjectBitmap = resource
+                    binding.imgSubject.setImageBitmap(resource)
+                    subjectRotation = 0f
+                    subjectFlipH = false
+                    subjectFlipV = false
+                    binding.imgSubject.post { applySubjectTransform() }
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {}
+            })
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Transform: rotate + flip
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun applySubjectTransform() {
+        val bmp = subjectBitmap ?: return
+        val viewW = binding.imgSubject.width.toFloat()
+        val viewH = binding.imgSubject.height.toFloat()
+        if (viewW <= 0f || viewH <= 0f) return
+
+        val matrix = Matrix()
+
+        val scale = minOf(viewW / bmp.width, viewH / bmp.height)
+        val dx = (viewW - bmp.width * scale) / 2f
+        val dy = (viewH - bmp.height * scale) / 2f
+        matrix.postScale(scale, scale)
+        matrix.postTranslate(dx, dy)
+
+        val cx = viewW / 2f
+        val cy = viewH / 2f
+
+        val rotated90 = (subjectRotation % 180f) != 0f
+        val flipH = if (rotated90) subjectFlipV else subjectFlipH
+        val flipV = if (rotated90) subjectFlipH else subjectFlipV
+
+        val sx = if (flipH) -1f else 1f
+        val sy = if (flipV) -1f else 1f
+        if (sx != 1f || sy != 1f) {
+            matrix.postScale(sx, sy, cx, cy)
+        }
+
+        if (subjectRotation != 0f) {
+            matrix.postRotate(subjectRotation, cx, cy)
+        }
+
+        binding.imgSubject.imageMatrix = matrix
+        binding.imgSubject.invalidate()
+    }
+
+    private fun rotateSubject() {
+        subjectRotation = (subjectRotation + 90f) % 360f
+        applySubjectTransform()
+    }
+
+    private fun flipSubjectHorizontal() {
+        subjectFlipH = !subjectFlipH
+        applySubjectTransform()
+    }
+
+    private fun flipSubjectVertical() {
+        subjectFlipV = !subjectFlipV
+        applySubjectTransform()
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Crop — nhúng UCropFragment vào overlay
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun openCropOverlay() {
+        val bmp = subjectBitmap
+        if (bmp == null) {
+            Toast.makeText(this, "Chưa có ảnh để crop", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val srcFile = File(cacheDir, "crop_src_${System.currentTimeMillis()}.png")
+        try {
+            FileOutputStream(srcFile).use {
+                bmp.compress(Bitmap.CompressFormat.PNG, 100, it)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Không chuẩn bị được ảnh", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val srcUri = Uri.fromFile(srcFile)
+        val destFile = File(cacheDir, "crop_dest_${System.currentTimeMillis()}.png")
+        cropDestUri = Uri.fromFile(destFile)
+
+        val options = UCrop.Options().apply {
+            setCompressionFormat(Bitmap.CompressFormat.PNG)
+            setCompressionQuality(100)
+            setHideBottomControls(true)
+            setFreeStyleCropEnabled(true)
+            setShowCropGrid(true)
+            setShowCropFrame(true)
+            setActiveControlsWidgetColor(Color.parseColor("#039855"))
+            setRootViewBackgroundColor(Color.parseColor("#FFFFFF"))
+            setCropFrameColor(Color.parseColor("#039855"))
+            setCropGridColor(Color.parseColor("#80FFFFFF"))
+            setDimmedLayerColor(Color.parseColor("#99000000"))
+        }
+
+        val uCrop = UCrop.of(srcUri, cropDestUri!!).withOptions(options)
+        val fragment = uCrop.getFragment(uCrop.getIntent(this).extras!!)
+        cropFragment = fragment
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.crop_fragment_container, fragment, CROP_FRAGMENT_TAG)
+            .commitAllowingStateLoss()
+
+        binding.flCropContainer.visibility = View.VISIBLE
+
+        // Mặc định chọn Free — đợi fragment gắn xong rồi mới áp
+        binding.flCropContainer.post {
+            selectRatio(binding.ratioFree, 0f, 0f)
+        }
+    }
+
+    private fun closeCropOverlay() {
+        binding.flCropContainer.visibility = View.GONE
+        cropFragment?.let {
+            supportFragmentManager.beginTransaction()
+                .remove(it)
+                .commitAllowingStateLoss()
+        }
+        cropFragment = null
+    }
+
+    private fun confirmCrop() {
+        cropFragment?.cropAndSaveImage()
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Lấy GestureCropImageView bên trong UCropFragment bằng reflection
+    // (UCropFragment 2.2.10 không expose public)
+    // ─────────────────────────────────────────────────────────────────────────
+    private fun getCropImageView(): GestureCropImageView? {
+        val fragment = cropFragment ?: return null
+        return try {
+            val field = UCropFragment::class.java.getDeclaredField("mGestureCropImageView")
+            field.isAccessible = true
+            field.get(fragment) as? GestureCropImageView
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    private fun selectRatio(view: View, ratioX: Float, ratioY: Float) {
+        // Reset selected tất cả 8 item
+        binding.ratioFree.isSelected = false
+        binding.ratio11.isSelected   = false
+        binding.ratio45.isSelected   = false
+        binding.ratio54.isSelected   = false
+        binding.ratio23.isSelected   = false
+        binding.ratio916.isSelected  = false
+        binding.ratio169.isSelected  = false
+        binding.ratio12.isSelected   = false
+        view.isSelected = true
+
+        val cropImageView = getCropImageView() ?: return
+
+        if (ratioX == 0f || ratioY == 0f) {
+            cropImageView.targetAspectRatio = 0f
+        } else {
+            cropImageView.targetAspectRatio = ratioX / ratioY
+        }
+        cropImageView.setImageToWrapCropBounds()
+    }
+
+    private fun resetCrop() {
+        // Về tỉ lệ Free + reset khung crop về full ảnh
+        val cropImageView = getCropImageView() ?: return
+        cropImageView.targetAspectRatio = 0f
+        cropImageView.setImageToWrapCropBounds()
+
+        // Reset trạng thái selected của thanh tỉ lệ về Free
+        selectRatio(binding.ratioFree, 0f, 0f)
+    }
+
+    // ── UCropFragmentCallback ──
+    override fun loadingProgress(showLoader: Boolean) {
+        // uCrop đang xử lý — show/hide loading nếu muốn
+    }
+
+    override fun onCropFinish(result: UCropFragment.UCropResult?) {
+        if (result == null) {
+            closeCropOverlay()
+            return
+        }
+        if (result.mResultCode == RESULT_OK) {
+            val uri = result.mResultData?.let { UCrop.getOutput(it) } ?: cropDestUri
+            if (uri != null) {
+                loadCroppedSubject(uri)
+            }
+        } else if (result.mResultCode == UCrop.RESULT_ERROR) {
+            val err = result.mResultData?.let { UCrop.getError(it) }
+            err?.printStackTrace()
+            Toast.makeText(this, "Crop thất bại", Toast.LENGTH_SHORT).show()
+        }
+        closeCropOverlay()
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -189,13 +457,16 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
             ToolItem(R.drawable.ic_background, getString(R.string.background)),
             ToolItem(R.drawable.ic_sticker,    getString(R.string.sticker)),
             ToolItem(R.drawable.ic_text,       getString(R.string.text)),
+            ToolItem(R.drawable.ic_unselect,  getString(R.string.transform)),
+            ToolItem(R.drawable.ic_crop,       getString(R.string.crop)),
         )
 
         val adapter = ToolAdapter(tools) { _, pos ->
-            binding.llBg.visibility      = View.GONE
-            binding.llSticker.visibility = View.GONE
-            binding.llDraw.visibility    = View.GONE
-            binding.rcvTools.visibility  = View.GONE
+            binding.llBg.visibility        = View.GONE
+            binding.llSticker.visibility   = View.GONE
+            binding.llDraw.visibility      = View.GONE
+            binding.llTransform.visibility = View.GONE
+            binding.rcvTools.visibility    = View.GONE
 
             when (pos) {
                 0 -> { // Background
@@ -239,6 +510,26 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
                     }
                     updateDraw()
                     syncUndoRedoUI()
+                }
+
+                3 -> { // Transform
+                    binding.llTransform.visibility = View.VISIBLE
+                    binding.drawView.setDrawingEnabled(false)
+
+                    binding.btnRotateLeft.setOnClickListener { rotateSubject() }
+                    binding.btnFlipH.setOnClickListener { flipSubjectHorizontal() }
+                    binding.btnFlipV.setOnClickListener { flipSubjectVertical() }
+
+                    binding.icCheckTransform.setOnClickListener {
+                        binding.llTransform.visibility = View.GONE
+                        binding.rcvTools.visibility = View.VISIBLE
+                    }
+                }
+
+                4 -> { // Crop — mở overlay nhúng UCropFragment
+                    binding.rcvTools.visibility = View.VISIBLE
+                    binding.drawView.setDrawingEnabled(false)
+                    openCropOverlay()
                 }
             }
         }
@@ -335,7 +626,7 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
     override fun interactUpdateBackground(url: String?) {}
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Export composite — composite cả 3 layer (BG + Subject + DrawView)
+    // Export composite
     // ─────────────────────────────────────────────────────────────────────────
 
     private fun exportComposite(): Bitmap {
@@ -349,12 +640,11 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Save to gallery — compatible với mọi Android version (copy từ FilterCollageActivity)
+    // Save to gallery
     // ─────────────────────────────────────────────────────────────────────────
 
     private fun saveToGallery(bitmap: Bitmap): Uri {
         val fileName = "IMG_${System.currentTimeMillis()}.jpg"
-
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             saveToGalleryQ(bitmap, fileName)
         } else {

@@ -167,14 +167,14 @@ public class WeatherApplication extends Application{
     }
 
     private static void LogTroasFirebaseAdImpression(double tRoasCache, String currency) {
-        try {
-            Bundle bundle = new Bundle();
-            bundle.putDouble(FirebaseAnalytics.Param.VALUE, tRoasCache);//(Required)tROAS event must include Double Value
-            bundle.putString(FirebaseAnalytics.Param.CURRENCY, currency);//put in the correct currency
-            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.AD_IMPRESSION, bundle);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Bundle bundle = new Bundle();
+//            bundle.putDouble(FirebaseAnalytics.Param.VALUE, tRoasCache);//(Required)tROAS event must include Double Value
+//            bundle.putString(FirebaseAnalytics.Param.CURRENCY, currency);//put in the correct currency
+//            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.AD_IMPRESSION, bundle);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
 
@@ -191,12 +191,12 @@ public class WeatherApplication extends Application{
 
         @Override
         public void onActivityResumed(Activity activity) {
-//            Adjust.onResume();
+            Adjust.onResume();
         }
 
         @Override
         public void onActivityPaused(Activity activity) {
-//            Adjust.onPause();
+            Adjust.onPause();
         }
 
         @Override

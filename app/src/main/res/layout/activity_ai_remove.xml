@@ -60,7 +60,6 @@
                 android:layout_centerInParent="true"
                 android:adjustViewBounds="true"
                 android:scaleType="fitCenter"
-                android:src="@drawable/img_remove_bg"
                 />
 
             <!-- Lottie animation + text khi đang processing -->

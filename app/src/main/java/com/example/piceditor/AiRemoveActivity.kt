@@ -22,6 +22,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
+import androidx.core.net.toUri
+import androidx.core.graphics.toColorInt
 
 class AiRemoveActivity : BaseActivityNew<ActivityAiRemoveBinding>() {
 
@@ -80,12 +82,14 @@ class AiRemoveActivity : BaseActivityNew<ActivityAiRemoveBinding>() {
                 // Chưa remove BG → bắt đầu xử lý
                 startRemoveBackground()
             } else {
-                // Đã remove BG → chuyển sang AfterRemoveActivity
-                val intent = Intent(this, AfterRemoveActivity::class.java).apply {
-                    putExtra(AfterRemoveActivity.EXTRA_SUBJECT_URL, resultUrl)
+                InterAds.showAdsBreak(this@AiRemoveActivity) {
+                    // Đã remove BG → chuyển sang AfterRemoveActivity
+                    val intent = Intent(this, AfterRemoveActivity::class.java).apply {
+                        putExtra(AfterRemoveActivity.EXTRA_SUBJECT_URL, resultUrl)
+                    }
+                    startActivity(intent)
+                    finish()
                 }
-                startActivity(intent)
-                finish()
             }
         }
     }
@@ -95,7 +99,7 @@ class AiRemoveActivity : BaseActivityNew<ActivityAiRemoveBinding>() {
     override fun afterSetContentView() {
         super.afterSetContentView()
         BarsUtils.setHideNavigation(this)
-        BarsUtils.setStatusBarColor(this, Color.parseColor("#01000000"))
+        BarsUtils.setStatusBarColor(this, "#01000000".toColorInt())
         BarsUtils.setAppearanceLightStatusBars(this, true)
     }
 
@@ -145,7 +149,7 @@ class AiRemoveActivity : BaseActivityNew<ActivityAiRemoveBinding>() {
         }
 
         val source: Any = if (path.startsWith("content://") || path.startsWith("file://")) {
-            Uri.parse(path)
+            path.toUri()
         } else {
             File(path)
         }
@@ -233,7 +237,7 @@ class AiRemoveActivity : BaseActivityNew<ActivityAiRemoveBinding>() {
                 runOnUiThread { callRemoveBgApi(inputFile) }
             } catch (e: IOException) {
                 runOnUiThread {
-                    onProcessingFailed("Không đọc được file ảnh")
+                    onProcessingFailed(getString(R.string.unable_to_read_image_file))
                 }
             }
         }.start()
@@ -245,7 +249,7 @@ class AiRemoveActivity : BaseActivityNew<ActivityAiRemoveBinding>() {
 
         return when {
             path.startsWith("content://") -> {
-                val uri = Uri.parse(path)
+                val uri = path.toUri()
                 val resolver: ContentResolver = contentResolver
                 val outFile = File(
                     cacheDir,
@@ -263,7 +267,7 @@ class AiRemoveActivity : BaseActivityNew<ActivityAiRemoveBinding>() {
                 outFile
             }
             path.startsWith("file://") -> {
-                val filePath = Uri.parse(path).path ?: throw IOException("Invalid file uri: $path")
+                val filePath = path.toUri().path ?: throw IOException("Invalid file uri: $path")
                 File(filePath)
             }
             else -> File(path)
@@ -277,7 +281,7 @@ class AiRemoveActivity : BaseActivityNew<ActivityAiRemoveBinding>() {
             if (result == null
                 || result.value == null
                 || result.value.url.isNullOrEmpty()) {
-                onProcessingFailed("Remove background thất bại")
+                onProcessingFailed(getString(R.string.background_removal_failed))
                 return@removeBg
             }
 

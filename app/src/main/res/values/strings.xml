@@ -153,5 +153,11 @@
     <string name="make_another">✨ Make Another</string>
     <string name="image_not_ready">Image not ready, please wait</string>
     <string name="app_not_installed">App not installed</string>
+    <string name="unable_to_read_image_file">Unable to read image file</string>
+    <string name="background_removal_failed">Background removal failed</string>
+    <string name="transform">Transform</string>
+    <string name="flip_horizontal">Flip H</string>
+    <string name="flip_vertical">Flip V</string>
+    <string name="crop_free">Free</string>
 
 </resources>
