@@ -159,5 +159,12 @@
     <string name="flip_horizontal">Flip H</string>
     <string name="flip_vertical">Flip V</string>
     <string name="crop_free">Free</string>
+    <string name="brush_size">Size</string>
+    <string name="add_text">Add Text</string>
+    <string name="type_something">Type something…</string>
+    <string name="font">Font</string>
+    <string name="color">Color</string>
+    <string name="draw">Draw</string>
+    <string name="please_enter_the_content">Please enter the content.</string>
 
 </resources>

@@ -1,30 +1,44 @@
 package com.example.piceditor
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
+import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Rect
+import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.SystemClock
+import android.text.Layout
+import android.text.StaticLayout
+import android.text.TextPaint
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewTreeObserver
+import android.view.Window
+import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.SeekBar
+import android.widget.Toast
 import androidx.annotation.IntDef
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.FileProvider
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.piceditor.adapters.BackgroundAdapter
+import com.example.piceditor.adapters.ColorAdapter
+import com.example.piceditor.adapters.FontAdapter
+import com.example.piceditor.adapters.FontItem
 import com.example.piceditor.adapters.FrameAdapter
 import com.example.piceditor.adapters.ToolAdapter
 import com.example.piceditor.ads.Callback
@@ -51,13 +65,18 @@ import com.example.piceditor.utilsApp.Constant
 import com.example.piceditor.utilsApp.PreferenceUtil
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.yalantis.ucrop.UCrop
+import com.yalantis.ucrop.UCropFragment
+import com.yalantis.ucrop.UCropFragmentCallback
+import com.yalantis.ucrop.view.GestureCropImageView
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStreamReader
 
 open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnClickListener,
-    FrameAdapter.OnFrameClickListener, BackgroundAdapter.OnBGClickListener, DrawInteractListener {
+    FrameAdapter.OnFrameClickListener, BackgroundAdapter.OnBGClickListener, DrawInteractListener,
+    UCropFragmentCallback {
 
     var mFramePhotoLayout: FramePhotoLayout? = null
     var DEFAULT_SPACE: Float = 0.0f
@@ -88,6 +107,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         const val TYPE_GESTURE = 0
         const val TYPE_SHAPE = 1
         const val TYPE_ERASER = 2
+        private const val CROP_FRAGMENT_TAG = "ucrop_fragment"
     }
 
     @Retention(AnnotationRetention.SOURCE)
@@ -105,6 +125,18 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
     private var shapeBrushStyle: BrushStyle = BrushStyle.HEART
     var isDrawingMode = false
 
+    // ── Transform state (áp lúc export) ──
+    private var outputRotation = 0f
+    private var outputFlipH = false
+    private var outputFlipV = false
+
+    // ── Crop ──
+    private var cropFragment: UCropFragment? = null
+    private var cropDestUri: Uri? = null
+
+    // ── Draw panel init flag ──
+    private var drawPanelInitialized = false
+
     fun getDrawerManager(): DrawerManager? {
         if (drawerManager == null) {
             drawerManager = binding.drawView.drawManager
@@ -118,24 +150,18 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // ✅ Đồng bộ visual undo/redo — gọi từ MỌI nơi thay đổi stack
-    //
-    // DrawerManager.undo/redo đã dùng timestamp để quyết định undo cái nào
-    // (canvas hay sticker) → stack thực tế đã chung sẵn.
-    // Hàm này chỉ cần phản ánh đúng trạng thái lên UI.
+    // Đồng bộ visual undo/redo
     // ─────────────────────────────────────────────────────────────────────────
     private fun syncUndoRedoUI() {
         val manager = getDrawerManager() ?: return
         val canUndo = manager.isActiveUndo
         val canRedo = manager.isActiveRedo
 
-        // Undo
         binding.btnUndo.isEnabled = canUndo
         binding.btnUndo.alpha     = if (canUndo) 1f else 0.3f
         binding.btnUndo.colorFilter = if (canUndo) null
         else ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
 
-        // Redo
         binding.btnRedo.isEnabled = canRedo
         binding.btnRedo.alpha     = if (canRedo) 1f else 0.3f
         binding.btnRedo.colorFilter = if (canRedo) null
@@ -146,8 +172,6 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
     // DrawInteractListener callbacks
     // ─────────────────────────────────────────────────────────────────────────
 
-    // ✅ Callback này được DrawerManager gọi SAU MỖI thao tác
-    // (vẽ nét, thêm/xóa sticker, undo, redo) → update UI tự động
     override fun interactUndoRedoChange() {
         syncUndoRedoUI()
     }
@@ -249,6 +273,10 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
     }
 
     override fun onBackPressed() {
+        if (binding.flCropContainer.visibility == View.VISIBLE) {
+            closeCropOverlay()
+            return
+        }
         super.onBackPressed()
         InterAds.showAdsBreak(this@CollageActivity) { finish() }
     }
@@ -324,21 +352,283 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
 
         binding.btnNext.setOnClickListener(this)
 
-        // ✅ Đăng ký listener — DrawerManager sẽ gọi interactUndoRedoChange()
-        // mỗi khi stack thay đổi (vẽ, sticker, undo, redo)
         binding.drawView.drawManager.addDrawInteractListener(this)
 
-        // ✅ Khởi tạo UI ban đầu: cả 2 nút mờ vì chưa có gì
         syncUndoRedoUI()
 
         binding.btnUndo.setOnClickListener {
             getDrawerManager()?.undo()
-            // syncUndoRedoUI() sẽ được gọi tự động qua interactUndoRedoChange()
         }
 
         binding.btnRedo.setOnClickListener {
             getDrawerManager()?.redo()
-            // syncUndoRedoUI() sẽ được gọi tự động qua interactUndoRedoChange()
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Add Text — nhập text, chọn font + màu, render thành sticker ảnh
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun showAddTextDialog() {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        val view = LayoutInflater.from(this).inflate(R.layout.dialog_input_text, null)
+        dialog.setContentView(view)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.9f).toInt(),
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
+        val edtText  = view.findViewById<EditText>(R.id.dlg_edit_text)
+        val tvCancel = view.findViewById<AppCompatTextView>(R.id.dlg_cancel)
+        val tvDone   = view.findViewById<AppCompatTextView>(R.id.dlg_done)
+        val listColor = view.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.dlg_list_color)
+        val listFont  = view.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.dlg_list_font)
+
+        var pickedColor = Color.BLACK
+        var pickedTypeface: Typeface? = null
+
+        listColor.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        listColor.adapter = ColorAdapter { c ->
+            pickedColor = c
+            edtText.setTextColor(c)
+        }
+
+        // Font — sửa cho khớp font thật trong res/font/
+        val fonts = listOf(
+            FontItem("Default", R.font.geistmono_regular),
+            FontItem("Bold",    R.font.handlee_regular),
+            FontItem("Poppins", R.font.herdrock),
+            FontItem("Semi",    R.font.holtwoodonesc_regular),
+            FontItem("Default", R.font.imperialscript_regular),
+            FontItem("Bold",    R.font.indieflower_regular),
+            FontItem("Poppins", R.font.inter_18pt_medium),
+            FontItem("Semi",    R.font.jersey15_regular),
+            FontItem("Poppins", R.font.kiss_boom),
+            FontItem("Semi",    R.font.limelight_regular),
+        )
+        val fontAdapter = FontAdapter(this, fonts) { tf ->
+            pickedTypeface = tf
+            edtText.typeface = tf
+        }
+        listFont.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        listFont.adapter = fontAdapter
+        pickedTypeface = fontAdapter.getSelectedTypeface()
+
+        tvCancel.setOnClickListener { dialog.dismiss() }
+
+        tvDone.setOnClickListener {
+            val text = edtText.text?.toString()?.trim().orEmpty()
+            if (text.isEmpty()) {
+                Toast.makeText(this, "Hãy nhập nội dung", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            dialog.dismiss()
+            addTextAsSticker(text, pickedColor, pickedTypeface)
+        }
+
+        dialog.show()
+    }
+
+    private fun addTextAsSticker(text: String, textColor: Int, typeface: Typeface?) {
+        try {
+            val bitmap = renderTextToBitmap(text, textColor, typeface)
+            val file = File(cacheDir, "text_sticker_${System.currentTimeMillis()}.png")
+            FileOutputStream(file).use {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+            }
+            getDrawerManager()?.addSticker(StickerData(file.absolutePath))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Không tạo được text", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun renderTextToBitmap(text: String, textColor: Int, typeface: Typeface?): Bitmap {
+        val textPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
+            this.color = textColor
+            this.typeface = typeface ?: Typeface.DEFAULT
+            textSize = 120f
+        }
+
+        val padding = 40
+        val maxLineWidth = text.split("\n")
+            .maxOf { textPaint.measureText(it) }
+            .toInt()
+        val layoutWidth = maxLineWidth.coerceAtLeast(1)
+
+        val staticLayout = StaticLayout.Builder
+            .obtain(text, 0, text.length, textPaint, layoutWidth)
+            .setAlignment(Layout.Alignment.ALIGN_CENTER)
+            .build()
+
+        val bmpW = layoutWidth + padding * 2
+        val bmpH = staticLayout.height + padding * 2
+
+        val bitmap = Bitmap.createBitmap(bmpW, bmpH, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        canvas.translate(padding.toFloat(), padding.toFloat())
+        staticLayout.draw(canvas)
+
+        return bitmap
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Setup SeekBar size + dãy màu cho tab Draw
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun setupDrawPanel() {
+        if (drawPanelInitialized) return
+        drawPanelInitialized = true
+
+        binding.seekbarBrushSize.progress = gestureSize.toInt()
+        binding.tvBrushSize.text = gestureSize.toInt().toString()
+        binding.seekbarBrushSize.setOnSeekBarChangeListener(
+            object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
+                    val size = progress.coerceAtLeast(2).toFloat()
+                    if (type == TYPE_GESTURE) {
+                        gestureSize = size
+                    } else {
+                        eraserSize = size
+                    }
+                    binding.tvBrushSize.text = size.toInt().toString()
+                    updateDraw()
+                }
+                override fun onStartTrackingTouch(sb: SeekBar?) {}
+                override fun onStopTrackingTouch(sb: SeekBar?) {}
+            }
+        )
+
+        binding.listBrushColor.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.listBrushColor.adapter = ColorAdapter { c ->
+            color = c
+            updateDraw()
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Transform — áp rotate/flip lên bitmap output
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun applyTransform(src: Bitmap): Bitmap {
+        if (outputRotation == 0f && !outputFlipH && !outputFlipV) return src
+
+        val matrix = Matrix()
+        if (outputFlipH || outputFlipV) {
+            matrix.postScale(
+                if (outputFlipH) -1f else 1f,
+                if (outputFlipV) -1f else 1f,
+                src.width / 2f, src.height / 2f
+            )
+        }
+        if (outputRotation != 0f) {
+            matrix.postRotate(outputRotation, src.width / 2f, src.height / 2f)
+        }
+        return Bitmap.createBitmap(src, 0, 0, src.width, src.height, matrix, true)
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Crop — render cả tấm → uCrop overlay → sang FilterCollageActivity
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun openCropOverlay() {
+        val bmp = try {
+            createOutputImage()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            Toast.makeText(this, "Không tạo được ảnh", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val srcFile = File(cacheDir, "crop_src_${System.currentTimeMillis()}.jpg")
+        try {
+            FileOutputStream(srcFile).use { bmp.compress(Bitmap.CompressFormat.JPEG, 95, it) }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Không chuẩn bị được ảnh", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val srcUri = Uri.fromFile(srcFile)
+        val destFile = File(cacheDir, "crop_dest_${System.currentTimeMillis()}.jpg")
+        cropDestUri = Uri.fromFile(destFile)
+
+        val options = UCrop.Options().apply {
+            setCompressionFormat(Bitmap.CompressFormat.JPEG)
+            setCompressionQuality(95)
+            setHideBottomControls(true)
+            setFreeStyleCropEnabled(true)
+            setShowCropGrid(true)
+            setShowCropFrame(true)
+            setActiveControlsWidgetColor(Color.parseColor("#039855"))
+            setRootViewBackgroundColor(Color.parseColor("#FFFFFF"))
+            setCropFrameColor(Color.parseColor("#039855"))
+            setCropGridColor(Color.parseColor("#80FFFFFF"))
+            setDimmedLayerColor(Color.parseColor("#99000000"))
+        }
+
+        val uCrop = UCrop.of(srcUri, cropDestUri!!).withOptions(options)
+        val fragment = uCrop.getFragment(uCrop.getIntent(this).extras!!)
+        cropFragment = fragment
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.crop_fragment_container, fragment, CROP_FRAGMENT_TAG)
+            .commitAllowingStateLoss()
+
+        binding.flCropContainer.visibility = View.VISIBLE
+
+        binding.cropBtnCancel.setOnClickListener { closeCropOverlay() }
+        binding.cropBtnDone.setOnClickListener { cropFragment?.cropAndSaveImage() }
+        binding.cropBtnReset.setOnClickListener {
+            getCropImageView()?.setImageToWrapCropBounds()
+        }
+    }
+
+    private fun getCropImageView(): GestureCropImageView? {
+        val fragment = cropFragment ?: return null
+        return try {
+            val field = UCropFragment::class.java.getDeclaredField("mGestureCropImageView")
+            field.isAccessible = true
+            field.get(fragment) as? GestureCropImageView
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    private fun closeCropOverlay() {
+        binding.flCropContainer.visibility = View.GONE
+        cropFragment?.let {
+            supportFragmentManager.beginTransaction().remove(it).commitAllowingStateLoss()
+        }
+        cropFragment = null
+    }
+
+    // ── UCropFragmentCallback ──
+    override fun loadingProgress(showLoader: Boolean) {}
+
+    override fun onCropFinish(result: UCropFragment.UCropResult?) {
+        if (result == null) { closeCropOverlay(); return }
+        if (result.mResultCode == RESULT_OK) {
+            val uri = result.mResultData?.let { UCrop.getOutput(it) } ?: cropDestUri
+            closeCropOverlay()
+            if (uri != null) {
+                InterAds.showAdsBreak(this@CollageActivity) {
+                    startActivity(Intent(this, FilterCollageActivity::class.java).apply {
+                        putExtra("image_uri", uri.toString())
+                    })
+                    finish()
+                }
+            }
+        } else if (result.mResultCode == UCrop.RESULT_ERROR) {
+            result.mResultData?.let { UCrop.getError(it) }?.printStackTrace()
+            Toast.makeText(this, "Crop thất bại", Toast.LENGTH_SHORT).show()
+            closeCropOverlay()
         }
     }
 
@@ -358,18 +648,22 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
             ToolItem(R.drawable.ic_border,     getString(R.string.border)),
             ToolItem(R.drawable.ic_sticker,    getString(R.string.sticker)),
             ToolItem(R.drawable.ic_background, getString(R.string.background)),
+            ToolItem(R.drawable.ic_draw,       getString(R.string.draw)),
             ToolItem(R.drawable.ic_text,       getString(R.string.text)),
+            ToolItem(R.drawable.ic_transform,  getString(R.string.transform)),
+            ToolItem(R.drawable.ic_crop,       getString(R.string.crop)),
         )
 
         val adapter = ToolAdapter(tools) { _, pos ->
             // Ẩn tất cả panel
-            binding.llFrame.visibility   = View.GONE
-            binding.llBorder.visibility  = View.GONE
-            binding.llBg.visibility      = View.GONE
-            binding.llSticker.visibility = View.GONE
-            binding.llDraw.visibility    = View.GONE
-            binding.llRatio.visibility   = View.GONE
-            binding.rcvTools.visibility  = View.GONE
+            binding.llFrame.visibility     = View.GONE
+            binding.llBorder.visibility    = View.GONE
+            binding.llBg.visibility        = View.GONE
+            binding.llSticker.visibility   = View.GONE
+            binding.llDraw.visibility      = View.GONE
+            binding.llRatio.visibility     = View.GONE
+            binding.llTransform.visibility = View.GONE
+            binding.rcvTools.visibility    = View.GONE
 
             when (pos) {
                 0 -> { // Layout
@@ -400,7 +694,6 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                         binding.drawView.setDrawingEnabled(false)
                     }
                     binding.drawView.setDrawingEnabled(true)
-                    // ✅ Sync lại UI khi vào tab sticker
                     syncUndoRedoUI()
                 }
 
@@ -413,18 +706,24 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                     binding.drawView.setDrawingEnabled(false)
                 }
 
-                4 -> { // Text / Draw
+                4 -> { // Draw
                     binding.llDraw.visibility = View.VISIBLE
+                    setupDrawPanel()
+
                     binding.icBrush.setOnClickListener {
                         binding.icBrush.setBackgroundResource(R.drawable.bg_icon_draw)
                         binding.icErase.setBackgroundResource(0)
                         type = TYPE_GESTURE
+                        binding.seekbarBrushSize.progress = gestureSize.toInt()
+                        binding.tvBrushSize.text = gestureSize.toInt().toString()
                         updateDraw()
                     }
                     binding.icErase.setOnClickListener {
                         binding.icErase.setBackgroundResource(R.drawable.bg_icon_draw)
                         binding.icBrush.setBackgroundResource(0)
                         type = TYPE_ERASER
+                        binding.seekbarBrushSize.progress = eraserSize.toInt()
+                        binding.tvBrushSize.text = eraserSize.toInt().toString()
                         updateDraw()
                     }
                     binding.icCheckDraw.setOnClickListener {
@@ -433,18 +732,41 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                         binding.drawView.setDrawingEnabled(false)
                     }
                     updateDraw()
-                    // ✅ Sync lại UI khi vào tab draw
                     syncUndoRedoUI()
                 }
 
-                5 -> { // Ratio
-                    binding.llRatio.visibility = View.VISIBLE
-                    binding.btnRotate.setOnClickListener { }
-                    binding.icCheckRatio.setOnClickListener {
-                        binding.llRatio.visibility = View.GONE
+                5 -> { // Text
+                    binding.rcvTools.visibility = View.VISIBLE
+                    binding.drawView.setDrawingEnabled(false)
+                    showAddTextDialog()
+                }
+
+                6 -> { // Transform
+                    binding.llTransform.visibility = View.VISIBLE
+                    binding.drawView.setDrawingEnabled(false)
+
+                    binding.btnRotateLeft.setOnClickListener {
+                        outputRotation = (outputRotation + 90f) % 360f
+                        Toast.makeText(this, "Rotate ${outputRotation.toInt()}°", Toast.LENGTH_SHORT).show()
+                    }
+                    binding.btnFlipH.setOnClickListener {
+                        outputFlipH = !outputFlipH
+                        Toast.makeText(this, "Flip H: $outputFlipH", Toast.LENGTH_SHORT).show()
+                    }
+                    binding.btnFlipV.setOnClickListener {
+                        outputFlipV = !outputFlipV
+                        Toast.makeText(this, "Flip V: $outputFlipV", Toast.LENGTH_SHORT).show()
+                    }
+                    binding.icCheckTransform.setOnClickListener {
+                        binding.llTransform.visibility = View.GONE
                         binding.rcvTools.visibility = View.VISIBLE
                     }
+                }
+
+                7 -> { // Crop
+                    binding.rcvTools.visibility = View.VISIBLE
                     binding.drawView.setDrawingEnabled(false)
+                    openCropOverlay()
                 }
             }
         }
@@ -564,7 +886,8 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         }
         canvas.drawBitmap(template, 0f, 0f, paint)
         canvas.drawBitmap(getBitmapFromView(binding.drawView), 0f, 0f, paint)
-        return result
+
+        return applyTransform(result)
     }
 
     fun getBitmapFromView(view: View): Bitmap {

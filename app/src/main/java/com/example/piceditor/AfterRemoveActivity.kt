@@ -1,6 +1,7 @@
 package com.example.piceditor
 
 import android.Manifest
+import android.app.Dialog
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -8,6 +9,8 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Matrix
+import android.graphics.Paint
+import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -15,14 +18,25 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.text.Layout
+import android.text.StaticLayout
+import android.text.TextPaint
+import android.view.LayoutInflater
 import android.view.View
+import android.view.Window
+import android.widget.EditText
+import android.widget.SeekBar
 import android.widget.Toast
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.example.piceditor.adapters.BackgroundAdapter
+import com.example.piceditor.adapters.ColorAdapter
+import com.example.piceditor.adapters.FontAdapter
+import com.example.piceditor.adapters.FontItem
 import com.example.piceditor.adapters.ToolAdapter
 import com.example.piceditor.ads.InterAds
 import com.example.piceditor.base.BaseActivityNew
@@ -204,8 +218,163 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
     }
 
     // ─────────────────────────────────────────────────────────────────────────
+// Add Text — nhập text, chọn font + màu, render thành sticker ảnh
+// ─────────────────────────────────────────────────────────────────────────
+
+    private fun showAddTextDialog() {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        val view = LayoutInflater.from(this).inflate(R.layout.dialog_input_text, null)
+        dialog.setContentView(view)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.9f).toInt(),
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
+        val edtText  = view.findViewById<EditText>(R.id.dlg_edit_text)
+        val tvCancel = view.findViewById<AppCompatTextView>(R.id.dlg_cancel)
+        val tvDone   = view.findViewById<AppCompatTextView>(R.id.dlg_done)
+        val listColor = view.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.dlg_list_color)
+        val listFont  = view.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.dlg_list_font)
+
+        // State trong dialog
+        var pickedColor = Color.BLACK
+        var pickedTypeface: Typeface? = null
+
+        // Màu
+        listColor.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        listColor.adapter = ColorAdapter { color ->
+            pickedColor = color
+            edtText.setTextColor(color)
+        }
+
+        // Font — danh sách font của bạn
+        val fonts = listOf(
+            FontItem("Default", R.font.inter_medium),
+            FontItem("Bold",    R.font.inter_bold),
+            FontItem("Hand",    R.font.poppins_bold),
+            FontItem("Serif",   R.font.inter_semi_bold),
+        )
+        val fontAdapter = FontAdapter(this, fonts) { tf ->
+            pickedTypeface = tf
+            edtText.typeface = tf
+        }
+        listFont.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        listFont.adapter = fontAdapter
+        pickedTypeface = fontAdapter.getSelectedTypeface()
+
+        tvCancel.setOnClickListener { dialog.dismiss() }
+
+        tvDone.setOnClickListener {
+            val text = edtText.text?.toString()?.trim().orEmpty()
+            if (text.isEmpty()) {
+                Toast.makeText(this, "Hãy nhập nội dung", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            dialog.dismiss()
+            addTextAsSticker(text, pickedColor, pickedTypeface)
+        }
+
+        dialog.show()
+    }
+
+    /**
+     * Render text thành bitmap PNG trong suốt → lưu file → addSticker.
+     */
+    private fun addTextAsSticker(text: String, color: Int, typeface: Typeface?) {
+        try {
+            val bitmap = renderTextToBitmap(text, color, typeface)
+            val file = File(cacheDir, "text_sticker_${System.currentTimeMillis()}.png")
+            FileOutputStream(file).use {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+            }
+            // addSticker nhận đường dẫn ảnh
+            getDrawerManager()?.addSticker(StickerData(file.absolutePath))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Không tạo được text", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * Vẽ text (nhiều dòng) lên bitmap trong suốt.
+     */
+    private fun renderTextToBitmap(text: String, color: Int, typeface: Typeface?): Bitmap {
+        val textPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
+            this.color = color
+            this.typeface = typeface ?: Typeface.DEFAULT
+            textSize = 120f   // render to để nét mịn, sticker tự scale lại
+        }
+
+        val padding = 40
+        // Bề rộng tối đa của text
+        val maxLineWidth = text.split("\n")
+            .maxOf { textPaint.measureText(it) }
+            .toInt()
+        val layoutWidth = maxLineWidth.coerceAtLeast(1)
+
+        val staticLayout = StaticLayout.Builder
+            .obtain(text, 0, text.length, textPaint, layoutWidth)
+            .setAlignment(Layout.Alignment.ALIGN_CENTER)
+            .build()
+
+        val bmpW = layoutWidth + padding * 2
+        val bmpH = staticLayout.height + padding * 2
+
+        val bitmap = Bitmap.createBitmap(bmpW, bmpH, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        canvas.translate(padding.toFloat(), padding.toFloat())
+        staticLayout.draw(canvas)
+
+        return bitmap
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
     // Load subject
     // ─────────────────────────────────────────────────────────────────────────
+
+    // ─────────────────────────────────────────────────────────────────────────
+// Setup SeekBar size + dãy màu cho tab Draw
+// ─────────────────────────────────────────────────────────────────────────
+
+    private var drawPanelInitialized = false
+
+    private fun setupDrawPanel() {
+        if (drawPanelInitialized) return
+        drawPanelInitialized = true
+
+        // SeekBar kích cỡ nét
+        binding.seekbarBrushSize.progress = gestureSize.toInt()
+        binding.tvBrushSize.text = gestureSize.toInt().toString()
+        binding.seekbarBrushSize.setOnSeekBarChangeListener(
+            object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
+                    // tối thiểu 2 để nét không quá nhỏ
+                    val size = progress.coerceAtLeast(2).toFloat()
+                    if (drawType == TYPE_GESTURE) {
+                        gestureSize = size
+                    } else {
+                        eraserSize = size
+                    }
+                    binding.tvBrushSize.text = size.toInt().toString()
+                    updateDraw()
+                }
+                override fun onStartTrackingTouch(sb: SeekBar?) {}
+                override fun onStopTrackingTouch(sb: SeekBar?) {}
+            }
+        )
+
+        // Dãy màu
+        binding.listBrushColor.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.listBrushColor.adapter = ColorAdapter { color ->
+            drawColor = color
+            updateDraw()
+        }
+    }
 
     private fun loadSubjectImage() {
         if (subjectUrl.isNullOrEmpty()) {
@@ -456,9 +625,10 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
         val tools = mutableListOf(
             ToolItem(R.drawable.ic_background, getString(R.string.background)),
             ToolItem(R.drawable.ic_sticker,    getString(R.string.sticker)),
-            ToolItem(R.drawable.ic_text,       getString(R.string.text)),
-            ToolItem(R.drawable.ic_unselect,  getString(R.string.transform)),
+            ToolItem(R.drawable.ic_draw,       getString(R.string.draw)),
+            ToolItem(R.drawable.ic_transform,  getString(R.string.transform)),
             ToolItem(R.drawable.ic_crop,       getString(R.string.crop)),
+            ToolItem(R.drawable.ic_text,   getString(R.string.text)),
         )
 
         val adapter = ToolAdapter(tools) { _, pos ->
@@ -491,16 +661,24 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
 
                 2 -> { // Draw / Text
                     binding.llDraw.visibility = View.VISIBLE
+                    setupDrawPanel()   // ✅ thêm dòng này
+
                     binding.icBrush.setOnClickListener {
                         binding.icBrush.setBackgroundResource(R.drawable.bg_icon_draw)
                         binding.icErase.setBackgroundResource(0)
                         drawType = TYPE_GESTURE
+                        // ✅ cập nhật SeekBar theo size của brush
+                        binding.seekbarBrushSize.progress = gestureSize.toInt()
+                        binding.tvBrushSize.text = gestureSize.toInt().toString()
                         updateDraw()
                     }
                     binding.icErase.setOnClickListener {
                         binding.icErase.setBackgroundResource(R.drawable.bg_icon_draw)
                         binding.icBrush.setBackgroundResource(0)
                         drawType = TYPE_ERASER
+                        // ✅ cập nhật SeekBar theo size của eraser
+                        binding.seekbarBrushSize.progress = eraserSize.toInt()
+                        binding.tvBrushSize.text = eraserSize.toInt().toString()
                         updateDraw()
                     }
                     binding.icCheckDraw.setOnClickListener {
@@ -530,6 +708,12 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
                     binding.rcvTools.visibility = View.VISIBLE
                     binding.drawView.setDrawingEnabled(false)
                     openCropOverlay()
+                }
+
+                5 -> { // Text — mở dialog nhập
+                    binding.rcvTools.visibility = View.VISIBLE
+                    binding.drawView.setDrawingEnabled(false)
+                    showAddTextDialog()
                 }
             }
         }
