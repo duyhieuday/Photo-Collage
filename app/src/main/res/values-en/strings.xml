@@ -154,5 +154,25 @@
     <string name="make_another">✨ Make Another</string>
     <string name="image_not_ready">Image not ready, please wait</string>
     <string name="app_not_installed">App not installed</string>
+    <string name="unable_to_read_image_file">Unable to read image file</string>
+    <string name="background_removal_failed">Background removal failed</string>
+    <string name="transform">Transform</string>
+    <string name="flip_horizontal">Flip H</string>
+    <string name="flip_vertical">Flip V</string>
+    <string name="crop_free">Free</string>
+    <string name="brush_size">Size</string>
+    <string name="add_text">Add Text</string>
+    <string name="type_something">Type something…</string>
+    <string name="font">Font</string>
+    <string name="color">Color</string>
+    <string name="draw">Draw</string>
+    <string name="please_enter_the_content">Please enter the content.</string>
+    <string name="crop_failed">Crop failed</string>
+    <string name="the_photo_was_not_prepared">The photo was not prepared.</string>
+    <string name="no_image_to_crop_yet">No image to crop yet.</string>
+    <string name="no_subject_image">No subject image</string>
+    <string name="unable_to_create_text">Unable to create text</string>
+    <string name="image_saving_failed">Image saving failed</string>
+    <string name="the_image_box">The image box has not been selected.</string>
 
 </resources>

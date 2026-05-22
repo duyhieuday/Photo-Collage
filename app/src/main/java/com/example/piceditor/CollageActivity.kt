@@ -20,7 +20,6 @@ import android.os.SystemClock
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewTreeObserver
@@ -41,7 +40,6 @@ import com.example.piceditor.adapters.FontAdapter
 import com.example.piceditor.adapters.FontItem
 import com.example.piceditor.adapters.FrameAdapter
 import com.example.piceditor.adapters.ToolAdapter
-import com.example.piceditor.ads.Callback
 import com.example.piceditor.ads.InterAds
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
@@ -73,6 +71,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStreamReader
+import androidx.core.view.isVisible
 
 open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnClickListener,
     FrameAdapter.OnFrameClickListener, BackgroundAdapter.OnBGClickListener, DrawInteractListener,
@@ -123,7 +122,6 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
     private var gesturePaintStyle: PaintStyle = PaintStyle.STROKE
     private var shapePaintStyle: PaintStyle = PaintStyle.STROKE
     private var shapeBrushStyle: BrushStyle = BrushStyle.HEART
-    var isDrawingMode = false
 
     // ── Transform state (áp lúc export) ──
     private var outputRotation = 0f
@@ -147,6 +145,28 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
     private fun checkClick() {
         if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return
         mLastClickTime = SystemClock.elapsedRealtime()
+    }
+
+    private fun applyContainerTransform() {
+        val container = binding.rlContainer
+        val parentW = (container.parent as? View)?.width ?: container.width
+        val parentH = (container.parent as? View)?.height ?: container.height
+        if (container.width == 0 || container.height == 0) return
+
+        container.rotation = outputRotation
+        container.scaleX = if (outputFlipH) -1f else 1f
+        container.scaleY = if (outputFlipV) -1f else 1f
+
+        // Bù scale khi xoay 90/270 để vừa khung cha
+        val rotated90 = (outputRotation % 180f) != 0f
+        if (rotated90 && parentW > 0 && parentH > 0) {
+            val fitScale = minOf(
+                parentW.toFloat() / container.height,
+                parentH.toFloat() / container.width
+            ).coerceAtMost(1f)
+            container.scaleX *= fitScale
+            container.scaleY *= fitScale
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -273,7 +293,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
     }
 
     override fun onBackPressed() {
-        if (binding.flCropContainer.visibility == View.VISIBLE) {
+        if (binding.flCropContainer.isVisible) {
             closeCropOverlay()
             return
         }
@@ -345,7 +365,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         mSelectedTemplateItem!!.isSelected = true
 
         if (extraImagePaths != null) {
-            val size = Math.min(extraImagePaths.size, mSelectedTemplateItem!!.photoItemList.size)
+            val size = extraImagePaths.size.coerceAtMost(mSelectedTemplateItem!!.photoItemList.size)
             for (i in 0 until size)
                 mSelectedTemplateItem!!.photoItemList[i].imagePath = extraImagePaths[i]
         }
@@ -423,7 +443,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         tvDone.setOnClickListener {
             val text = edtText.text?.toString()?.trim().orEmpty()
             if (text.isEmpty()) {
-                Toast.makeText(this, "Hãy nhập nội dung", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.please_enter_the_content), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             dialog.dismiss()
@@ -443,7 +463,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
             getDrawerManager()?.addSticker(StickerData(file.absolutePath))
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(this, "Không tạo được text", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.unable_to_create_text), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -468,7 +488,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         val bmpW = layoutWidth + padding * 2
         val bmpH = staticLayout.height + padding * 2
 
-        val bitmap = Bitmap.createBitmap(bmpW, bmpH, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(bmpW, bmpH)
         val canvas = Canvas(bitmap)
         canvas.translate(padding.toFloat(), padding.toFloat())
         staticLayout.draw(canvas)
@@ -541,7 +561,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
             createOutputImage()
         } catch (e: Throwable) {
             e.printStackTrace()
-            Toast.makeText(this, "Không tạo được ảnh", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.unable_to_read_image_file), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -550,7 +570,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
             FileOutputStream(srcFile).use { bmp.compress(Bitmap.CompressFormat.JPEG, 95, it) }
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(this, "Không chuẩn bị được ảnh", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.unable_to_read_image_file), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -565,11 +585,11 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
             setFreeStyleCropEnabled(true)
             setShowCropGrid(true)
             setShowCropFrame(true)
-            setActiveControlsWidgetColor(Color.parseColor("#039855"))
-            setRootViewBackgroundColor(Color.parseColor("#FFFFFF"))
-            setCropFrameColor(Color.parseColor("#039855"))
-            setCropGridColor(Color.parseColor("#80FFFFFF"))
-            setDimmedLayerColor(Color.parseColor("#99000000"))
+            setActiveControlsWidgetColor("#039855".toColorInt())
+            setRootViewBackgroundColor("#FFFFFF".toColorInt())
+            setCropFrameColor("#039855".toColorInt())
+            setCropGridColor("#80FFFFFF".toColorInt())
+            setDimmedLayerColor("#99000000".toColorInt())
         }
 
         val uCrop = UCrop.of(srcUri, cropDestUri!!).withOptions(options)
@@ -584,9 +604,49 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
 
         binding.cropBtnCancel.setOnClickListener { closeCropOverlay() }
         binding.cropBtnDone.setOnClickListener { cropFragment?.cropAndSaveImage() }
-        binding.cropBtnReset.setOnClickListener {
-            getCropImageView()?.setImageToWrapCropBounds()
+        binding.cropBtnReset.setOnClickListener { resetCrop() }
+
+        // Các nút tỉ lệ
+        binding.ratioFree.setOnClickListener { selectRatio(it, 0f, 0f) }
+        binding.ratio11.setOnClickListener  { selectRatio(it, 1f, 1f) }
+        binding.ratio45.setOnClickListener  { selectRatio(it, 4f, 5f) }
+        binding.ratio54.setOnClickListener  { selectRatio(it, 5f, 4f) }
+        binding.ratio23.setOnClickListener  { selectRatio(it, 2f, 3f) }
+        binding.ratio916.setOnClickListener { selectRatio(it, 9f, 16f) }
+        binding.ratio169.setOnClickListener { selectRatio(it, 16f, 9f) }
+        binding.ratio12.setOnClickListener  { selectRatio(it, 1f, 2f) }
+
+        // Mặc định chọn Free sau khi fragment gắn xong
+        binding.flCropContainer.post {
+            selectRatio(binding.ratioFree, 0f, 0f)
         }
+    }
+
+    private fun selectRatio(view: View, ratioX: Float, ratioY: Float) {
+        binding.ratioFree.isSelected = false
+        binding.ratio11.isSelected   = false
+        binding.ratio45.isSelected   = false
+        binding.ratio54.isSelected   = false
+        binding.ratio23.isSelected   = false
+        binding.ratio916.isSelected  = false
+        binding.ratio169.isSelected  = false
+        binding.ratio12.isSelected   = false
+        view.isSelected = true
+
+        val cropImageView = getCropImageView() ?: return
+        if (ratioX == 0f || ratioY == 0f) {
+            cropImageView.targetAspectRatio = 0f
+        } else {
+            cropImageView.targetAspectRatio = ratioX / ratioY
+        }
+        cropImageView.setImageToWrapCropBounds()
+    }
+
+    private fun resetCrop() {
+        val cropImageView = getCropImageView() ?: return
+        cropImageView.targetAspectRatio = 0f
+        cropImageView.setImageToWrapCropBounds()
+        selectRatio(binding.ratioFree, 0f, 0f)
     }
 
     private fun getCropImageView(): GestureCropImageView? {
@@ -627,7 +687,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
             }
         } else if (result.mResultCode == UCrop.RESULT_ERROR) {
             result.mResultData?.let { UCrop.getError(it) }?.printStackTrace()
-            Toast.makeText(this, "Crop thất bại", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.crop_failed), Toast.LENGTH_SHORT).show()
             closeCropOverlay()
         }
     }
@@ -747,15 +807,15 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
 
                     binding.btnRotateLeft.setOnClickListener {
                         outputRotation = (outputRotation + 90f) % 360f
-                        Toast.makeText(this, "Rotate ${outputRotation.toInt()}°", Toast.LENGTH_SHORT).show()
+                        applyContainerTransform()
                     }
                     binding.btnFlipH.setOnClickListener {
                         outputFlipH = !outputFlipH
-                        Toast.makeText(this, "Flip H: $outputFlipH", Toast.LENGTH_SHORT).show()
+                        applyContainerTransform()
                     }
                     binding.btnFlipV.setOnClickListener {
                         outputFlipV = !outputFlipV
-                        Toast.makeText(this, "Flip V: $outputFlipV", Toast.LENGTH_SHORT).show()
+                        applyContainerTransform()
                     }
                     binding.icCheckTransform.setOnClickListener {
                         binding.llTransform.visibility = View.GONE
@@ -781,12 +841,10 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         shapePaintStyle   = PaintStyle.STROKE
         shapeBrushStyle   = BrushStyle.HEART
 
-        Log.e("xcncnah", "updateDraw: $type")
-
-        when (type) {
-            TYPE_GESTURE -> drawPath = DrawPath(BrushStyle.GESTURE, gesturePaintStyle, color, gestureSize)
-            TYPE_SHAPE   -> drawPath = DrawPath(shapeBrushStyle, shapePaintStyle, color, shapeSize)
-            TYPE_ERASER  -> drawPath = DrawPath(BrushStyle.GESTURE, PaintStyle.ERASE, color, eraserSize)
+        drawPath = when (type) {
+            TYPE_GESTURE -> DrawPath(BrushStyle.GESTURE, gesturePaintStyle, color, gestureSize)
+            TYPE_SHAPE   -> DrawPath(shapeBrushStyle, shapePaintStyle, color, shapeSize)
+            TYPE_ERASER  -> DrawPath(BrushStyle.GESTURE, PaintStyle.ERASE, color, eraserSize)
             else -> return
         }
         getDrawerManager()!!.setDrawPath(drawPath)

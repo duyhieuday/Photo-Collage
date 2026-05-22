@@ -154,5 +154,25 @@
     <string name="make_another">✨ Faites-en un autre</string>
     <string name="image_not_ready">Image non disponible, veuillez patienter</string>
     <string name="app_not_installed">Application non installée</string>
+    <string name="unable_to_read_image_file">Impossible de lire le fichier image</string>
+    <string name="background_removal_failed">La suppression de l\'arrière-plan a échoué</string>
+    <string name="transform">Transformer</string>
+    <string name="flip_horizontal">Flip H</string>
+    <string name="flip_vertical">Flip V</string>
+    <string name="crop_free">Gratuit</string>
+    <string name="brush_size">Taille</string>
+    <string name="add_text">Ajouter du texte</string>
+    <string name="type_something">Tapez quelque chose…</string>
+    <string name="font">Fonte</string>
+    <string name="color">Couleur</string>
+    <string name="draw">Dessiner</string>
+    <string name="please_enter_the_content">Veuillez saisir le contenu.</string>
+    <string name="crop_failed">La récolte a échoué</string>
+    <string name="the_photo_was_not_prepared">La photo n\'a pas été préparée.</string>
+    <string name="no_image_to_crop_yet">Aucune image à recadrer pour le moment.</string>
+    <string name="no_subject_image">Aucune image du sujet</string>
+    <string name="unable_to_create_text">Impossible de créer du texte</string>
+    <string name="image_saving_failed">Échec de ln\'enregistrement de ln\'image</string>
+    <string name="the_image_box">La zone d\'image nn\'a pas été sélectionnée.</string>
 
 </resources>

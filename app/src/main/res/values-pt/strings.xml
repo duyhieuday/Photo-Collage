@@ -154,5 +154,25 @@
     <string name="make_another">✨ Faça outro</string>
     <string name="image_not_ready">A imagem ainda não está pronta, aguarde.</string>
     <string name="app_not_installed">Aplicativo não instalado</string>
+    <string name="unable_to_read_image_file">Não foi possível ler o arquivo de imagem.</string>
+    <string name="background_removal_failed">A remoção do plano de fundo falhou</string>
+    <string name="transform">Transformar</string>
+    <string name="flip_horizontal">Vire H</string>
+    <string name="flip_vertical">Virar V</string>
+    <string name="crop_free">Livre</string>
+    <string name="brush_size">Tamanho</string>
+    <string name="add_text">Adicionar texto</string>
+    <string name="type_something">Digite alguma coisa…</string>
+    <string name="font">Fonte</string>
+    <string name="color">Cor</string>
+    <string name="draw">Empate</string>
+    <string name="please_enter_the_content">Por favor, insira o conteúdo.</string>
+    <string name="crop_failed">A colheita falhou</string>
+    <string name="the_photo_was_not_prepared">A foto não foi preparada.</string>
+    <string name="no_image_to_crop_yet">Ainda não há imagem para recortar.</string>
+    <string name="no_subject_image">Sem imagem de assunto</string>
+    <string name="unable_to_create_text">Não foi possível criar o texto.</string>
+    <string name="image_saving_failed">Falha ao salvar a imagem</string>
+    <string name="the_image_box">A caixa de imagem não foi selecionada.</string>
 
 </resources>

@@ -166,5 +166,12 @@
     <string name="color">Color</string>
     <string name="draw">Draw</string>
     <string name="please_enter_the_content">Please enter the content.</string>
+    <string name="crop_failed">Crop failed</string>
+    <string name="the_photo_was_not_prepared">The photo was not prepared.</string>
+    <string name="no_image_to_crop_yet">No image to crop yet.</string>
+    <string name="no_subject_image">No subject image</string>
+    <string name="unable_to_create_text">Unable to create text</string>
+    <string name="image_saving_failed">Image saving failed</string>
+    <string name="the_image_box">The image box has not been selected.</string>
 
 </resources>

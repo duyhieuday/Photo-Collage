@@ -154,5 +154,25 @@
     <string name="make_another">✨ एक और बनाएं</string>
     <string name="image_not_ready">छवि तैयार नहीं है, कृपया प्रतीक्षा करें</string>
     <string name="app_not_installed">ऐप इंस्टॉल नहीं हुआ</string>
+    <string name="unable_to_read_image_file">छवि फ़ाइल को पढ़ने में असमर्थ</string>
+    <string name="background_removal_failed">पृष्ठभूमि हटाने में विफलता</string>
+    <string name="transform">परिवर्तन</string>
+    <string name="flip_horizontal">फ्लिप एच</string>
+    <string name="flip_vertical">फ्लिप वी</string>
+    <string name="crop_free">मुक्त</string>
+    <string name="brush_size">आकार</string>
+    <string name="add_text">लेख जोड़ें</string>
+    <string name="type_something">कुछ लिखें…</string>
+    <string name="font">फ़ॉन्ट</string>
+    <string name="color">रंग</string>
+    <string name="draw">खींचना</string>
+    <string name="please_enter_the_content">कृपया विषयवस्तु दर्ज करें।</string>
+    <string name="crop_failed">फसल खराब हो गई</string>
+    <string name="the_photo_was_not_prepared">यह तस्वीर पहले से तैयार नहीं थी।</string>
+    <string name="no_image_to_crop_yet">क्रॉप करने के लिए अभी कोई इमेज नहीं है।</string>
+    <string name="no_subject_image">कोई विषय छवि नहीं</string>
+    <string name="unable_to_create_text">टेक्स्ट बनाने में असमर्थ</string>
+    <string name="image_saving_failed">छवि सहेजने में विफलता</string>
+    <string name="the_image_box">इमेज बॉक्स का चयन नहीं किया गया है।</string>
 
 </resources>

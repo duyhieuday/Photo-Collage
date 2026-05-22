@@ -154,5 +154,25 @@
     <string name="make_another">✨再做一个</string>
     <string name="image_not_ready">图片尚未准备就绪，请稍候。</string>
     <string name="app_not_installed">应用未安装</string>
+    <string name="unable_to_read_image_file">无法读取图像文件</string>
+    <string name="background_removal_failed">背景移除失败</string>
+    <string name="transform">转换</string>
+    <string name="flip_horizontal">翻转 H</string>
+    <string name="flip_vertical">翻转 V</string>
+    <string name="crop_free">自由的</string>
+    <string name="brush_size">尺寸</string>
+    <string name="add_text">添加文本</string>
+    <string name="type_something">输入一些内容……</string>
+    <string name="font">字体</string>
+    <string name="color">颜色</string>
+    <string name="draw">画</string>
+    <string name="please_enter_the_content">请输入内容。</string>
+    <string name="crop_failed">作物歉收</string>
+    <string name="the_photo_was_not_prepared">这张照片未经处理。</string>
+    <string name="no_image_to_crop_yet">暂无图片可供裁剪。</string>
+    <string name="no_subject_image">无主题图像</string>
+    <string name="unable_to_create_text">无法创建文本</string>
+    <string name="image_saving_failed">图片保存失败</string>
+    <string name="the_image_box">图片框未被选中。</string>
 
 </resources>

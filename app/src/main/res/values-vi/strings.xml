@@ -154,5 +154,25 @@
     <string name="make_another">✨ Làm thêm một cái nữa</string>
     <string name="image_not_ready">Hình ảnh chưa sẵn sàng, vui lòng chờ.</string>
     <string name="app_not_installed">Ứng dụng chưa được cài đặt</string>
+    <string name="unable_to_read_image_file">Không thể đọc tệp hình ảnh</string>
+    <string name="background_removal_failed">Xóa nền không thành công</string>
+    <string name="transform">Biến đổi</string>
+    <string name="flip_horizontal">Lật H</string>
+    <string name="flip_vertical">Lật V</string>
+    <string name="crop_free">Miễn phí</string>
+    <string name="brush_size">Kích cỡ</string>
+    <string name="add_text">Thêm văn bản</string>
+    <string name="type_something">Hãy nhập gì đó…</string>
+    <string name="font">Phông chữ</string>
+    <string name="color">Màu sắc</string>
+    <string name="draw">Vẽ tranh</string>
+    <string name="please_enter_the_content">Vui lòng nhập nội dung.</string>
+    <string name="crop_failed">Mùa màng thất bát</string>
+    <string name="the_photo_was_not_prepared">Bức ảnh này không được dàn dựng.</string>
+    <string name="no_image_to_crop_yet">Chưa có ảnh nào để cắt.</string>
+    <string name="no_subject_image">Không có hình ảnh chủ thể</string>
+    <string name="unable_to_create_text">Không thể tạo văn bản</string>
+    <string name="image_saving_failed">Lưu ảnh không thành công</string>
+    <string name="the_image_box">Hộp hình ảnh chưa được chọn.</string>
 
 </resources>

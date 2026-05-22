@@ -237,6 +237,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
                         android:padding="8dp"
+                        android:background="@drawable/bg_icon_draw"
                         android:src="@drawable/ic_brush" />
 
                     <androidx.appcompat.widget.AppCompatImageView

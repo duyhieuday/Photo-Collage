@@ -64,6 +64,9 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStreamReader
+import androidx.core.graphics.toColorInt
+import androidx.core.graphics.createBitmap
+import androidx.core.view.isVisible
 
 class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
     BackgroundAdapter.OnBGClickListener,
@@ -148,7 +151,7 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
                     finish()
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    Toast.makeText(this, "Lưu ảnh thất bại", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.image_saving_failed), Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -174,7 +177,7 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
     override fun afterSetContentView() {
         super.afterSetContentView()
         BarsUtils.setHideNavigation(this)
-        BarsUtils.setStatusBarColor(this, Color.parseColor("#01000000"))
+        BarsUtils.setStatusBarColor(this, "#01000000".toColorInt())
         BarsUtils.setAppearanceLightStatusBars(this, true)
     }
 
@@ -188,7 +191,7 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
     }
 
     override fun onBackPressed() {
-        if (binding.flCropContainer.visibility == View.VISIBLE) {
+        if (binding.flCropContainer.isVisible) {
             closeCropOverlay()
             return
         }
@@ -271,7 +274,7 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
         tvDone.setOnClickListener {
             val text = edtText.text?.toString()?.trim().orEmpty()
             if (text.isEmpty()) {
-                Toast.makeText(this, "Hãy nhập nội dung", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.please_enter_the_content), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             dialog.dismiss()
@@ -295,7 +298,7 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
             getDrawerManager()?.addSticker(StickerData(file.absolutePath))
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(this, "Không tạo được text", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.unable_to_create_text), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -324,7 +327,7 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
         val bmpW = layoutWidth + padding * 2
         val bmpH = staticLayout.height + padding * 2
 
-        val bitmap = Bitmap.createBitmap(bmpW, bmpH, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(bmpW, bmpH)
         val canvas = Canvas(bitmap)
         canvas.translate(padding.toFloat(), padding.toFloat())
         staticLayout.draw(canvas)
@@ -378,7 +381,7 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
 
     private fun loadSubjectImage() {
         if (subjectUrl.isNullOrEmpty()) {
-            Toast.makeText(this, "Không có ảnh subject", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.no_subject_image), Toast.LENGTH_SHORT).show()
             finish()
             return
         }
@@ -483,7 +486,7 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
     private fun openCropOverlay() {
         val bmp = subjectBitmap
         if (bmp == null) {
-            Toast.makeText(this, "Chưa có ảnh để crop", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.no_image_to_crop_yet), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -494,7 +497,7 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(this, "Không chuẩn bị được ảnh", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.the_photo_was_not_prepared), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -509,11 +512,11 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
             setFreeStyleCropEnabled(true)
             setShowCropGrid(true)
             setShowCropFrame(true)
-            setActiveControlsWidgetColor(Color.parseColor("#039855"))
-            setRootViewBackgroundColor(Color.parseColor("#FFFFFF"))
-            setCropFrameColor(Color.parseColor("#039855"))
-            setCropGridColor(Color.parseColor("#80FFFFFF"))
-            setDimmedLayerColor(Color.parseColor("#99000000"))
+            setActiveControlsWidgetColor("#039855".toColorInt())
+            setRootViewBackgroundColor("#FFFFFF".toColorInt())
+            setCropFrameColor("#039855".toColorInt())
+            setCropGridColor("#80FFFFFF".toColorInt())
+            setDimmedLayerColor("#99000000".toColorInt())
         }
 
         val uCrop = UCrop.of(srcUri, cropDestUri!!).withOptions(options)
@@ -612,7 +615,7 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
         } else if (result.mResultCode == UCrop.RESULT_ERROR) {
             val err = result.mResultData?.let { UCrop.getError(it) }
             err?.printStackTrace()
-            Toast.makeText(this, "Crop thất bại", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.crop_failed), Toast.LENGTH_SHORT).show()
         }
         closeCropOverlay()
     }
@@ -815,9 +818,7 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
 
     private fun exportComposite(): Bitmap {
         val container = binding.rlContainer
-        val bitmap = Bitmap.createBitmap(
-            container.width, container.height, Bitmap.Config.ARGB_8888
-        )
+        val bitmap = createBitmap(container.width, container.height)
         val canvas = Canvas(bitmap)
         container.draw(canvas)
         return bitmap

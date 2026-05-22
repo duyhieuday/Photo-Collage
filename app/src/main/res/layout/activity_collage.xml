@@ -373,6 +373,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
                         android:padding="8dp"
+                        android:background="@drawable/bg_icon_draw"
                         android:src="@drawable/ic_brush" />
 
                     <androidx.appcompat.widget.AppCompatImageView
@@ -734,14 +735,13 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:background="@color/white"
-                android:orientation="vertical"
-                android:paddingTop="12dp"
-                android:paddingBottom="16dp">
+                android:orientation="vertical">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/dimen_16dp">
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginTop="@dimen/dimen_16dp">
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
@@ -750,7 +750,7 @@
                         android:fontFamily="@font/inter_medium"
                         android:text="@string/crop"
                         android:textColor="#101828"
-                        android:textSize="15sp" />
+                        android:textSize="12sp" />
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/crop_btn_done"
@@ -762,6 +762,240 @@
                         android:src="@drawable/ic_check_tool" />
 
                 </RelativeLayout>
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="@dimen/dimen_16dp"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="24dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:id="@+id/ratio_free"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/dimen_16dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/bg_ratio_item"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="10dp">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:src="@drawable/ic_ratio_free" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/inter_medium"
+                                android:text="@string/crop_free"
+                                android:textColor="@color/crop_ratio_text"
+                                android:textSize="11sp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/ratio_1_1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/bg_ratio_item"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="10dp">
+
+                            <View
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:background="@drawable/bg_ratio_shape" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/inter_medium"
+                                android:text="1:1"
+                                android:textColor="@color/crop_ratio_text"
+                                android:textSize="11sp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/ratio_4_5"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/bg_ratio_item"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="10dp">
+
+                            <View
+                                android:layout_width="16dp"
+                                android:layout_height="20dp"
+                                android:background="@drawable/bg_ratio_shape" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/inter_medium"
+                                android:text="4:5"
+                                android:textColor="@color/crop_ratio_text"
+                                android:textSize="11sp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/ratio_5_4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/bg_ratio_item"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="10dp">
+
+                            <View
+                                android:layout_width="20dp"
+                                android:layout_height="16dp"
+                                android:background="@drawable/bg_ratio_shape" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/inter_medium"
+                                android:text="5:4"
+                                android:textColor="@color/crop_ratio_text"
+                                android:textSize="11sp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/ratio_2_3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/bg_ratio_item"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="10dp">
+
+                            <View
+                                android:layout_width="14dp"
+                                android:layout_height="20dp"
+                                android:background="@drawable/bg_ratio_shape" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/inter_medium"
+                                android:text="2:3"
+                                android:textColor="@color/crop_ratio_text"
+                                android:textSize="11sp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/ratio_9_16"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/bg_ratio_item"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="10dp">
+
+                            <View
+                                android:layout_width="12dp"
+                                android:layout_height="20dp"
+                                android:background="@drawable/bg_ratio_shape" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/inter_medium"
+                                android:text="9:16"
+                                android:textColor="@color/crop_ratio_text"
+                                android:textSize="11sp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/ratio_16_9"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/bg_ratio_item"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="10dp">
+
+                            <View
+                                android:layout_width="20dp"
+                                android:layout_height="12dp"
+                                android:background="@drawable/bg_ratio_shape" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/inter_medium"
+                                android:text="16:9"
+                                android:textColor="@color/crop_ratio_text"
+                                android:textSize="11sp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/ratio_1_2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/dimen_16dp"
+                            android:background="@drawable/bg_ratio_item"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="10dp">
+
+                            <View
+                                android:layout_width="10dp"
+                                android:layout_height="20dp"
+                                android:background="@drawable/bg_ratio_shape" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/inter_medium"
+                                android:text="1:2"
+                                android:textColor="@color/crop_ratio_text"
+                                android:textSize="11sp" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </HorizontalScrollView>
 
             </LinearLayout>
 
