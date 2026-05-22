@@ -40,6 +40,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 
 public class WeatherApplication extends Application{
@@ -49,6 +50,8 @@ public class WeatherApplication extends Application{
     private static WeatherApplication instance;
     public static FirebaseAnalytics mFirebaseAnalytics;
     private Prefs prefs;
+
+    private int percent = 100;
 
     public static WeatherApplication getInstance() {
         return instance;
@@ -168,13 +171,30 @@ public class WeatherApplication extends Application{
 
     private static void LogTroasFirebaseAdImpression(double tRoasCache, String currency) {
 //        try {
-//            Bundle bundle = new Bundle();
-//            bundle.putDouble(FirebaseAnalytics.Param.VALUE, tRoasCache);//(Required)tROAS event must include Double Value
-//            bundle.putString(FirebaseAnalytics.Param.CURRENCY, currency);//put in the correct currency
-//            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.AD_IMPRESSION, bundle);
+            if (randomPercent(instance.percent)) {
+                try {
+                    Bundle bundle = new Bundle();
+                    bundle.putDouble(FirebaseAnalytics.Param.VALUE, tRoasCache);//(Required)tROAS event must include Double Value
+                    bundle.putString(FirebaseAnalytics.Param.CURRENCY, currency);//put in the correct currency
+                    mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.AD_IMPRESSION, bundle);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                Log.e("hehehehehe", "yes");
+            } else {
+                Log.e("hehehehehe", "no");
+            }
 //        } catch (Exception e) {
-//            e.printStackTrace();
+//
 //        }
+    }
+
+
+    public static boolean randomPercent(int percent) {
+        int i = new Random().nextInt(100);
+        Log.e("hehehehehehe", i+"..."+percent);
+        return i < percent;
     }
 
 
@@ -323,6 +343,12 @@ public class WeatherApplication extends Application{
             String inter_time = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.INTER_TIME);
             String first_flow = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.FIRST_FLOW);
             String inter_onb = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.INTER_Onb);
+            try {
+                percent = Integer.parseInt(mFirebaseRemoteConfig.getString("percent"));
+            } catch (NumberFormatException e) {
+
+            }
+            percent = 70;
 
             //CHƯA TEST
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.BANNER_COL, banner_coll);
@@ -340,6 +366,12 @@ public class WeatherApplication extends Application{
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.INTER_TIME, inter_time);
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.FIRST_FLOW, first_flow);
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.INTER_Onb, inter_onb);
+
+
+            for (int i = 0; i < 100; i++) {
+                Log.e("hehehehehehe", "fdhsfkhdskj");
+                LogTroasFirebaseAdImpression(0.0f, "");
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
