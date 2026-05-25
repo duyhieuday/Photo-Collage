@@ -170,7 +170,7 @@ public class WeatherApplication extends Application{
     }
 
     private static void LogTroasFirebaseAdImpression(double tRoasCache, String currency) {
-//        try {
+        try {
             if (randomPercent(instance.percent)) {
                 try {
                     Bundle bundle = new Bundle();
@@ -185,8 +185,17 @@ public class WeatherApplication extends Application{
             } else {
                 Log.e("hehehehehe", "no");
             }
+        } catch (Exception e) {
+
+        }
+
+//        try {
+//            Bundle bundle = new Bundle();
+//            bundle.putDouble(FirebaseAnalytics.Param.VALUE, tRoasCache);//(Required)tROAS event must include Double Value
+//            bundle.putString(FirebaseAnalytics.Param.CURRENCY, currency);//put in the correct currency
+//            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.AD_IMPRESSION, bundle);
 //        } catch (Exception e) {
-//
+//            e.printStackTrace();
 //        }
     }
 
@@ -345,10 +354,11 @@ public class WeatherApplication extends Application{
             String inter_onb = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.INTER_Onb);
             try {
                 percent = Integer.parseInt(mFirebaseRemoteConfig.getString("percent"));
-            } catch (NumberFormatException e) {
+
+                Log.e("heheheheheh", percent+"");
+            } catch (Exception e) {
 
             }
-            percent = 70;
 
             //CHƯA TEST
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.BANNER_COL, banner_coll);
@@ -368,10 +378,10 @@ public class WeatherApplication extends Application{
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.INTER_Onb, inter_onb);
 
 
-            for (int i = 0; i < 100; i++) {
-                Log.e("hehehehehehe", "fdhsfkhdskj");
-                LogTroasFirebaseAdImpression(0.0f, "");
-            }
+//            for (int i = 0; i < 100; i++) {
+//                Log.e("hehehehehehe", "fdhsfkhdskj");
+//                LogTroasFirebaseAdImpression(0.0f, "");
+//            }
 
         } catch (Exception e) {
             e.printStackTrace();
