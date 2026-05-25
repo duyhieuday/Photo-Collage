@@ -22,11 +22,13 @@ import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.QueryPurchasesParams;
 import com.example.piceditor.ads.OpenAdsHelper;
+import com.example.piceditor.ads.PhotoEditorAdsProvider;
 import com.example.piceditor.ads.Prefs;
 import com.example.piceditor.templates_editor.ABRC;
 import com.example.piceditor.utilsApp.Constant;
 import com.example.piceditor.utilsApp.LanguageManager;
 import com.example.piceditor.utilsApp.PreferenceUtil;
+import com.ezt.pdfreader.photoeditor.util.PhotoEditorAds;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
@@ -74,6 +76,7 @@ public class WeatherApplication extends Application{
         registerActivityLifecycleCallbacks(new AdjustLifecycleCallbacks());
 
         new OpenAdsHelper().setup(this);
+        PhotoEditorAds.INSTANCE.setProvider(new PhotoEditorAdsProvider());
 
         initRemoteConfig();
 

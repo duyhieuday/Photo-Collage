@@ -29,7 +29,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 
-import com.example.piceditor.adapters.ImageAdapter;
+import com.example.piceditor.adapters.ImageDraftAdapter;
 import com.example.piceditor.ads.InterAds;
 import com.example.piceditor.base.BaseActivityNew;
 import com.example.piceditor.base.BaseFragment;
@@ -47,8 +47,8 @@ import java.util.Objects;
 
 public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
 
-    private ImageAdapter adapter;
-    private ImageAdapter pendingAdapter;
+    private ImageDraftAdapter adapter;
+    private ImageDraftAdapter pendingAdapter;
     private Dialog dialogDelete;
 
     private final ActivityResultLauncher<IntentSenderRequest> deleteRequestLauncher =
@@ -140,7 +140,7 @@ public class MyDraftActivity extends BaseActivityNew<ActivityMyDraftBinding> {
             getBinding().llEmptyDraft.setVisibility(GONE);
         }
 
-        adapter = new ImageAdapter(new ArrayList<>(images));
+        adapter = new ImageDraftAdapter(new ArrayList<>(images));
         getBinding().rcvDrafts.setLayoutManager(new GridLayoutManager(this, 2));
         getBinding().rcvDrafts.setAdapter(adapter);
 

@@ -10,22 +10,23 @@ import com.example.piceditor.MyDraftActivity.formatDateTime
 import com.example.piceditor.R
 import com.example.piceditor.ShowImageActivity
 import com.example.piceditor.ads.InterAds
+import com.example.piceditor.databinding.ItemImageDraftSavedBinding
 import com.example.piceditor.databinding.ItemImageSavedBinding
 import com.example.piceditor.model.ImageModel
 
-class ImageAdapter(
+class ImageDraftAdapter(
     private val list: MutableList<ImageModel>
-) : RecyclerView.Adapter<ImageAdapter.ImageViewHolder>() {
+) : RecyclerView.Adapter<ImageDraftAdapter.ImageViewHolder>() {
 
     private val selectedPositions = mutableSetOf<Int>()
     private var selectMode = false   // đổi tên để tránh conflict với setSelectMode()
     var onSelectionChanged: ((count: Int) -> Unit)? = null
 
-    inner class ImageViewHolder(val binding: ItemImageSavedBinding) :
+    inner class ImageViewHolder(val binding: ItemImageDraftSavedBinding) :
         RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
-        val binding = ItemImageSavedBinding.inflate(
+        val binding = ItemImageDraftSavedBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
         )
         return ImageViewHolder(binding)

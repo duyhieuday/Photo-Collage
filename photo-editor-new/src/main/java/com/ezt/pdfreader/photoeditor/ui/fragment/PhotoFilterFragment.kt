@@ -26,6 +26,7 @@ import com.ezt.pdfreader.photoeditor.databinding.FragmentPhotoFilterBinding
 import com.ezt.pdfreader.photoeditor.ui.activity.PhotoEditorActivity
 import com.ezt.pdfreader.photoeditor.ui.adapter.FilterAdapter
 import com.ezt.pdfreader.photoeditor.ui.adapter.PagePagerAdapter
+import com.ezt.pdfreader.photoeditor.util.PhotoEditorAds
 import com.ezt.pdfreader.photoeditor.viewmodel.PhotoEditorEvent
 import com.ezt.pdfreader.photoeditor.viewmodel.PhotoEditorViewModel
 import com.mct.doc.scanner.view.PerspectiveImageView
@@ -147,7 +148,12 @@ class PhotoFilterFragment : Fragment() {
 //                activity.openPaywall()
 //                return@setOnClickListener
 //            }
-            activity.saveAndFinish()
+            val provider = PhotoEditorAds.provider
+            if (provider != null) {
+                provider.showInterAds(activity) { activity.saveAndFinish() }
+            } else {
+                activity.saveAndFinish()
+            }
         }
     }
 

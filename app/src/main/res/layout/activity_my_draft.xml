@@ -114,6 +114,7 @@
         android:id="@+id/rcvDrafts"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="4dp"
         android:layout_below="@+id/layoutBar"
         android:layout_above="@+id/layoutDelete"
         android:overScrollMode="never"
