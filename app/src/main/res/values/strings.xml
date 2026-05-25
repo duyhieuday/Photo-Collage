@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Photo Collage Maker Grid Photo</string>
+    <string name="facebook_app_id" translatable="false">4059521101008955</string>
+    <string name="facebook_client_token" translatable="false">40269ef5e99ed698b0e7c3cdff750e57</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="text_tag_line">Bringing Joy of Every Photo</string>
