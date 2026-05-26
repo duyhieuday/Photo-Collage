@@ -50,6 +50,7 @@ import com.example.piceditor.draw.model.draw.style.PaintStyle
 import com.example.piceditor.draw.model.sticker.StickerData
 import com.example.piceditor.draw.test.Beard
 import com.example.piceditor.draw.test.BeardAdapter
+import com.example.piceditor.sticker.StickerPanelController
 import com.example.piceditor.model.ToolItem
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utilsApp.Constant
@@ -92,6 +93,7 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
     // ── Sticker state ─────────────────────────────────────
     private var beardAdapter: BeardAdapter? = null
     private var beardList: MutableList<Beard?>? = null
+    private var stickerPanelController: StickerPanelController? = null
 
     // ── Transform state cho imgSubject ────────────────────
     private var subjectBitmap: Bitmap? = null
@@ -208,7 +210,7 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
         binding.drawView.setDrawingEnabled(false)
 
         setupBackgroundList()
-        loadImageBeards()
+        setupStickerPanel()
         setUpTab()
 
         binding.drawView.drawManager.addDrawInteractListener(this)
@@ -745,26 +747,13 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
     // Sticker tab
     // ─────────────────────────────────────────────────────────────────────────
 
-    private fun loadImageBeards() {
-        val gson = Gson()
-        val type = object : TypeToken<MutableList<Beard?>?>() {}.type
-        val beards: MutableList<Beard?>? = try {
-            gson.fromJson(InputStreamReader(assets.open("beard.json")), type)
-        } catch (e: IOException) {
-            null
-        }
-
-        binding.listSticker.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        beardList = beards
-        beardAdapter = BeardAdapter()
-        beardAdapter?.setData(beardList)
-        binding.listSticker.adapter = beardAdapter
-        beardAdapter?.setClickListener { _, beard -> onSelectModel(beard.imageAsset) }
-    }
-
-    private fun onSelectModel(s: String?) {
-        getDrawerManager()?.addSticker(StickerData(s))
+    private fun setupStickerPanel() {
+        stickerPanelController = StickerPanelController(
+            context = this,
+            categoryRecycler = binding.listStickerCategory,
+            gridRecycler = binding.listSticker,
+            onAddSticker = { data -> getDrawerManager()?.addSticker(data) }
+        )
     }
 
     // ─────────────────────────────────────────────────────────────────────────

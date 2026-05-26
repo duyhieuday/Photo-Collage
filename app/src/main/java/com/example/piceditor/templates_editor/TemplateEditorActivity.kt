@@ -101,6 +101,7 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
 
     // -- Sticker --
     private var beardAdapter: BeardAdapter? = null
+    private var stickerPanelController: com.example.piceditor.sticker.StickerPanelController? = null
 
     // -- Background --
     private var backgroundBitmap: Bitmap? = null
@@ -748,22 +749,15 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
     // -- Stickers --
 
     private fun loadStickers() {
-        if (beardAdapter != null) return
-        val gson  = Gson()
-        val type  = object : TypeToken<MutableList<Beard?>?>() {}.getType()
-        val beards: MutableList<Beard?>? = try {
-            gson.fromJson(InputStreamReader(assets.open("beard.json")), type)
-        } catch (e: IOException) { null }
-
-        binding.listSticker.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        beardAdapter = BeardAdapter()
-        beardAdapter?.setData(beards)
-        binding.listSticker.adapter = beardAdapter
-        beardAdapter?.setClickListener { _, beard ->
-            binding.templateEditorView.drawView?.drawManager
-                ?.addSticker(StickerData(beard.imageAsset))
-        }
+        if (stickerPanelController != null) return
+        stickerPanelController = com.example.piceditor.sticker.StickerPanelController(
+            context = this,
+            categoryRecycler = binding.listStickerCategory,
+            gridRecycler = binding.listSticker,
+            onAddSticker = { data ->
+                binding.templateEditorView.drawView?.drawManager?.addSticker(data)
+            }
+        )
     }
 
     // -- Template loading --

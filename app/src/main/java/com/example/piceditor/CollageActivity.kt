@@ -101,6 +101,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
     private var drawerManager: DrawerManager? = null
     private var beardAdapter: BeardAdapter? = null
     private var beardList: MutableList<Beard?>? = null
+    private var stickerPanelController: com.example.piceditor.sticker.StickerPanelController? = null
 
     companion object {
         const val TYPE_GESTURE = 0
@@ -340,7 +341,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         binding.listBg.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.listBg.adapter = BackgroundAdapter(this, this)
 
-        loadImageBeards()
+        setupStickerPanel()
 
         binding.seekbarSpace.setOnSeekBarChangeListener(space_listener())
         binding.seekbarCorner.setOnSeekBarChangeListener(corner_listener())
@@ -853,22 +854,13 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         binding.drawView.setDrawingEnabled(true)
     }
 
-    private fun loadImageBeards() {
-        val gson  = Gson()
-        val beard = object : TypeToken<MutableList<Beard?>?>() {}.getType()
-        val beards: MutableList<Beard?>? = try {
-            gson.fromJson(InputStreamReader(assets.open("beard.json")), beard)
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
-
-        binding.listSticker.setLayoutManager(LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false))
-        beardList    = beards
-        beardAdapter = BeardAdapter()
-        beardAdapter?.setData(beardList)
-        binding.listSticker.setAdapter(beardAdapter)
-        binding.listSticker.smoothScrollToPosition(0)
-        beardAdapter?.setClickListener { _, beard -> onSelectModel(beard.imageAsset) }
+    private fun setupStickerPanel() {
+        stickerPanelController = com.example.piceditor.sticker.StickerPanelController(
+            context = this,
+            categoryRecycler = binding.listStickerCategory,
+            gridRecycler = binding.listSticker,
+            onAddSticker = { data -> getDrawerManager()?.addSticker(data) }
+        )
     }
 
     private fun loadFrameImages() {

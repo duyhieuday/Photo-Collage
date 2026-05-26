@@ -162,32 +162,51 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/dimen_16dp"
-                    android:layout_marginVertical="20dp">
+                    android:layout_marginTop="16dp">
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:fontFamily="@font/inter_medium"
-                        android:text="@string/sticker"
-                        android:textColor="#101828"
-                        android:textSize="14sp" />
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/inter_medium"
+                            android:text="@string/sticker"
+                            android:textColor="#101828"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/icCheckSticker"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
                         android:padding="4dp"
                         android:src="@drawable/ic_check_tool" />
 
                 </RelativeLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/listStickerCategory"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="12dp"
+                    android:clipToPadding="false"
+                    android:paddingHorizontal="16dp" />
+
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/listSticker"
                     android:layout_width="match_parent"
-                    android:layout_height="96dp"
-                    android:layout_marginBottom="@dimen/dimen_16dp" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="@dimen/dimen_16dp"
+                    android:clipToPadding="false"
+                    android:paddingHorizontal="8dp" />
             </LinearLayout>
 
             <!-- Draw panel -->
