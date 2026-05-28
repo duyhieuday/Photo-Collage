@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/categoryRoot"
+    android:layout_width="30dp"
+    android:layout_height="30dp"
+    android:layout_marginEnd="20dp"
+    android:background="@drawable/bg_sticker_category">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/categoryImage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="2dp"
+        android:scaleType="fitCenter" />
+</FrameLayout>

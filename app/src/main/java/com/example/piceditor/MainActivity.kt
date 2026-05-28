@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.piceditor.adapters.ImageAdapter
 import com.example.piceditor.adapters.TemplateAdapter
@@ -283,7 +284,7 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         }
 
         binding.rcvTemplates.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+            GridLayoutManager(this, 2,LinearLayoutManager.HORIZONTAL, false)
 
         templateList    = temps
         templateAdapter = TemplateAdapter()

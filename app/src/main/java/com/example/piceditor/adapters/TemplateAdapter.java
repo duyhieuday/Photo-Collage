@@ -15,6 +15,8 @@ import com.bumptech.glide.Glide;
 import com.example.piceditor.R;
 import com.example.piceditor.templates_editor.Template;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class TemplateAdapter extends RecyclerView.Adapter<TemplateAdapter.TempViewHolder>{
@@ -30,7 +32,19 @@ public class TemplateAdapter extends RecyclerView.Adapter<TemplateAdapter.TempVi
     }
 
     public void setData(List<Template> list) {
-        this.templateList = list;
+        if (list != null) {
+            // Sao chép để không ảnh hưởng list gốc, rồi sắp xếp từ mới đến cũ (id giảm dần)
+            List<Template> sorted = new ArrayList<>(list);
+            Collections.sort(sorted, (a, b) -> {
+                if (a == null && b == null) return 0;
+                if (a == null) return 1;   // null xuống cuối
+                if (b == null) return -1;
+                return Integer.compare(b.getId(), a.getId()); // id lớn (mới) lên trước
+            });
+            this.templateList = sorted;
+        } else {
+            this.templateList = null;
+        }
         notifyDataSetChanged();
     }
 

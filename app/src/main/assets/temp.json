@@ -34,5 +34,41 @@
   {
     "id": 10,
     "image": "images/thumb_10.webp"
+  },
+  {
+    "id": 11,
+    "image": "images/thumb_11.webp"
+  },
+  {
+    "id": 12,
+    "image": "images/thumb_12.webp"
+  },
+  {
+    "id": 13,
+    "image": "images/thumb_13.webp"
+  },
+  {
+    "id": 15,
+    "image": "images/thumb_15.webp"
+  },
+  {
+    "id": 16,
+    "image": "images/thumb_16.webp"
+  },
+  {
+    "id": 17,
+    "image": "images/thumb_17.webp"
+  },
+  {
+    "id": 18,
+    "image": "images/thumb_18.webp"
+  },
+  {
+    "id": 19,
+    "image": "images/thumb_19.webp"
+  },
+  {
+    "id": 20,
+    "image": "images/thumb_20.webp"
   }
 ]
