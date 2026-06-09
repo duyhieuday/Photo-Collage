@@ -19,6 +19,8 @@ android {
         versionCode 3
         versionName "1.0.3"
 
+        resConfigs "en"
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         renderscriptTargetApi 21
