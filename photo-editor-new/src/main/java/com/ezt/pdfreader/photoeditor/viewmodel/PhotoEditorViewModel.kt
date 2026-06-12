@@ -17,9 +17,10 @@ import com.ezt.pdfreader.photoeditor.data.FilterType
 import com.ezt.pdfreader.photoeditor.data.PageInfo
 import com.ezt.pdfreader.photoeditor.data.PageState
 import com.ezt.pdfreader.photoeditor.util.BitmapLoader
-import com.mct.doc.scanner.DocCropUtils
-import com.mct.doc.scanner.DocProcUtils
-import com.mct.doc.scanner.DocScanUtils
+import com.mct.dockit.core.DockitMode
+import com.mct.dockit.proc.image.DockitImageCrop
+import com.mct.dockit.proc.image.DockitImageProc
+import com.mct.dockit.vision.edge.DockitDocumentDetector
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,6 +55,7 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
     val events = _events.asSharedFlow()
 
     private var preciseSessionCreated = false
+    private var preciseDetector: DockitDocumentDetector? = null
     private val preloadTargets = mutableListOf<Target<Bitmap>>()
 
     // ═══════════════════════════════════════════════════════════════
@@ -102,7 +104,7 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
             val context = getApplication<Application>()
             try {
                 if (!preciseSessionCreated) {
-                    withContext(Dispatchers.IO) { DocScanUtils.create(DocScanUtils.Mode.PRECISE) }
+                    withContext(Dispatchers.IO) { DockitDocumentDetector.loadModel(); preciseDetector = DockitDocumentDetector(DockitMode.HIGH) }
                     preciseSessionCreated = true
                 }
                 for ((index, state) in pagesNeedingDetection) {
@@ -113,7 +115,7 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
                             val bitmap = futureTarget.get()
                             val bw = bitmap.width
                             val bh = bitmap.height
-                            val result = DocScanUtils.scan(bitmap, DocScanUtils.Mode.PRECISE)
+                            val result = preciseDetector!!.scan(bitmap)
                             if (result.isNotEmpty() && result[0] >= 0)
                                 PageState.scaleCorners(
                                     result,
@@ -253,7 +255,7 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
             try {
                 val context = getApplication<Application>()
                 if (!preciseSessionCreated) {
-                    withContext(Dispatchers.IO) { DocScanUtils.create(DocScanUtils.Mode.PRECISE) }
+                    withContext(Dispatchers.IO) { DockitDocumentDetector.loadModel(); preciseDetector = DockitDocumentDetector(DockitMode.HIGH) }
                     preciseSessionCreated = true
                 }
                 val updatedPages = _pages.value.toMutableList()
@@ -269,7 +271,7 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
                                 val bitmap = futureTarget.get()
                                 val bw = bitmap.width
                                 val bh = bitmap.height
-                                val result = DocScanUtils.scan(bitmap, DocScanUtils.Mode.PRECISE)
+                                val result = preciseDetector!!.scan(bitmap)
                                 if (result.isNotEmpty() && result[0] >= 0)
                                     PageState.scaleCorners(
                                         result,
@@ -375,7 +377,7 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
                 val context = getApplication<Application>()
                 val corners = withContext(Dispatchers.IO) {
                     if (!preciseSessionCreated) {
-                        DocScanUtils.create(DocScanUtils.Mode.PRECISE)
+                        DockitDocumentDetector.loadModel(); preciseDetector = DockitDocumentDetector(DockitMode.HIGH)
                         preciseSessionCreated = true
                     }
                     val futureTarget = BitmapLoader.request(context, currentState.uri)
@@ -385,7 +387,7 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
                         val bitmap = futureTarget.get()
                         val bw = bitmap.width
                         val bh = bitmap.height
-                        val result = DocScanUtils.scan(bitmap, DocScanUtils.Mode.PRECISE)
+                        val result = preciseDetector!!.scan(bitmap)
                         if (result.isNotEmpty() && result[0] >= 0)
                             PageState.scaleCorners(
                                 result,
@@ -451,7 +453,7 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
                 // 1. Crop first — corners are stored in original (pre-rotation) space
                 state.corners?.let { corners ->
                     val old = bitmap
-                    bitmap = DocCropUtils.crop(bitmap, corners)
+                    bitmap = DockitImageCrop.crop(bitmap, corners)
                     if (old !== bitmap) old.recycle()
                 }
 
@@ -472,7 +474,7 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
                         state.saturation != 1f || state.warmth != 1f
                 if (needsProc) {
                     val old = bitmap
-                    bitmap = DocProcUtils.process(
+                    bitmap = DockitImageProc.process(
                         bitmap,
                         state.rotation,
                         if (state.flipX) 1 else 0,
@@ -604,7 +606,8 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
     override fun onCleared() {
         super.onCleared()
         if (preciseSessionCreated) {
-            DocScanUtils.destroy(DocScanUtils.Mode.PRECISE); preciseSessionCreated = false
+            preciseDetector?.destroy(); preciseDetector = null
+            DockitDocumentDetector.unloadModel(); preciseSessionCreated = false
         }
     }
 }

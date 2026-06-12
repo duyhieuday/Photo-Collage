@@ -29,7 +29,7 @@ import com.ezt.pdfreader.photoeditor.ui.adapter.PagePagerAdapter
 import com.ezt.pdfreader.photoeditor.util.PhotoEditorAds
 import com.ezt.pdfreader.photoeditor.viewmodel.PhotoEditorEvent
 import com.ezt.pdfreader.photoeditor.viewmodel.PhotoEditorViewModel
-import com.mct.doc.scanner.view.PerspectiveImageView
+import com.mct.dockit.ext.scanner.PerspectiveImageView
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import androidx.core.graphics.drawable.toDrawable

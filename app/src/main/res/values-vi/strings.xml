@@ -168,6 +168,7 @@
     <string name="draw">Vẽ tranh</string>
     <string name="please_enter_the_content">Vui lòng nhập nội dung.</string>
     <string name="crop_failed">Mùa màng thất bát</string>
+    <string name="please_fill_all_frames">Vui lòng thêm ảnh vào tất cả khung trước khi lưu.</string>
     <string name="the_photo_was_not_prepared">Bức ảnh này không được dàn dựng.</string>
     <string name="no_image_to_crop_yet">Chưa có ảnh nào để cắt.</string>
     <string name="no_subject_image">Không có hình ảnh chủ thể</string>

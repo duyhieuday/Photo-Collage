@@ -20,7 +20,7 @@ import com.ezt.pdfreader.photoeditor.databinding.ItemPePageBinding
 import com.ezt.pdfreader.photoeditor.transform.CropTransform
 import com.ezt.pdfreader.photoeditor.transform.FilterTransform
 import com.ezt.pdfreader.photoeditor.util.BitmapLoader
-import com.mct.doc.scanner.view.PerspectiveImageView
+import com.mct.dockit.ext.scanner.PerspectiveImageView
 
 class PagePagerAdapter :
     ListAdapter<PageState, PagePagerAdapter.PageViewHolder>(PageDiffCallback()) {

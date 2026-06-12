@@ -386,12 +386,26 @@ class TemplateEditorView @JvmOverloads constructor(
         invalidate()
     }
 
+    // ── Kiểm tra fill ảnh ─────────────────────────────────
+    /** Số ô ảnh chưa được fill (bitmap null). */
+    fun getEmptyCellCount(): Int = cells.count { it.bitmap == null }
+
+    /** True nếu tất cả ô ảnh đều đã có ảnh. */
+    fun areAllCellsFilled(): Boolean = cells.all { it.bitmap != null }
+
     // ── Export ────────────────────────────────────────────
     fun export(): Bitmap {
         val result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(result)
-        draw(canvas)
-        drawView?.draw(canvas)
+        // Ẩn khung điều khiển (xoá, copy, scale, xoay) của sticker/text khi render ảnh lưu.
+        // draw(canvas) cũng vẽ drawView (child) nên phải bật cờ TRƯỚC cả 2 lần vẽ.
+        drawView?.drawManager?.setStickerForceHideControls(true)
+        try {
+            draw(canvas)
+            drawView?.draw(canvas)
+        } finally {
+            drawView?.drawManager?.setStickerForceHideControls(false)
+        }
         return result
     }
 }

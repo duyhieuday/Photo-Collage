@@ -168,6 +168,7 @@
     <string name="draw">Draw</string>
     <string name="please_enter_the_content">Please enter the content.</string>
     <string name="crop_failed">Crop failed</string>
+    <string name="please_fill_all_frames">Please add a photo to every frame before saving.</string>
     <string name="the_photo_was_not_prepared">The photo was not prepared.</string>
     <string name="no_image_to_crop_yet">No image to crop yet.</string>
     <string name="no_subject_image">No subject image</string>

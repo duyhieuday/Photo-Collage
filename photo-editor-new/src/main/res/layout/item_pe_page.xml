@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.mct.doc.scanner.view.PerspectiveImageView
+    <com.mct.dockit.ext.scanner.PerspectiveImageView
         android:id="@+id/iv_page"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

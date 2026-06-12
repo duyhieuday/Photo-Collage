@@ -935,7 +935,13 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
             canvas.drawColor(mBackgroundColor)
         }
         canvas.drawBitmap(template, 0f, 0f, paint)
-        canvas.drawBitmap(getBitmapFromView(binding.drawView), 0f, 0f, paint)
+        // Ẩn khung điều khiển (xoá, copy, scale, xoay) của sticker/text khi render ảnh lưu
+        getDrawerManager()?.setStickerForceHideControls(true)
+        try {
+            canvas.drawBitmap(getBitmapFromView(binding.drawView), 0f, 0f, paint)
+        } finally {
+            getDrawerManager()?.setStickerForceHideControls(false)
+        }
 
         return applyTransform(result)
     }

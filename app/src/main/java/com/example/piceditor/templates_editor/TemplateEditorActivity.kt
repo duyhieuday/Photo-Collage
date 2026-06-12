@@ -873,6 +873,15 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
     // -- Export --
 
     private fun onExportClick() {
+        // Bắt buộc fill đủ ảnh vào tất cả ô trước khi save
+        if (!binding.templateEditorView.areAllCellsFilled()) {
+            Toast.makeText(
+                this,
+                getString(R.string.please_fill_all_frames),
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
         lifecycleScope.launch {
             val savedUri = withContext(Dispatchers.IO) {
                 runCatching {

@@ -27,7 +27,7 @@ import com.ezt.pdfreader.photoeditor.ui.activity.PhotoEditorActivity
 import com.ezt.pdfreader.photoeditor.ui.adapter.PagePagerAdapter
 import com.ezt.pdfreader.photoeditor.viewmodel.PhotoEditorEvent
 import com.ezt.pdfreader.photoeditor.viewmodel.PhotoEditorViewModel
-import com.mct.doc.scanner.view.PerspectiveImageView
+import com.mct.dockit.ext.scanner.PerspectiveImageView
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 

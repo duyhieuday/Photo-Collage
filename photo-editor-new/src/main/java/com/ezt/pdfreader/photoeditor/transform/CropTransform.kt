@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation
 import com.ezt.pdfreader.photoeditor.data.PageState
-import com.mct.doc.scanner.DocCropUtils
+import com.mct.dockit.proc.image.DockitImageCrop
 import java.security.MessageDigest
 
 /**
@@ -30,7 +30,7 @@ class CropTransform(
         } else {
             corners
         }
-        return DocCropUtils.crop(toTransform, scaledCorners)
+        return DockitImageCrop.crop(toTransform, scaledCorners)
     }
 
     override fun updateDiskCacheKey(messageDigest: MessageDigest) {

@@ -29,6 +29,9 @@ import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.toColorInt
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
@@ -50,24 +53,17 @@ import com.example.piceditor.draw.model.draw.style.PaintStyle
 import com.example.piceditor.draw.model.sticker.StickerData
 import com.example.piceditor.draw.test.Beard
 import com.example.piceditor.draw.test.BeardAdapter
-import com.example.piceditor.sticker.StickerPanelController
 import com.example.piceditor.model.ToolItem
+import com.example.piceditor.sticker.StickerPanelController
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utilsApp.Constant
 import com.example.piceditor.utilsApp.PreferenceUtil
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.yalantis.ucrop.UCrop
 import com.yalantis.ucrop.UCropFragment
 import com.yalantis.ucrop.UCropFragmentCallback
 import com.yalantis.ucrop.view.GestureCropImageView
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStreamReader
-import androidx.core.graphics.toColorInt
-import androidx.core.graphics.createBitmap
-import androidx.core.view.isVisible
 
 class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
     BackgroundAdapter.OnBGClickListener,
@@ -809,7 +805,14 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
         val container = binding.rlContainer
         val bitmap = createBitmap(container.width, container.height)
         val canvas = Canvas(bitmap)
-        container.draw(canvas)
+        // Ẩn khung điều khiển (xoá, copy, scale, xoay) của sticker/text khi render ảnh lưu
+        val drawManager = binding.drawView.drawManager
+        drawManager.setStickerForceHideControls(true)
+        try {
+            container.draw(canvas)
+        } finally {
+            drawManager.setStickerForceHideControls(false)
+        }
         return bitmap
     }
 

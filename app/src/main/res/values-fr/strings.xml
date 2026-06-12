@@ -168,6 +168,7 @@
     <string name="draw">Dessiner</string>
     <string name="please_enter_the_content">Veuillez saisir le contenu.</string>
     <string name="crop_failed">La récolte a échoué</string>
+    <string name="please_fill_all_frames">Veuillez ajouter une photo à chaque cadre avant d\'enregistrer.</string>
     <string name="the_photo_was_not_prepared">La photo n\'a pas été préparée.</string>
     <string name="no_image_to_crop_yet">Aucune image à recadrer pour le moment.</string>
     <string name="no_subject_image">Aucune image du sujet</string>

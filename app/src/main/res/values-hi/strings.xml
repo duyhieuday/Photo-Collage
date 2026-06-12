@@ -168,6 +168,7 @@
     <string name="draw">खींचना</string>
     <string name="please_enter_the_content">कृपया विषयवस्तु दर्ज करें।</string>
     <string name="crop_failed">फसल खराब हो गई</string>
+    <string name="please_fill_all_frames">सहेजने से पहले कृपया हर फ़्रेम में एक फ़ोटो जोड़ें।</string>
     <string name="the_photo_was_not_prepared">यह तस्वीर पहले से तैयार नहीं थी।</string>
     <string name="no_image_to_crop_yet">क्रॉप करने के लिए अभी कोई इमेज नहीं है।</string>
     <string name="no_subject_image">कोई विषय छवि नहीं</string>

@@ -168,6 +168,7 @@
     <string name="draw">Empate</string>
     <string name="please_enter_the_content">Por favor, insira o conteúdo.</string>
     <string name="crop_failed">A colheita falhou</string>
+    <string name="please_fill_all_frames">Adicione uma foto a cada moldura antes de salvar.</string>
     <string name="the_photo_was_not_prepared">A foto não foi preparada.</string>
     <string name="no_image_to_crop_yet">Ainda não há imagem para recortar.</string>
     <string name="no_subject_image">Sem imagem de assunto</string>

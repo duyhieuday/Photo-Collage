@@ -73,26 +73,35 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
 
         val context = getApplication<Application>()
         viewModelScope.launch {
-            val pages = withContext(Dispatchers.IO) {
-                pageInfos.map { info ->
-                    val (w, h) = getOriginalDimensions(context, info.uri)
-                    PageState(
-                        uri = info.uri,
-                        originalWidth = w,
-                        originalHeight = h,
-                        corners = info.corners
-                    )
+            try {
+                val pages = withContext(Dispatchers.IO) {
+                    pageInfos.map { info ->
+                        val (w, h) = getOriginalDimensions(context, info.uri)
+                        PageState(
+                            uri = info.uri,
+                            originalWidth = w,
+                            originalHeight = h,
+                            corners = info.corners
+                        )
+                    }
                 }
-            }
-            _pages.value = pages
+                _pages.value = pages
 
-            // Preload bitmaps at screen width into Glide cache
-            pageInfos.forEach { info ->
-                preloadTargets.add(
-                    BitmapLoader.request(context, info.uri)
-                        .override(BitmapLoader.PREVIEW_SIZE)
-                        .preload()
-                )
+                // Preload bitmaps at screen width into Glide cache
+                pageInfos.forEach { info ->
+                    try {
+                        preloadTargets.add(
+                            BitmapLoader.request(context, info.uri)
+                                .override(BitmapLoader.PREVIEW_SIZE)
+                                .preload()
+                        )
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            } catch (e: Exception) {
+                // Không để lỗi load ảnh (cloud/permission/file lỗi) làm crash app
+                e.printStackTrace()
             }
         }
     }
@@ -240,10 +249,15 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
     private fun getOriginalDimensions(context: android.content.Context, uri: Uri): Pair<Int, Int> {
         val contentResolver = context.contentResolver
 
-        // Read raw dimensions
+        // Read raw dimensions (bọc try/catch: openInputStream/decodeStream có thể ném
+        // FileNotFoundException/SecurityException với ảnh cloud, URI mất quyền, file lỗi…)
         val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        contentResolver.openInputStream(uri)?.use {
-            BitmapFactory.decodeStream(it, null, options)
+        try {
+            contentResolver.openInputStream(uri)?.use {
+                BitmapFactory.decodeStream(it, null, options)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
         var width = options.outWidth
         var height = options.outHeight
