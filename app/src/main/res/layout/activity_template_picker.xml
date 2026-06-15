@@ -40,14 +40,14 @@
 
     </RelativeLayout>
 
-    <!-- Grid 2 cột -->
+    <!-- Danh sách category cuộn dọc, mỗi category là 1 hàng cuộn ngang -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvTemplates"
+        android:id="@+id/rvSections"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginHorizontal="@dimen/dimen_8dp"
         android:layout_below="@+id/layoutBar"
         android:layout_above="@+id/layoutAds"
+        android:layout_marginTop="@dimen/dimen_8dp"
         android:clipToPadding="false"/>
 
     <LinearLayout

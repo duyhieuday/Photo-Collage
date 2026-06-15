@@ -5,8 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.core.graphics.toColorInt
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.piceditor.R
 import com.example.piceditor.SelectImageActivity
 import com.example.piceditor.ads.InterAds
@@ -61,9 +60,9 @@ class TemplatePickerActivity : BaseActivityNew<ActivityTemplatePickerBinding>() 
             finish()
         }
 
-        binding.rvTemplates.layoutManager = GridLayoutManager(this, 2)
+        binding.rvSections.layoutManager = LinearLayoutManager(this)
 
-        binding.rvTemplates.adapter = TemplatePickerAdapter(TemplateRepository.all) { template ->
+        binding.rvSections.adapter = TemplateSectionAdapter(TemplateRepository.sections) { template ->
             InterAds.showAdsBreak(this@TemplatePickerActivity) {
                 val intent = Intent(this, TemplateEditorActivity::class.java)
                 Log.e("xcncnajj1", "setUpTemp: " + template.id )

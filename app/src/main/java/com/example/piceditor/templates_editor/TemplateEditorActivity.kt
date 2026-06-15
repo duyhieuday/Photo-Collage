@@ -809,10 +809,11 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
                                 rawDecoded
                             }
 
-                            val maskBmp = if (templateData.maskMode == MaskMode.BLACK)
-                                binding.templateEditorView.createMaskFromBlack(rawBmp)
-                            else
-                                binding.templateEditorView.createMaskFromWhite(rawBmp)
+                            val maskBmp = when (templateData.maskMode) {
+                                MaskMode.BLACK -> binding.templateEditorView.createMaskFromBlack(rawBmp)
+                                MaskMode.WHITE -> binding.templateEditorView.createMaskFromWhite(rawBmp)
+                                MaskMode.NONE  -> null
+                            }
 
                             TemplateLoadResult(rawBmp, maskBmp, targetW.toFloat(), targetH.toFloat())
                         }
@@ -837,7 +838,7 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
 
     private data class TemplateLoadResult(
         val raw: Bitmap,
-        val mask: Bitmap,
+        val mask: Bitmap?,
         val logicW: Float,
         val logicH: Float
     )

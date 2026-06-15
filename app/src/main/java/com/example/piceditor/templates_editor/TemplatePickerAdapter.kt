@@ -9,14 +9,15 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.example.piceditor.R
 
+/**
+ * Adapter card dọc (9:16) dùng cho hàng cuộn ngang trong mỗi category.
+ * Giữ nguyên thứ tự template do [TemplateRepository.sections] cung cấp (không tự sort).
+ */
 class TemplatePickerAdapter(
-    templates: List<TemplateData>,
+    private val templates: List<TemplateData>,
+    private val itemLayout: Int = R.layout.item_template_card,
     private val onPick: (TemplateData) -> Unit
 ) : RecyclerView.Adapter<TemplatePickerAdapter.VH>() {
-
-    // ✅ Sắp xếp mới nhất trước (id lớn = thêm sau → lên đầu)
-    private val templates: List<TemplateData> =
-        templates.sortedByDescending { it.id.toIntOrNull() ?: 0 }
 
     inner class VH(view: View) : RecyclerView.ViewHolder(view) {
         val thumb: ImageView = view.findViewById(R.id.imgThumb)
@@ -24,15 +25,15 @@ class TemplatePickerAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_template, parent, false)
+            .inflate(itemLayout, parent, false)
         return VH(view)
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val t = templates[position]
 
-        // ✅ Load qua Glide: decode ở background + downsample + cache → vuốt mượt
-        //    RGB_565 (16-bit) + override nhỏ để giảm chất lượng cho nhẹ RAM
+        // Load qua Glide: decode background + downsample + cache → vuốt mượt.
+        // RGB_565 (16-bit) + override nhỏ để giảm RAM.
         Glide.with(holder.thumb)
             .load(t.thumbRes)
             .format(DecodeFormat.PREFER_RGB_565)
@@ -47,9 +48,9 @@ class TemplatePickerAdapter(
     override fun getItemCount() = templates.size
 
     companion object {
-        // Kích thước decode thumbnail (tỉ lệ 9:16). Nhỏ hơn view thật để giảm
-        // chất lượng + bộ nhớ, giúp vuốt mượt. Tăng nếu thấy ảnh bị mờ.
-        private const val THUMB_W = 360
-        private const val THUMB_H = 640
+        // Kích thước decode thumbnail (tỉ lệ 9:16). Card thật ~108x192dp nên
+        // decode quanh kích thước đó là đủ nét mà vẫn nhẹ RAM.
+        private const val THUMB_W = 324
+        private const val THUMB_H = 576
     }
 }
