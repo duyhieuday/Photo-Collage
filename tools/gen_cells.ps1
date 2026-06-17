@@ -1,5 +1,9 @@
-# Generate TemplateCells.kt from cells_config.ps1. ASCII only (ids/numbers/MaskMode are ASCII).
+# Generate TemplateCells.kt from cells_config.ps1. ASCII only.
+# Cell = @(x0,y0,x1,y1) (o thang) hoac @(x0,y0,x1,y1,angleDeg) (o xoay quanh tam).
 . "D:\EZTech\EZTechApp\collage_pic_editor\tools\cells_config.ps1"
+
+$inv=[System.Globalization.CultureInfo]::InvariantCulture
+function FmtF($v){ return ([double]$v).ToString($inv) + 'f' }
 
 $dst="D:\EZTech\EZTechApp\collage_pic_editor\app\src\main\java\com\example\piceditor\templates_editor\TemplateCells.kt"
 $sb=New-Object System.Text.StringBuilder
@@ -12,14 +16,31 @@ $sb=New-Object System.Text.StringBuilder
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('    val rects: Map<String, List<RectF>> = mapOf(')
 $keys=@($CELLS.Keys)
+$angleEntries=[ordered]@{}
 for($i=0;$i -lt $keys.Count;$i++){
   $id=$keys[$i]
   $rr=$CELLS[$id]
   if($rr.Count -ge 1 -and ($rr[0] -is [int] -or $rr[0] -is [double])){ $rr=@(,$rr) }  # single-cell flattened -> rewrap
-  $parts=@()
-  foreach($r in $rr){ $parts += ("RectF({0}f, {1}f, {2}f, {3}f)" -f $r[0],$r[1],$r[2],$r[3]) }
+  $parts=@(); $angs=@(); $hasAngle=$false
+  foreach($r in $rr){
+    $parts += ("RectF({0}, {1}, {2}, {3})" -f (FmtF $r[0]),(FmtF $r[1]),(FmtF $r[2]),(FmtF $r[3]))
+    if($r.Count -ge 5){ $angs += (FmtF $r[4]); if([double]$r[4] -ne 0){ $hasAngle=$true } }
+    else { $angs += '0f' }
+  }
+  if($hasAngle){ $angleEntries[$id]=$angs }
   $comma= if($i -lt $keys.Count-1){','}else{''}
   [void]$sb.AppendLine(('        "{0}" to listOf({1}){2}' -f $id, ($parts -join ', '), $comma))
+}
+[void]$sb.AppendLine('    )')
+[void]$sb.AppendLine('')
+# angles map: chi gom template co o xoay (angle != 0). Thieu -> coi nhu tat ca 0.
+[void]$sb.AppendLine('    // Goc xoay (do) song song voi rects[id]. Chi liet ke template co o nghieng.')
+[void]$sb.AppendLine('    val angles: Map<String, List<Float>> = mapOf(')
+$akeys=@($angleEntries.Keys)
+for($i=0;$i -lt $akeys.Count;$i++){
+  $id=$akeys[$i]
+  $comma= if($i -lt $akeys.Count-1){','}else{''}
+  [void]$sb.AppendLine(('        "{0}" to listOf({1}){2}' -f $id, ($angleEntries[$id] -join ', '), $comma))
 }
 [void]$sb.AppendLine('    )')
 [void]$sb.AppendLine('')
@@ -33,4 +54,4 @@ for($i=0;$i -lt $mkeys.Count;$i++){
 [void]$sb.AppendLine('    )')
 [void]$sb.AppendLine('}')
 $sb.ToString() | Out-File -FilePath $dst -Encoding ascii
-Write-Host ("Wrote TemplateCells.kt: {0} cell-sets, {1} mask overrides" -f $keys.Count, $mkeys.Count)
+Write-Host ("Wrote TemplateCells.kt: {0} cell-sets, {1} with angles, {2} mask overrides" -f $keys.Count, $akeys.Count, $mkeys.Count)

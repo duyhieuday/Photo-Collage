@@ -72,6 +72,8 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
     UCropFragmentCallback {
 
     companion object {
+        // DEBUG: to dac/vien o de kiem tra can chinh tren may that. PHAI tat (false) khi giao.
+        const val DEBUG_FILL_CELLS = false
         const val EXTRA_TEMPLATE_ID = "extra_template_id"
         const val TYPE_GESTURE = 0
         const val TYPE_SHAPE   = 1
@@ -812,6 +814,8 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
                             val maskBmp = when (templateData.maskMode) {
                                 MaskMode.BLACK -> binding.templateEditorView.createMaskFromBlack(rawBmp)
                                 MaskMode.WHITE -> binding.templateEditorView.createMaskFromWhite(rawBmp)
+                                MaskMode.GRAY  -> binding.templateEditorView.createMaskFromGray(rawBmp)
+                                MaskMode.GRAY2 -> binding.templateEditorView.createMaskFromGray2(rawBmp)
                                 MaskMode.NONE  -> null
                             }
 
@@ -824,9 +828,19 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
                         binding.templateEditorView.templateBitmapRaw  = result.raw
                         binding.templateEditorView.templateMaskBitmap = result.mask
 
-                        binding.templateEditorView.cells = templateData.cellRects.map { rect ->
-                            PhotoCell(RectF(rect))
-                        }.toMutableList()
+                        val angleList = TemplateCells.angles[templateData.id].orEmpty()
+                        binding.templateEditorView.cells =
+                            templateData.cellRects.mapIndexed { i, rect ->
+                                PhotoCell(RectF(rect), angle = angleList.getOrElse(i) { 0f })
+                            }.toMutableList()
+
+                        if (DEBUG_FILL_CELLS) {
+                            // Tô ẢNH THẬT (có chữ) vào mọi ô để thấy ảnh clip theo mask + do nghieng noi dung.
+                            val test = BitmapFactory.decodeResource(resources, R.drawable.thumb_gs03)
+                            binding.templateEditorView.cells.forEach {
+                                binding.templateEditorView.setImageToCell(it, test)
+                            }
+                        }
 
                         binding.templateEditorView.requestLayout()
                         binding.templateEditorView.invalidate()

@@ -25,6 +25,10 @@ class TemplateEditorView @JvmOverloads constructor(
     var templateLogicW: Float = 1125f
     var templateLogicH: Float = 2000f
 
+    // DEBUG: ve vien sang quanh o trong (thay vi placeholder mo) de kiem tra can chinh.
+    var debugOutline: Boolean = false
+        set(value) { field = value; invalidate() }
+
     // ── Data ──────────────────────────────────────────────
     var cells: MutableList<PhotoCell> = mutableListOf()
 
@@ -171,6 +175,12 @@ class TemplateEditorView @JvmOverloads constructor(
 
             canvas.save()
 
+            // Khung anh nghieng: xoay he toa do quanh tam o truoc khi clip + ve.
+            // clipRect/anh deu nam trong he da xoay nen bam dung khung nghieng.
+            if (cell.angle != 0f) {
+                canvas.rotate(cell.angle, cell.rect.centerX(), cell.rect.centerY())
+            }
+
             if (cellCorner > 0f) {
                 canvas.clipPath(Path().apply {
                     addRoundRect(drawRect, cellCorner, cellCorner, Path.Direction.CW)
@@ -184,17 +194,24 @@ class TemplateEditorView @JvmOverloads constructor(
                 canvas.concat(cell.matrix)
                 canvas.drawBitmap(bmp, 0f, 0f, cellPaint)
             } ?: run {
-                canvas.drawRect(drawRect, Paint().apply { color = 0x44888888; style = Paint.Style.FILL })
-                canvas.drawText(
-                    "+", drawRect.centerX(), drawRect.centerY() + 20f,
-                    Paint().apply {
-                        color = 0xAAFFFFFF.toInt()
-                        textSize = 56f
-                        textAlign = Paint.Align.CENTER
-                        isAntiAlias = true
-                        typeface = Typeface.DEFAULT_BOLD
-                    }
-                )
+                if (debugOutline) {
+                    // DEBUG: vien sang de doi chieu vien o vs vien khung tren may that.
+                    canvas.drawRect(drawRect, Paint().apply {
+                        color = 0xFFFF00FF.toInt(); style = Paint.Style.STROKE; strokeWidth = 6f; isAntiAlias = true
+                    })
+                } else {
+                    canvas.drawRect(drawRect, Paint().apply { color = 0x44888888; style = Paint.Style.FILL })
+                    canvas.drawText(
+                        "+", drawRect.centerX(), drawRect.centerY() + 20f,
+                        Paint().apply {
+                            color = 0xAAFFFFFF.toInt()
+                            textSize = 56f
+                            textAlign = Paint.Align.CENTER
+                            isAntiAlias = true
+                            typeface = Typeface.DEFAULT_BOLD
+                        }
+                    )
+                }
             }
 
             canvas.restore()
@@ -241,10 +258,9 @@ class TemplateEditorView @JvmOverloads constructor(
                 val cell = activeCell ?: return true
 
                 if (event.pointerCount == 1) {
-                    val ddx = (event.x - lastX) / scale
-                    val ddy = (event.y - lastY) / scale
                     if (abs(event.x - lastX) > 8f || abs(event.y - lastY) > 8f) isTap = false
-                    cell.matrix.postTranslate(ddx, ddy)
+                    val v = toCellVec(cell, (event.x - lastX) / scale, (event.y - lastY) / scale)
+                    cell.matrix.postTranslate(v[0], v[1])
                     lastX = event.x
                     lastY = event.y
                     invalidate()
@@ -262,17 +278,14 @@ class TemplateEditorView @JvmOverloads constructor(
                     if (dAngle > 180f)  dAngle -= 360f
                     if (dAngle < -180f) dAngle += 360f
 
-                    val dMidX = (curMidX - lastMidX) / scale
-                    val dMidY = (curMidY - lastMidY) / scale
-
-                    val pivotLogicX = (curMidX - dx) / scale - cell.rect.left
-                    val pivotLogicY = (curMidY - dy) / scale - cell.rect.top
+                    val dMid  = toCellVec(cell, (curMidX - lastMidX) / scale, (curMidY - lastMidY) / scale)
+                    val pivot = toCellPoint(cell, (curMidX - dx) / scale, (curMidY - dy) / scale)
 
                     cell.matrix.apply {
-                        postTranslate(dMidX, dMidY)
-                        postScale(scaleFactor, scaleFactor, pivotLogicX, pivotLogicY)
+                        postTranslate(dMid[0], dMid[1])
+                        postScale(scaleFactor, scaleFactor, pivot[0], pivot[1])
                         if (abs(dAngle) < 30f) {
-                            postRotate(dAngle, pivotLogicX, pivotLogicY)
+                            postRotate(dAngle, pivot[0], pivot[1])
                         }
                     }
 
@@ -318,7 +331,42 @@ class TemplateEditorView @JvmOverloads constructor(
         if (scale <= 0f) return null
         val logicX = (x - dx) / scale
         val logicY = (y - dy) / scale
-        return cells.find { it.rect.contains(logicX, logicY) }
+        return cells.find { cellContains(it, logicX, logicY) }
+    }
+
+    // Hit-test trong khong gian logic, co tinh goc xoay cua o.
+    private fun cellContains(cell: PhotoCell, lx: Float, ly: Float): Boolean {
+        if (cell.angle == 0f) return cell.rect.contains(lx, ly)
+        // Xoay nguoc diem ve he o (huy canvas.rotate) roi test rect thang.
+        val rad = Math.toRadians(-cell.angle.toDouble())
+        val cos = Math.cos(rad); val sin = Math.sin(rad)
+        val cx = cell.rect.centerX(); val cy = cell.rect.centerY()
+        val ox = (lx - cx).toDouble(); val oy = (ly - cy).toDouble()
+        val rx = cx + (ox * cos - oy * sin).toFloat()
+        val ry = cy + (ox * sin + oy * cos).toFloat()
+        return cell.rect.contains(rx, ry)
+    }
+
+    // Chuyen vector dich chuyen (da chia scale, he man hinh) ve he o (huy goc xoay).
+    private fun toCellVec(cell: PhotoCell, vx: Float, vy: Float): FloatArray {
+        if (cell.angle == 0f) return floatArrayOf(vx, vy)
+        val v = floatArrayOf(vx, vy)
+        Matrix().apply { setRotate(-cell.angle) }.mapVectors(v)
+        return v
+    }
+
+    // Chuyen diem logic ve he ve cua o (huy goc xoay quanh tam, roi tru goc trai-tren).
+    private fun toCellPoint(cell: PhotoCell, lx: Float, ly: Float): FloatArray {
+        var px = lx; var py = ly
+        if (cell.angle != 0f) {
+            val rad = Math.toRadians(-cell.angle.toDouble())
+            val cos = Math.cos(rad); val sin = Math.sin(rad)
+            val cx = cell.rect.centerX(); val cy = cell.rect.centerY()
+            val ox = (lx - cx).toDouble(); val oy = (ly - cy).toDouble()
+            px = cx + (ox * cos - oy * sin).toFloat()
+            py = cy + (ox * sin + oy * cos).toFloat()
+        }
+        return floatArrayOf(px - cell.rect.left, py - cell.rect.top)
     }
 
     // ── Public API ────────────────────────────────────────
@@ -347,6 +395,38 @@ class TemplateEditorView @JvmOverloads constructor(
         for (i in pixels.indices) {
             val r = Color.red(pixels[i]); val g = Color.green(pixels[i]); val b = Color.blue(pixels[i])
             if (r > 240 && g > 240 && b > 240) pixels[i] = Color.TRANSPARENT
+        }
+        val mask = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        mask.setPixels(pixels, 0, w, 0, 0, w, h)
+        return mask
+    }
+
+    // Mask ô xám #ededed: pixel trung tính sáng (~225..245) -> trong suốt.
+    // Loại trắng (>245: viền/giấy) và màu (saturation cao). Ảnh hiện đúng theo hình khung xám.
+    fun createMaskFromGray(src: Bitmap): Bitmap {
+        val w = src.width; val h = src.height
+        val pixels = IntArray(w * h)
+        src.getPixels(pixels, 0, w, 0, 0, w, h)
+        for (i in pixels.indices) {
+            val r = Color.red(pixels[i]); val g = Color.green(pixels[i]); val b = Color.blue(pixels[i])
+            val mx = max(r, max(g, b)); val mn = min(r, min(g, b))
+            if (mx in 231..243 && (mx - mn) <= 7) pixels[i] = Color.TRANSPARENT
+        }
+        val mask = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        mask.setPixels(pixels, 0, w, 0, 0, w, h)
+        return mask
+    }
+
+    // Mask ô xám SÁNG hơn (~#d9d9d9): pixel trung tính ~208..228 -> trong suốt.
+    // Dùng cho ô xám ngoài dải GRAY (sm02 ~217, sm04 ~222).
+    fun createMaskFromGray2(src: Bitmap): Bitmap {
+        val w = src.width; val h = src.height
+        val pixels = IntArray(w * h)
+        src.getPixels(pixels, 0, w, 0, 0, w, h)
+        for (i in pixels.indices) {
+            val r = Color.red(pixels[i]); val g = Color.green(pixels[i]); val b = Color.blue(pixels[i])
+            val mx = max(r, max(g, b)); val mn = min(r, min(g, b))
+            if (mx in 208..228 && (mx - mn) <= 10) pixels[i] = Color.TRANSPARENT
         }
         val mask = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         mask.setPixels(pixels, 0, w, 0, 0, w, h)

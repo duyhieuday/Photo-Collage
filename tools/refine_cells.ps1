@@ -15,20 +15,15 @@ $AW = 562; $AH = 1000
 
 # id -> @{ mode='white'|'gray'; pts=@(@(fx,fy),...) }
 $cfg = @{
-  "sm02" = @{ mode='gray';  pts=@(@(0.35,0.30),@(0.16,0.55),@(0.33,0.55),@(0.16,0.88),@(0.33,0.88),@(0.62,0.58)) }
-  "sm03" = @{ mode='gray';  pts=@(@(0.20,0.42),@(0.47,0.65),@(0.47,0.93)) }
-  "sm04" = @{ mode='gray';  pts=@(@(0.36,0.18),@(0.22,0.62)) }
-  "sm05" = @{ mode='gray';  pts=@(@(0.27,0.20),@(0.38,0.40),@(0.36,0.56),@(0.34,0.70)) }
-  "sm06" = @{ mode='gray';  pts=@(@(0.20,0.22),@(0.53,0.20),@(0.17,0.50),@(0.49,0.55),@(0.35,0.80)) }
-  "sm08" = @{ mode='gray';  pts=@(@(0.10,0.18),@(0.10,0.42),@(0.10,0.65),@(0.26,0.27),@(0.26,0.55),@(0.42,0.22),@(0.42,0.52),@(0.42,0.78)) }
-  "sm09" = @{ mode='white'; pts=@(@(0.15,0.17),@(0.13,0.42),@(0.11,0.65),@(0.37,0.45),@(0.38,0.70)) }
+  "sm05" = @{ mode='gray'; pts=@(@(0.30,0.18),@(0.42,0.27),@(0.39,0.43),@(0.36,0.59)) }
 }
 
 function Get-Mask($path,$mode){
   $img=[System.Drawing.Image]::FromFile($path)
   $small=New-Object System.Drawing.Bitmap $AW,$AH
   $g=[System.Drawing.Graphics]::FromImage($small)
-  $g.InterpolationMode=[System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+  $g.InterpolationMode=[System.Drawing.Drawing2D.InterpolationMode]::NearestNeighbor
+  $g.PixelOffsetMode=[System.Drawing.Drawing2D.PixelOffsetMode]::Half
   $g.DrawImage($img,0,0,$AW,$AH);$g.Dispose();$img.Dispose()
   $rect=New-Object System.Drawing.Rectangle 0,0,$AW,$AH
   $data=$small.LockBits($rect,[System.Drawing.Imaging.ImageLockMode]::ReadOnly,[System.Drawing.Imaging.PixelFormat]::Format24bppRgb)
@@ -43,7 +38,7 @@ function Get-Mask($path,$mode){
         if($r -ge 248 -and $gr -ge 248 -and $b -ge 248){$mask[$y*$AW+$x]=$true}
       } else {
         $mx=[Math]::Max($r,[Math]::Max($gr,$b));$mn=[Math]::Min($r,[Math]::Min($gr,$b))
-        if($mx -ge 222 -and $mx -le 244 -and ($mx-$mn) -le 12){$mask[$y*$AW+$x]=$true}
+        if($mx -ge 228 -and $mx -le 242 -and ($mx-$mn) -le 8){$mask[$y*$AW+$x]=$true}
       }
     }
   }

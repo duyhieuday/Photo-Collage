@@ -16,8 +16,15 @@ enum class MaskMode {
     WHITE,
     BLACK,
 
-    // Không tạo mask overlay: ảnh fill thẳng theo cellRect (dùng cho ô màu xám
-    // #ededed hình chữ nhật mà createMaskFromWhite không xử lý được).
+    // Mask theo ô XÁM #ededed: pixel xám trung tính -> trong suốt -> ảnh hiện ĐÚNG
+    // theo hình khung xám (kể cả nghiêng/bo góc), ô chỉ cần bao trùm khung.
+    GRAY,
+
+    // Như GRAY nhưng cho ô xám SÁNG/nhạt hơn (~#d9d9d9, R/G/B ~208..228).
+    // Dùng cho template có ô xám ngoài dải GRAY (vd sm02 ~217, sm04 ~222).
+    GRAY2,
+
+    // Không tạo mask overlay: ảnh fill thẳng theo cellRect.
     NONE
 }
 
@@ -26,7 +33,7 @@ enum class MaskMode {
 object TemplateRepository {
 
     private fun cells(id: String): List<RectF> = TemplateCells.rects[id] ?: emptyList()
-    private fun mask(id: String): MaskMode = TemplateCells.masks[id] ?: MaskMode.WHITE
+    private fun mask(id: String): MaskMode = TemplateCells.masks[id] ?: MaskMode.NONE
 
     val all: List<TemplateData> by lazy {
         listOf(
