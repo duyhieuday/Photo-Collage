@@ -32,6 +32,7 @@ class TemplatePickerAdapter(
     override fun onBindViewHolder(holder: VH, position: Int) {
         val t = templates[position]
 
+        // Preview dùng thumb_ (ảnh đã điền sẵn ảnh mẫu) cho card đẹp.
         // Load qua Glide: decode background + downsample + cache → vuốt mượt.
         // RGB_565 (16-bit) + override nhỏ để giảm RAM.
         Glide.with(holder.thumb)

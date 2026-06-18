@@ -58,7 +58,6 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import com.example.piceditor.ShowImageActivity
 import androidx.core.graphics.scale
-import com.example.piceditor.ads.InterAds
 import com.yalantis.ucrop.UCrop
 import com.yalantis.ucrop.UCropFragment
 import com.yalantis.ucrop.UCropFragmentCallback
@@ -159,7 +158,6 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
             return
         }
         super.onBackPressed()
-        InterAds.showAdsBreak(this@TemplateEditorActivity) { finish() }
     }
 
     override fun afterSetContentView() {
@@ -721,12 +719,10 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
             val uri = result.mResultData?.let { UCrop.getOutput(it) } ?: cropDestUri
             closeCropOverlay()
             if (uri != null) {
-                InterAds.showAdsBreak(this@TemplateEditorActivity) {
-                    startActivity(Intent(this, ShowImageActivity::class.java).apply {
-                        putExtra("image_uri", uri.toString())
-                    })
-                    finish()
-                }
+                startActivity(Intent(this, ShowImageActivity::class.java).apply {
+                    putExtra("image_uri", uri.toString())
+                })
+                finish()
             }
         } else if (result.mResultCode == UCrop.RESULT_ERROR) {
             result.mResultData?.let { UCrop.getError(it) }?.printStackTrace()

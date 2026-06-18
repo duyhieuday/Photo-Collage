@@ -44,12 +44,13 @@ class TemplateSectionAdapter(
         holder.title.text = section.title
         holder.rv.adapter = TemplatePickerAdapter(section.templates, onPick = onPick)
 
-        // "See all" → mở màn full-category (grid 2 cột) cho category này.
-        holder.seeAll.setOnClickListener {
-            CategoryTemplatesActivity.start(
-                holder.itemView.context, section.title, section.templates
-            )
-        }
+        // "See all" / tên category → mở màn full-category (kèm inter ad như các transition khác).
+        holder.seeAll.setOnClickListener { openCategory(holder.itemView.context, section) }
+        holder.title.setOnClickListener { openCategory(holder.itemView.context, section) }
+    }
+
+    private fun openCategory(ctx: android.content.Context, section: TemplateRepository.CategorySection) {
+        CategoryTemplatesActivity.start(ctx, section.title, section.templates)
     }
 
     override fun getItemCount() = sections.size

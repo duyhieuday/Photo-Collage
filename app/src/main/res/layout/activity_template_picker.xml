@@ -48,6 +48,7 @@
         android:layout_below="@+id/layoutBar"
         android:layout_above="@+id/layoutAds"
         android:layout_marginTop="@dimen/dimen_8dp"
+        android:layout_marginHorizontal="@dimen/dimen_8dp"
         android:clipToPadding="false"/>
 
     <LinearLayout

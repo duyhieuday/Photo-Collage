@@ -7,7 +7,6 @@ import android.view.View
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.piceditor.R
-import com.example.piceditor.ads.InterAds
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityCategoryTemplatesBinding
@@ -59,7 +58,6 @@ class CategoryTemplatesActivity : BaseActivityNew<ActivityCategoryTemplatesBindi
 
     override fun onBackPressed() {
         super.onBackPressed()
-        InterAds.showAdsBreak(this@CategoryTemplatesActivity) { finish() }
     }
 
     override fun setListener() {}
@@ -83,11 +81,9 @@ class CategoryTemplatesActivity : BaseActivityNew<ActivityCategoryTemplatesBindi
         binding.rvGridTemplates.layoutManager = GridLayoutManager(this, 2)
         binding.rvGridTemplates.adapter =
             TemplatePickerAdapter(templates, R.layout.item_template) { template ->
-                InterAds.showAdsBreak(this@CategoryTemplatesActivity) {
-                    val intent = Intent(this, TemplateEditorActivity::class.java)
-                    intent.putExtra(TemplateEditorActivity.EXTRA_TEMPLATE_ID, template.id)
-                    startActivity(intent)
-                }
+                val intent = Intent(this, TemplateEditorActivity::class.java)
+                intent.putExtra(TemplateEditorActivity.EXTRA_TEMPLATE_ID, template.id)
+                startActivity(intent)
             }
     }
 }

@@ -67,15 +67,23 @@
 
         </RelativeLayout>
 
-        <!-- ── TemplateEditorView ── -->
-        <com.example.piceditor.templates_editor.TemplateEditorView
-            android:id="@+id/templateEditorView"
+        <!-- ── TemplateEditorView (canvas tự co đúng aspect ratio template, căn giữa) ── -->
+        <FrameLayout
+            android:id="@+id/templateContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/layoutBar"
             android:layout_above="@+id/flContent"
             android:layout_marginHorizontal="26dp"
-            android:layout_marginVertical="40dp" />
+            android:layout_marginVertical="40dp">
+
+            <com.example.piceditor.templates_editor.TemplateEditorView
+                android:id="@+id/templateEditorView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+
+        </FrameLayout>
 
         <!-- ── Tool panels ── -->
         <FrameLayout

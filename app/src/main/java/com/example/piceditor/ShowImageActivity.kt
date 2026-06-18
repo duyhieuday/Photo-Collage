@@ -23,6 +23,8 @@ import com.example.piceditor.databinding.ActivityShowImageBinding
 import com.example.piceditor.templates_editor.Template
 import com.example.piceditor.templates_editor.TemplateEditorActivity
 import com.example.piceditor.templates_editor.TemplatePickerActivity
+import com.example.piceditor.templates_editor.TemplatePickerAdapter
+import com.example.piceditor.templates_editor.TemplateRepository
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utilsApp.Constant
 import com.example.piceditor.utilsApp.PreferenceUtil
@@ -121,34 +123,26 @@ class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnCl
     }
 
     private fun setUpTemp() {
-        val gson = Gson()
-        val type = object : TypeToken<MutableList<Template?>?>() {}.getType()
-        val temps: MutableList<Template?>? = try {
-            gson.fromJson(InputStreamReader(assets.open("temp.json")), type)
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
-
         binding.rcvTemplates.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
-        templateList    = temps
-        templateAdapter = TemplateAdapter()
-        templateAdapter?.setData(templateList)
-        binding.rcvTemplates.adapter = templateAdapter
-        binding.rcvTemplates.smoothScrollToPosition(0)
-
-        // ✅ template.id là Int, TemplateRepository.findById() nhận String → toString()
-        templateAdapter?.setClickListener { position, template ->
-            if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setClickListener
-            mLastClickTime = SystemClock.elapsedRealtime()
-            InterAds.showAdsBreak(this@ShowImageActivity) {
-                val intent = Intent(this, TemplateEditorActivity::class.java).apply {
-                    putExtra(TemplateEditorActivity.EXTRA_TEMPLATE_ID, template?.id?.toString())
+        // Dùng CHUNG nguồn TemplateRepository với picker (id dạng "bd01"...).
+        // Bỏ assets/temp.json (id số 1..20 cũ) để nhấn ra ĐÚNG template.
+        binding.rcvTemplates.adapter =
+            TemplatePickerAdapter(TemplateRepository.all) { template ->
+                val now = SystemClock.elapsedRealtime()
+                if (now - mLastClickTime >= 1000) {
+                    mLastClickTime = now
+                    InterAds.showAdsBreak(this@ShowImageActivity) {
+                        startActivity(
+                            Intent(this, TemplateEditorActivity::class.java).apply {
+                                putExtra(TemplateEditorActivity.EXTRA_TEMPLATE_ID, template.id)
+                            }
+                        )
+                    }
                 }
-                startActivity(intent)
             }
-        }
+        binding.rcvTemplates.smoothScrollToPosition(0)
 
         binding.tvSeeAllTemplate.setOnClickListener {
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener

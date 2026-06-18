@@ -62,8 +62,37 @@ class TemplateEditorView @JvmOverloads constructor(
     // ── Layout: tự co lại đúng aspect ratio template ──────
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        drawView?.measure(widthMeasureSpec, heightMeasureSpec)
+        val availW = MeasureSpec.getSize(widthMeasureSpec)
+        val availH = MeasureSpec.getSize(heightMeasureSpec)
+
+        // Chưa biết kích thước hoặc aspect ratio template -> đo mặc định.
+        if (availW <= 0 || availH <= 0 || templateLogicW <= 0f || templateLogicH <= 0f) {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+            drawView?.measure(widthMeasureSpec, heightMeasureSpec)
+            return
+        }
+
+        // ✅ Co view khít đúng aspect ratio template -> hiện FULL template, không crop, không viền trắng.
+        // Khung lớn nhất theo tỉ lệ template nằm gọn trong vùng cho phép (slot - margin).
+        val templateAR = templateLogicW / templateLogicH
+        val availAR = availW.toFloat() / availH.toFloat()
+
+        val w: Int
+        val h: Int
+        if (availAR > templateAR) {
+            // Vùng rộng hơn template -> giới hạn theo chiều cao.
+            h = availH
+            w = (availH * templateAR).toInt()
+        } else {
+            // Vùng cao hơn template -> giới hạn theo chiều rộng.
+            w = availW
+            h = (availW / templateAR).toInt()
+        }
+
+        val wSpec = MeasureSpec.makeMeasureSpec(w, MeasureSpec.EXACTLY)
+        val hSpec = MeasureSpec.makeMeasureSpec(h, MeasureSpec.EXACTLY)
+        setMeasuredDimension(w, h)
+        drawView?.measure(wSpec, hSpec)
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {

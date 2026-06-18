@@ -3,20 +3,27 @@
 
 $CELLS = [ordered]@{
   # ---- Birthday ----
-  "bd01"=@(@(343,496,801,985),@(129,986,588,1476),@(523,1494,981,1983))
-  "bd02"=@(@(0,1431,336,1796),@(393,1431,732,1796),@(789,1431,1125,1796))
-  "bd03"=@(@(497,90,1054,834),@(109,1075,653,1802))
-  "bd04"=@(@(655,422,1082,986),@(695,1179,1061,1668))
+  # bd01 Snoopy bac: 3 polaroid TRANG nghieng (-9/4/-16.5) - NONE + minrect white
+  "bd01"=@(@(383,453,841,943,-9),@(108,1003,567,1492,4),@(591,1410,1050,1901,-16.5))
+  # bd02 "to me": GRAY mask (vung tren XAM 237 = o LON, + 3 o nho duoi giu caption). Them o lon.
+  "bd02"=@(@(0,0,1125,1415),@(0,1431,335,1795),@(393,1431,731,1796),@(789,1432,1124,1796))
+  # bd03 lich 7.14: 2 polaroid TRANG nghieng (10.5/-10.5) - NONE + minrect white
+  "bd03"=@(@(423,134,982,880,10.5),@(171,1017,717,1746,-10.5))
+  # bd04 gingham: 2 o XAM ~205 nghieng (6/-7), goc vuong - NONE + rect xoay
+  "bd04"=@(@(622,443,1051,1009,6),@(722,1153,1091,1644,-7))
   "bd05"=@(,@(267,642,955,1567))
   "bd06"=@(,@(152,158,963,1230))
   "bd07"=@(,@(118,566,966,1374))
   "bd08"=@(,@(231,711,894,1457))
-  "bd09"=@(@(66,557,585,1088),@(599,1220,1034,1663))
+  # bd09 Yankees: 2 polaroid TRANG (gan thang) - NONE + minrect white
+  "bd09"=@(@(70,551,589,1083,-1),@(599,1220,1034,1663))
   "bd10"=@(@(608,424,1083,889),@(608,935,1083,1402),@(608,1449,1083,1924),@(88,1449,562,1924))
 
   # ---- Couple ----
-  "cp01"=@(@(222,295,990,775),@(165,775,905,1295))
-  "cp02"=@(@(0,0,1125,667),@(0,667,1125,1333),@(0,1333,1125,2000))
+  # cp01 Anniversary: 2 o TRANG nghieng (top -6.5) - NONE + minrect white
+  "cp01"=@(@(244,291,986,812,-6.5),@(225,773,904,1294))
+  # cp02 giay rach: 3 dai XAM 232 + divider TRANG -> GRAY mask (giu mep rach)
+  "cp02"=@(@(0,0,1125,656),@(0,661,1125,1334),@(0,1331,1125,2000))
   # cp03 film strip: khung NGHIENG ~ -12.7 deg (rect = khung thang quanh tam + goc xoay)
   "cp03"=@(@(84,92,730,576,-12.7),@(202,631,848,1111,-12.5),@(323,1166,959,1662,-12.9))
   "cp04"=@(@(500,40,1069,788),@(111,1085,672,1833))
@@ -25,36 +32,51 @@ $CELLS = [ordered]@{
   # cp06 (WHITE mask, o bao trum man hinh + o card)
   # cp06 (WHITE mask): man hinh 5 deg + card -4.5 deg (min-area-rect)
   "cp06"=@(@(465,495,812,955,5),@(193,1294,547,1649,-4.5))
-  "cp07"=@(@(167,357,723,842),@(365,1285,918,1766))
-  "cp08"=@(@(459,559,993,966),@(296,1145,661,1561))
+  # cp07 Twitter You/Me: 2 o anh card XAM 237 nghieng (-8/4.5) -> GRAY mask (giu card+chu)
+  "cp07"=@(@(168,353,721,836,-8),@(362,1295,915,1778,4.5))
+  # cp08 "Dear my darling": 2 o TRANG 255, hoa che goc -> WHITE mask (clip dung hinh o + hoa noi tren).
+  #   o tren THUC SU nghieng ~23 deg (flood-fill xac nhan: canh dai top->right = 23 deg).
+  "cp08"=@(@(355,645,890,1056,23.5),@(287,1152,651,1570,2.5))
   "cp09"=@(@(145,344,560,759),@(603,344,1017,759),@(145,803,560,1217),@(603,803,1017,1217),@(145,1261,560,1676),@(603,1261,1017,1676))
 
   # ---- Glad season ----
-  "gs01"=@(,@(224,836,944,1684))
-  "gs02"=@(@(188,352,936,836),@(188,872,936,1284))
-  "gs03"=@(@(86,480,554,1096),@(565,482,1029,1090),@(579,1118,1035,1712),@(86,1092,554,1702))
+  # gs01 Happy Graduation: 1 o XAM 237 nghieng -4.5 (polaroid treo) -> GRAY mask (giu vien+kep+may)
+  "gs01"=@(,@(243,850,925,1672,-4.5))
+  # gs02 typewriter: 2 o TRANG 255, nen kem 242 (khong WHITE-mask duoc) -> NONE
+  "gs02"=@(@(188,349,936,838),@(187,870,936,1286))
+  # gs03 BACK to SCHOOL (most-popular): 4 polaroid TRANG nghieng nhe; cell cu THANG -> them goc (NONE, nen trang)
+  "gs03"=@(@(101,469,540,1086,-3),@(557,487,1020,1083,1.5),@(589,1126,1022,1702,-2.5),@(119,1125,552,1701,0.5))
   "gs04"=@(@(32,52,368,708),@(392,52,732,708),@(756,52,1092,708),@(32,1292,368,1944),@(392,1292,732,1944),@(756,1292,1092,1944))
-  "gs05"=@(@(77,77,1049,1051),@(58,1591,459,1970))
+  # gs05 THE CLASS (blue grid): 2 o TRANG 255 (o lon BO GOC), nen XANH -> WHITE mask (clip bo goc, khung xanh+textbox giu)
+  "gs05"=@(@(80,80,1049,1049),@(59,1592,457,1968))
   "gs06"=@(@(68,620,1056,1140),@(552,1172,1056,1628))
-  "gs07"=@(@(61,186,526,662),@(634,780,1072,1223),@(44,1393,500,1854))
-  "gs08"=@(@(68,478,515,1065),@(665,949,1082,1378))
+  # gs07 CLASS OF 26: 3 polaroid TRANG nghieng (-10.5/4.5/-5.5) - NONE + minrect white
+  "gs07"=@(@(100,138,567,615,-10.5),@(615,796,1054,1239,4.5),@(64,1370,520,1830,-5.5))
+  # gs08 Seniors: o phone (-6, giu nguyen - OK) + polaroid (6 deg). Polaroid duoi bi toi -> do mep tay, rect bao kin polaroid
+  "gs08"=@(@(93,451,545,1040,-6),@(612,920,1108,1500,6))
   "gs09"=@(@(519,477,997,814),@(91,1006,600,1370))
   "gs10"=@(,@(222,628,856,1306))
 
   # ---- IG Story ----
   "is01"=@(@(83,275,542,900),@(52,973,510,1598),@(615,399,1073,1024),@(583,1097,1042,1722))
-  "is02"=@(,@(188,300,1004,1112))
+  # is02 music player: 1 o anh TRANG 255 (khung giay 243 -> WHITE mask cat ca khung, dung NONE); cell cu lech xuong
+  "is02"=@(,@(155,212,971,1024))
   "is03"=@(,@(251,599,901,1288))
-  "is04"=@(@(113,158,523,573),@(604,729,1034,1173),@(95,1366,526,1806))
+  # is04 Pochacco: o anh = vung TRANG 255 (vien xam polaroid bao ngoai); NONE + rect = dung mep o trang
+  "is04"=@(@(112,158,522,572),@(599,734,1030,1177,1),@(90,1370,521,1810,1))
   # is05 notebook: 5 o NGHIENG (GRAY mask + o xoay; seedflood 4-corner fit chuan)
   "is05"=@(@(123,266,467,746,-4.5),@(503,410,1032,892,-4.5),@(162,775,508,1255,-4.5),@(542,925,1073,1407,-4),@(203,1284,545,1764,-4.5))
   # is06: o chu nhat trang + hinh tim/may (bao long, se dung MaskMode.WHITE clip theo hinh)
   "is06"=@(@(53,329,530,1019),@(573,314,1075,905),@(40,1135,550,1595),@(574,1054,1056,1751))
-  "is07"=@(@(132,198,845,880),@(287,879,1087,1669))
-  "is08"=@(@(231,110,783,662),@(49,1295,601,1847),@(502,736,1054,1288))
+  # is07 Lovely Barbie: 2 khung BO GOC, o trong XAM 237 NGHIENG (-3 / 6 deg) -> GRAY mask clip bo goc
+  "is07"=@(@(178,210,829,776,-3),@(273,947,1019,1617,6))
+  # is08 Save The Moments: 3 khung giay RACH, o trong XAM 237 NGHIENG (13.5 / -2 / -13 deg) -> GRAY mask
+  "is08"=@(@(162,169,708,716,13.5),@(514,730,1060,1276,-2),@(106,1229,652,1776,-13))
   "is09"=@(@(136,552,386,851),@(430,552,989,1536),@(136,895,386,1194),@(136,1238,386,1536))
-  "is10"=@(@(571,181,1055,680),@(105,1105,549,1560))
-  "is11"=@(@(116,252,564,884),@(468,1120,1004,1880))
+  # is10 Vinyl: 2 polaroid o trong TRANG 255 (vien 231 tach duoc), NGHIENG (7 / -17 deg) -> NONE + rect xoay
+  "is10"=@(@(538,209,1023,709,7),@(161,1028,607,1485,-17))
+  # is11 vien sao: 2 o trong TRANG 255 (vien sao nhieu mau tach duoc), gan thang -> NONE + rect
+  "is11"=@(@(116,251,565,887),@(466,1117,1005,1882))
   # is12 (GRAY mask, o bao trum): Travels + Couple + Gym
   # is12 (GRAY mask): Travels/Couple/Gym - o xam THANG (0 deg, khung mau nghieng chi trang tri)
   "is12"=@(@(73,309,434,777),@(497,103,974,817),@(145,1419,921,1867))
@@ -94,4 +116,7 @@ $CELLS = [ordered]@{
 #  sm01 = card TRANG tren nen vang (WHITE); sm03 page xam 237 + sm07 puzzle xam 232 (GRAY 231-243);
 #  sm02 (~217) & sm04 (~222) xam SANG hon dai GRAY -> GRAY2 (208-228).
 $MASKS = @{ "is05"="GRAY"; "is12"="GRAY"; "sm05"="GRAY"; "sp01"="GRAY"; "is06"="WHITE"; "cp06"="WHITE";
-            "sm01"="WHITE"; "sm02"="GRAY2"; "sm03"="GRAY"; "sm04"="GRAY2"; "sm07"="GRAY" }
+            "sm01"="WHITE"; "sm02"="GRAY2"; "sm03"="GRAY"; "sm04"="GRAY2"; "sm07"="GRAY";
+            "is07"="GRAY"; "is08"="GRAY";
+            "bd02"="GRAY"; "cp02"="GRAY"; "cp07"="GRAY"; "cp08"="WHITE";
+            "gs01"="GRAY"; "gs05"="WHITE"; "gs02"="WHITE" }
