@@ -21,7 +21,7 @@ $CELLS = [ordered]@{
 
   # ---- Couple ----
   # cp01 Anniversary: 2 o TRANG nghieng (top -6.5) - NONE + minrect white
-  "cp01"=@(@(244,291,986,812,-6.5),@(225,773,904,1294))
+  "cp01"=@(@(179,281,983,701,-7),@(151,674,910,1290,-3.4))
   # cp02 giay rach: 3 dai XAM 232 + divider TRANG -> GRAY mask (giu mep rach)
   "cp02"=@(@(0,0,1125,656),@(0,661,1125,1334),@(0,1331,1125,2000))
   # cp03 film strip: khung NGHIENG ~ -12.7 deg (rect = khung thang quanh tam + goc xoay)

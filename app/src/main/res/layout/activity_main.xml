@@ -217,7 +217,6 @@
                         android:fontFamily="@font/inter_medium"
                         android:textColor="#039855"
                         android:padding="@dimen/dimen_8dp"
-                        android:layout_marginHorizontal="16dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true" />
 
@@ -260,7 +259,6 @@
                         android:fontFamily="@font/inter_medium"
                         android:textColor="#039855"
                         android:padding="@dimen/dimen_8dp"
-                        android:layout_marginHorizontal="16dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true" />
 

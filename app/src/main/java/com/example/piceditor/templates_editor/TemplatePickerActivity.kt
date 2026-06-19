@@ -8,6 +8,7 @@ import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.piceditor.R
 import com.example.piceditor.SelectImageActivity
+import com.example.piceditor.ads.InterAds
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityTemplatePickerBinding
@@ -41,7 +42,7 @@ class TemplatePickerActivity : BaseActivityNew<ActivityTemplatePickerBinding>() 
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
+        InterAds.showAdsBreak(this@TemplatePickerActivity) { super.onBackPressed() }
     }
 
     override fun setListener() {}
@@ -55,16 +56,17 @@ class TemplatePickerActivity : BaseActivityNew<ActivityTemplatePickerBinding>() 
         BarsUtils.setAppearanceLightStatusBars(this, true)
 
         binding.btnBack.setOnClickListener {
-            finish()
+            InterAds.showAdsBreak(this@TemplatePickerActivity) { finish() }
         }
 
         binding.rvSections.layoutManager = LinearLayoutManager(this)
 
         binding.rvSections.adapter = TemplateSectionAdapter(TemplateRepository.sections) { template ->
-            val intent = Intent(this, TemplateEditorActivity::class.java)
-            Log.e("xcncnajj1", "setUpTemp: " + template.id )
-            intent.putExtra(TemplateEditorActivity.Companion.EXTRA_TEMPLATE_ID, template.id)
-            startActivity(intent)
+            InterAds.showAdsBreak(this@TemplatePickerActivity) {
+                val intent = Intent(this, TemplateEditorActivity::class.java)
+                intent.putExtra(TemplateEditorActivity.Companion.EXTRA_TEMPLATE_ID, template.id)
+                startActivity(intent)
+            }
         }
     }
 }

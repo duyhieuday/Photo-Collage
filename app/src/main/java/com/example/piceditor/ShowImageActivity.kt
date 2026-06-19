@@ -15,12 +15,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import com.example.piceditor.adapters.TemplateAdapter
 import com.example.piceditor.ads.InterAds
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityShowImageBinding
-import com.example.piceditor.templates_editor.Template
 import com.example.piceditor.templates_editor.TemplateEditorActivity
 import com.example.piceditor.templates_editor.TemplatePickerActivity
 import com.example.piceditor.templates_editor.TemplatePickerAdapter
@@ -28,16 +26,12 @@ import com.example.piceditor.templates_editor.TemplateRepository
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utilsApp.Constant
 import com.example.piceditor.utilsApp.PreferenceUtil
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStreamReader
 
 class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnClickListener {
 
@@ -48,8 +42,6 @@ class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnCl
     private var cachedShareFile: File? = null
     private var shareJob: Job? = null
     private var mLastClickTime: Long = 0
-    private var templateAdapter: TemplateAdapter? = null
-    private var templateList: MutableList<Template?>? = null
 
     override fun getLayoutRes(): Int = R.layout.activity_show_image
     override fun getFrame(): Int = 0

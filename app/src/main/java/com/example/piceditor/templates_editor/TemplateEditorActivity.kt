@@ -58,6 +58,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import com.example.piceditor.ShowImageActivity
 import androidx.core.graphics.scale
+import com.example.piceditor.ads.InterAds
 import com.yalantis.ucrop.UCrop
 import com.yalantis.ucrop.UCropFragment
 import com.yalantis.ucrop.UCropFragmentCallback
@@ -157,7 +158,7 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
             closeCropOverlay()
             return
         }
-        super.onBackPressed()
+        InterAds.showAdsBreak(this@TemplateEditorActivity) { super.onBackPressed() }
     }
 
     override fun afterSetContentView() {
@@ -232,7 +233,9 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
     // -- Setup --
 
     private fun setupListeners() {
-        binding.btnBack.setOnClickListener { finish() }
+        binding.btnBack.setOnClickListener {
+            InterAds.showAdsBreak(this@TemplateEditorActivity) { finish() }
+        }
         binding.btnExport.setOnClickListener { onExportClick() }
 
         binding.btnUndo.setOnClickListener {
@@ -719,10 +722,12 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
             val uri = result.mResultData?.let { UCrop.getOutput(it) } ?: cropDestUri
             closeCropOverlay()
             if (uri != null) {
-                startActivity(Intent(this, ShowImageActivity::class.java).apply {
-                    putExtra("image_uri", uri.toString())
-                })
-                finish()
+                InterAds.showAdsBreak(this@TemplateEditorActivity) {
+                    startActivity(Intent(this, ShowImageActivity::class.java).apply {
+                        putExtra("image_uri", uri.toString())
+                    })
+                    finish()
+                }
             }
         } else if (result.mResultCode == UCrop.RESULT_ERROR) {
             result.mResultData?.let { UCrop.getError(it) }?.printStackTrace()
@@ -901,11 +906,13 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
                 }.getOrNull()
             }
             if (savedUri != null) {
-                startActivity(
-                    Intent(this@TemplateEditorActivity, ShowImageActivity::class.java).apply {
-                        putExtra("image_uri", savedUri.toString())
-                    }
-                )
+                InterAds.showAdsBreak(this@TemplateEditorActivity) {
+                    startActivity(
+                        Intent(this@TemplateEditorActivity, ShowImageActivity::class.java).apply {
+                            putExtra("image_uri", savedUri.toString())
+                        }
+                    )
+                }
             } else {
                 Toast.makeText(this@TemplateEditorActivity, "Save failed", Toast.LENGTH_SHORT).show()
             }

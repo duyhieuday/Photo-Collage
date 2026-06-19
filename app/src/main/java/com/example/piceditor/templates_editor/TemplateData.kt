@@ -50,7 +50,7 @@ object TemplateRepository {
             TemplateData("bd10", "BD10", R.drawable.temp_bd10, R.drawable.thumb_bd10, cells("bd10"), mask("bd10")),
 
             // ── Couple ────────────────────────────────────────
-            TemplateData("cp01", "CP01", R.drawable.temp_cp01, R.drawable.thumb_cp01, cells("cp01"), mask("cp01")),
+            // cp01 đã bỏ khỏi catalog (ô ảnh không khớp khung, tạm ẩn).
             TemplateData("cp02", "CP02", R.drawable.temp_cp02, R.drawable.thumb_cp02, cells("cp02"), mask("cp02")),
             TemplateData("cp03", "CP03", R.drawable.temp_cp03, R.drawable.thumb_cp03, cells("cp03"), mask("cp03")),
             TemplateData("cp04", "CP04", R.drawable.temp_cp04, R.drawable.thumb_cp04, cells("cp04"), mask("cp04")),
@@ -82,7 +82,8 @@ object TemplateRepository {
             TemplateData("is07", "IS07", R.drawable.temp_is07, R.drawable.thumb_is07, cells("is07"), mask("is07")),
             TemplateData("is08", "IS08", R.drawable.temp_is08, R.drawable.thumb_is08, cells("is08"), mask("is08")),
             TemplateData("is09", "IS09", R.drawable.temp_is09, R.drawable.thumb_is09, cells("is09"), mask("is09")),
-            TemplateData("is10", "IS10", R.drawable.temp_is10, R.drawable.thumb_is10, cells("is10"), mask("is10")),
+            // thumb_is10 import bị lệch design (3 khung) so với temp_is10 (2 khung) -> preview dùng temp_ cho khớp.
+            TemplateData("is10", "IS10", R.drawable.temp_is10, R.drawable.temp_is10, cells("is10"), mask("is10")),
             TemplateData("is11", "IS11", R.drawable.temp_is11, R.drawable.thumb_is11, cells("is11"), mask("is11")),
             TemplateData("is12", "IS12", R.drawable.temp_is12, R.drawable.thumb_is12, cells("is12"), mask("is12")),
             TemplateData("is13", "IS13", R.drawable.temp_is13, R.drawable.thumb_is13, cells("is13"), mask("is13")),
@@ -96,7 +97,8 @@ object TemplateRepository {
             TemplateData("sm04", "SM04", R.drawable.temp_sm04, R.drawable.thumb_sm04, cells("sm04"), mask("sm04")),
             TemplateData("sm05", "SM05", R.drawable.temp_sm05, R.drawable.thumb_sm05, cells("sm05"), mask("sm05")),
             TemplateData("sm06", "SM06", R.drawable.temp_sm06, R.drawable.thumb_sm06, cells("sm06"), mask("sm06")),
-            TemplateData("sm07", "SM07", R.drawable.temp_sm07, R.drawable.thumb_sm07, cells("sm07"), mask("sm07")),
+            // thumb_sm07 import bị lệch design (hiking) so với temp_sm07 (puzzle) -> preview dùng temp_ cho khớp.
+            TemplateData("sm07", "SM07", R.drawable.temp_sm07, R.drawable.temp_sm07, cells("sm07"), mask("sm07")),
             TemplateData("sm08", "SM08", R.drawable.temp_sm08, R.drawable.thumb_sm08, cells("sm08"), mask("sm08")),
             TemplateData("sm09", "SM09", R.drawable.temp_sm09, R.drawable.thumb_sm09, cells("sm09"), mask("sm09")),
 

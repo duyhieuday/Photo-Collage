@@ -15,36 +15,27 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.piceditor.adapters.ImageAdapter
-import com.example.piceditor.adapters.TemplateAdapter
 import com.example.piceditor.ads.Callback
 import com.example.piceditor.ads.InterAds
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityMainBinding
 import com.example.piceditor.model.ImageModel
-import com.example.piceditor.templates_editor.Template
 import com.example.piceditor.templates_editor.TemplateEditorActivity
 import com.example.piceditor.templates_editor.TemplatePickerActivity
-import com.example.piceditor.templates_editor.TemplatePickerAdapter
 import com.example.piceditor.templates_editor.TemplateRepository
+import com.example.piceditor.templates_editor.TemplateSectionAdapter
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utilsApp.Constant
 import com.example.piceditor.utilsApp.PreferenceUtil
 import com.ezt.pdfreader.photoeditor.data.PageInfo
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import java.io.File
-import java.io.IOException
-import java.io.InputStreamReader
 
 class MainActivity : BaseActivityNew<ActivityMainBinding>() {
 
     private var mLastClickTime: Long = 0
-    private var templateAdapter: TemplateAdapter? = null
-    private var templateList: MutableList<Template?>? = null
 
     companion object {
         var isFromSaved: Boolean = true
@@ -277,14 +268,11 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
     }
 
     private fun setUpTemp() {
-        binding.rcvTemplates.layoutManager =
-            GridLayoutManager(this, 2, LinearLayoutManager.HORIZONTAL, false)
-
-        // Dùng CHUNG nguồn TemplateRepository với picker (id dạng "bd01"...).
-        // Trước đây load assets/temp.json (id số 1..20 cũ) -> editor findById() không khớp
-        // -> rơi về template đầu danh sách -> "nhấn ra sai template". Đã bỏ temp.json.
+        // GIỐNG màn Picker: list category cuộn dọc, mỗi category 1 hàng cuộn ngang.
+        // Dùng chung TemplateSectionAdapter + TemplateRepository.sections như TemplatePickerActivity.
+        binding.rcvTemplates.layoutManager = LinearLayoutManager(this)
         binding.rcvTemplates.adapter =
-            TemplatePickerAdapter(TemplateRepository.all) { template ->
+            TemplateSectionAdapter(TemplateRepository.sections) { template ->
                 val now = SystemClock.elapsedRealtime()
                 if (now - mLastClickTime >= 1000) {
                     mLastClickTime = now
@@ -297,7 +285,6 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
                     }
                 }
             }
-        binding.rcvTemplates.smoothScrollToPosition(0)
 
         binding.tvSeeAllTemplate.setOnClickListener {
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener

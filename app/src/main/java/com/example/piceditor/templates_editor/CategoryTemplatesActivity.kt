@@ -7,6 +7,7 @@ import android.view.View
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.piceditor.R
+import com.example.piceditor.ads.InterAds
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityCategoryTemplatesBinding
@@ -57,7 +58,7 @@ class CategoryTemplatesActivity : BaseActivityNew<ActivityCategoryTemplatesBindi
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
+        InterAds.showAdsBreak(this@CategoryTemplatesActivity) { super.onBackPressed() }
     }
 
     override fun setListener() {}
@@ -72,7 +73,9 @@ class CategoryTemplatesActivity : BaseActivityNew<ActivityCategoryTemplatesBindi
 
         binding.tvCategoryTitle.text = intent.getStringExtra(EXTRA_TITLE).orEmpty()
 
-        binding.btnBack.setOnClickListener { finish() }
+        binding.btnBack.setOnClickListener {
+            InterAds.showAdsBreak(this@CategoryTemplatesActivity) { finish() }
+        }
 
         // Tái dựng list template từ id (giữ đúng thứ tự đã truyền vào).
         val ids = intent.getStringArrayListExtra(EXTRA_IDS) ?: arrayListOf()
@@ -81,9 +84,11 @@ class CategoryTemplatesActivity : BaseActivityNew<ActivityCategoryTemplatesBindi
         binding.rvGridTemplates.layoutManager = GridLayoutManager(this, 2)
         binding.rvGridTemplates.adapter =
             TemplatePickerAdapter(templates, R.layout.item_template) { template ->
-                val intent = Intent(this, TemplateEditorActivity::class.java)
-                intent.putExtra(TemplateEditorActivity.EXTRA_TEMPLATE_ID, template.id)
-                startActivity(intent)
+                InterAds.showAdsBreak(this@CategoryTemplatesActivity) {
+                    val intent = Intent(this, TemplateEditorActivity::class.java)
+                    intent.putExtra(TemplateEditorActivity.EXTRA_TEMPLATE_ID, template.id)
+                    startActivity(intent)
+                }
             }
     }
 }

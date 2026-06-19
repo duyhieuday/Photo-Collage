@@ -1,5 +1,6 @@
 package com.example.piceditor.templates_editor
 
+import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.piceditor.R
+import com.example.piceditor.ads.InterAds
 
 /**
  * Adapter dọc cho màn picker: mỗi item là 1 category gồm header (emoji + tên +
@@ -50,7 +52,8 @@ class TemplateSectionAdapter(
     }
 
     private fun openCategory(ctx: android.content.Context, section: TemplateRepository.CategorySection) {
-        CategoryTemplatesActivity.start(ctx, section.title, section.templates)
+        val open = { CategoryTemplatesActivity.start(ctx, section.title, section.templates) }
+        if (ctx is Activity) InterAds.showAdsBreak(ctx) { open() } else open()
     }
 
     override fun getItemCount() = sections.size
