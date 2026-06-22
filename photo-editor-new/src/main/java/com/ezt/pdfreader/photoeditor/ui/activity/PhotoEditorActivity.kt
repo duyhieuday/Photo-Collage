@@ -35,14 +35,33 @@ abstract class PhotoEditorActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_PAGES = "extra_pages"
         const val RESULT_PAGES = "result_pages"
+        // State nguồn từng page (ảnh gốc + tham số) — để app lưu draft mở lại đúng input
+        const val RESULT_SOURCE_PAGES = "result_source_pages"
 
         @Suppress("DEPRECATION")
         fun getResultPages(data: Intent?): List<Uri>? {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                data?.getParcelableArrayListExtra(RESULT_PAGES, Uri::class.java)
-            } else {
-                data?.getParcelableArrayListExtra(RESULT_PAGES)
-            }
+            // Intent KẾT QUẢ về process app mang classloader mặc định → phải set classloader app
+            // trước khi unparcel (bundle unparcel cả các extra chứa class app như PageInfo).
+            data?.setExtrasClassLoader(PageInfo::class.java.classLoader)
+            return runCatching {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    data?.getParcelableArrayListExtra(RESULT_PAGES, Uri::class.java)
+                } else {
+                    data?.getParcelableArrayListExtra(RESULT_PAGES)
+                }
+            }.getOrNull()
+        }
+
+        @Suppress("DEPRECATION")
+        fun getResultSourcePages(data: Intent?): List<PageInfo>? {
+            data?.setExtrasClassLoader(PageInfo::class.java.classLoader)
+            return runCatching {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    data?.getParcelableArrayListExtra(RESULT_SOURCE_PAGES, PageInfo::class.java)
+                } else {
+                    data?.getParcelableArrayListExtra(RESULT_SOURCE_PAGES)
+                }
+            }.getOrNull()
         }
 
         fun clearCache(context: Context) {
@@ -164,12 +183,14 @@ abstract class PhotoEditorActivity : AppCompatActivity() {
         dialog.show()
 
         lifecycleScope.launch {
+            val sourcePages = viewModel.sourcePageInfos()
             val resultUris = viewModel.saveEditedPages { current, _ ->
                 if (showProgress) dialogBinding.tvProgress.text = "$current/$total"
             }
             dialog.dismiss()
             val resultIntent = Intent().apply {
                 putParcelableArrayListExtra(RESULT_PAGES, ArrayList(resultUris))
+                putParcelableArrayListExtra(RESULT_SOURCE_PAGES, ArrayList(sourcePages))
             }
             setResult(RESULT_OK, resultIntent)
             finish()

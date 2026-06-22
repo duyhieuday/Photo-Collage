@@ -143,6 +143,7 @@
     <string name="delete">删除</string>
     <string name="template">模板</string>
     <string name="replace">代替</string>
+    <string name="tap_photo_to_replace">点按照片以替换</string>
     <string name="replace_photos">替换照片</string>
     <string name="original">原来的</string>
     <string name="permission_title">需要获得许可</string>

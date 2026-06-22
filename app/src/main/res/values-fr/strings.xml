@@ -143,6 +143,7 @@
     <string name="delete">Supprimer</string>
     <string name="template">Modèle</string>
     <string name="replace">Remplacer</string>
+    <string name="tap_photo_to_replace">Touchez une photo pour la remplacer</string>
     <string name="replace_photos">Remplacer les photos</string>
     <string name="original">Original</string>
     <string name="permission_title">Autorisation requise</string>

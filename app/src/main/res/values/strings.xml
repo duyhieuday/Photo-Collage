@@ -144,6 +144,7 @@
     <string name="delete">Delete</string>
     <string name="template">Template</string>
     <string name="replace">Replace</string>
+    <string name="tap_photo_to_replace">Tap a photo to replace</string>
     <string name="replace_photos">Replace Photos</string>
     <string name="original">Original</string>
     <string name="permission_title">Permission Required</string>

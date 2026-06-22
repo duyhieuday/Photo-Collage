@@ -33,6 +33,10 @@ import com.example.piceditor.adapters.FontItem
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityTemplateEditorBinding
+import com.example.piceditor.draft.DraftDrawData
+import com.example.piceditor.draft.DraftProject
+import com.example.piceditor.draft.DraftRepository
+import com.example.piceditor.draft.TemplateDraft
 import com.example.piceditor.draw.DrawInteractListener
 import com.example.piceditor.draw.model.draw.DrawPath
 import com.example.piceditor.draw.model.draw.style.BrushStyle
@@ -44,6 +48,8 @@ import com.example.piceditor.adapters.ToolAdapter
 import com.example.piceditor.model.ToolItem
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utilsApp.Constant
+import com.example.piceditor.utilsApp.DraftStore
+import com.example.piceditor.utilsApp.DraftType
 import com.example.piceditor.utilsApp.PreferenceUtil
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -75,6 +81,10 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
         // DEBUG: to dac/vien o de kiem tra can chinh tren may that. PHAI tat (false) khi giao.
         const val DEBUG_FILL_CELLS = false
         const val EXTRA_TEMPLATE_ID = "extra_template_id"
+        // Ảnh (content:// string) nạp sẵn vào ô đầu khi mở lại 1 draft template từ My Draft (fallback ảnh cũ)
+        const val EXTRA_PRELOAD_IMAGE = "extra_preload_image"
+        // URI ảnh export của draft → khôi phục ĐẦY ĐỦ dự án (ảnh gốc từng ô + sticker/chữ/vẽ)
+        const val EXTRA_DRAFT_URI = "extra_draft_uri"
         const val TYPE_GESTURE = 0
         const val TYPE_SHAPE   = 1
         const val TYPE_ERASER  = 2
@@ -110,6 +120,11 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
 
     // -- Template loading flag --
     private var templateLoaded = false
+
+    // -- Resume draft (khôi phục dự án đã lưu) --
+    private var resumeTemplateDraft: TemplateDraft? = null
+    private var resumeDrawJson: String? = null
+    private var resumeExportUri: android.net.Uri? = null
 
     // -- Transform state --
     private var outputRotation = 0f
@@ -173,7 +188,17 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val templateId = intent.getStringExtra(EXTRA_TEMPLATE_ID)
+        // Resume: nếu mở từ My Draft với 1 dự án đã lưu → đọc state để khôi phục
+        resumeExportUri = intent.getStringExtra(EXTRA_DRAFT_URI)?.let { Uri.parse(it) }
+        resumeExportUri?.let { uri ->
+            DraftRepository.load(this, uri)?.let { project ->
+                resumeTemplateDraft = project.template
+                resumeDrawJson = project.drawDataJson
+            }
+        }
+
+        val templateId = resumeTemplateDraft?.templateId
+            ?: intent.getStringExtra(EXTRA_TEMPLATE_ID)
             ?: TemplateRepository.all.first().id
         templateData = TemplateRepository.findById(templateId)
             ?: TemplateRepository.all.first()
@@ -845,6 +870,17 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
 
                         binding.templateEditorView.requestLayout()
                         binding.templateEditorView.invalidate()
+
+                        val td = resumeTemplateDraft
+                        if (td != null) {
+                            // Khôi phục ĐẦY ĐỦ: ảnh gốc từng ô + sticker/chữ/vẽ
+                            restoreTemplateDraft(td)
+                        } else {
+                            // Fallback ảnh cũ: nạp ảnh đã lưu vào ô đầu
+                            intent.getStringExtra(EXTRA_PRELOAD_IMAGE)?.let {
+                                preloadFirstCell(Uri.parse(it))
+                            }
+                        }
                     }
                 }
             }
@@ -862,28 +898,114 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
 
     private fun openGallery() { pickImageLauncher.launch("image/*") }
 
+    private suspend fun decodeUriBitmap(uri: Uri): Bitmap? = withContext(Dispatchers.IO) {
+        runCatching {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val source = ImageDecoder.createSource(contentResolver, uri)
+                ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
+                    decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+                }
+            } else {
+                @Suppress("DEPRECATION")
+                MediaStore.Images.Media.getBitmap(contentResolver, uri)
+            }
+        }.getOrNull()
+    }
+
     private fun loadImageFromUri(uri: Uri) {
         lifecycleScope.launch {
-            val bitmap = withContext(Dispatchers.IO) {
-                runCatching {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        val source = ImageDecoder.createSource(contentResolver, uri)
-                        ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
-                            decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
-                        }
-                    } else {
-                        @Suppress("DEPRECATION")
-                        MediaStore.Images.Media.getBitmap(contentResolver, uri)
-                    }
-                }.getOrNull()
-            }
+            val bitmap = decodeUriBitmap(uri)
             if (bitmap == null) {
                 Toast.makeText(this@TemplateEditorActivity, getString(R.string.unable_to_read_image_file), Toast.LENGTH_SHORT).show()
                 return@launch
             }
-            selectedCell?.let { binding.templateEditorView.setImageToCell(it, bitmap) }
-                ?: Toast.makeText(this@TemplateEditorActivity, getString(R.string.the_image_box), Toast.LENGTH_SHORT).show()
+            selectedCell?.let {
+                binding.templateEditorView.setImageToCell(it, bitmap)
+                it.sourceUri = uri   // nhớ ảnh gốc của ô để lưu draft
+            } ?: Toast.makeText(this@TemplateEditorActivity, getString(R.string.the_image_box), Toast.LENGTH_SHORT).show()
         }
+    }
+
+    /**
+     * Nạp sẵn 1 ảnh (draft đã lưu) vào ô đầu khi mở lại template từ My Draft.
+     * Gọi sau khi cells đã dựng xong trong [loadTemplate].
+     */
+    private fun preloadFirstCell(uri: Uri) {
+        lifecycleScope.launch {
+            val cells = binding.templateEditorView.cells
+            if (cells.isEmpty()) return@launch
+            val bitmap = decodeUriBitmap(uri) ?: return@launch
+            binding.templateEditorView.setImageToCell(cells[0], bitmap)
+            cells[0].sourceUri = uri
+            refreshPhotoCellList()
+        }
+    }
+
+    // ── Khôi phục dự án template từ draft ─────────────────────────────
+
+    private fun restoreTemplateDraft(td: TemplateDraft) {
+        lifecycleScope.launch {
+            // Bọc try/catch: draft hỏng/thiếu field/ảnh mất KHÔNG được làm sập app, chỉ là không khôi phục
+            runCatching {
+                val cells = binding.templateEditorView.cells
+                (td.cellImagePaths ?: emptyList()).forEachIndexed { i, path ->
+                    if (i < cells.size && !path.isNullOrEmpty()) {
+                        val bmp = decodeFileBitmap(path) ?: return@forEachIndexed
+                        binding.templateEditorView.setImageToCell(cells[i], bmp)
+                        cells[i].sourceUri = Uri.fromFile(File(path))
+                        // setImageToCell reset matrix về fit → override bằng matrix đã lưu (pan/zoom của user)
+                        (td.cellMatrices ?: emptyList()).getOrNull(i)?.let { m -> applyMatrix(cells[i].matrix, m) }
+                    }
+                }
+                DraftDrawData.parse(resumeDrawJson)?.let {
+                    binding.templateEditorView.drawView?.drawManager?.setData(it)
+                }
+                binding.templateEditorView.invalidate()
+                refreshPhotoCellList()
+                syncUndoRedoUI()
+            }.onFailure { it.printStackTrace() }
+        }
+    }
+
+    private suspend fun decodeFileBitmap(path: String): Bitmap? = withContext(Dispatchers.IO) {
+        runCatching { BitmapFactory.decodeFile(path) }.getOrNull()
+    }
+
+    // ── Lưu dự án template (ảnh gốc từng ô + matrix + sticker/chữ/vẽ) ──
+
+    private suspend fun saveTemplateDraft(exportUri: Uri) {
+        val cells = binding.templateEditorView.cells
+        val sources = cells.map { it.sourceUri }
+        val matrices = cells.map { matrixToList(it.matrix) }
+        val drawData = binding.templateEditorView.drawView?.drawManager?.data
+        val tplId = templateData.id
+        withContext(Dispatchers.IO) {
+            runCatching {
+                val dir = DraftRepository.dirFor(this@TemplateEditorActivity, exportUri)
+                val paths = sources.mapIndexed { i, src ->
+                    src?.let {
+                        DraftRepository.stashImage(this@TemplateEditorActivity, dir, it, "cell_$i.jpg")
+                    }
+                }
+                val drawJson = DraftDrawData.stash(this@TemplateEditorActivity, dir, drawData)
+                DraftRepository.save(
+                    dir,
+                    DraftProject(
+                        type = com.example.piceditor.utilsApp.DraftType.TEMPLATE.name,
+                        createdAt = System.currentTimeMillis(),
+                        drawDataJson = drawJson,
+                        template = TemplateDraft(tplId, paths, matrices)
+                    )
+                )
+            }
+        }
+    }
+
+    private fun matrixToList(matrix: Matrix): List<Float> =
+        FloatArray(9).also { matrix.getValues(it) }.toList()
+
+    private fun applyMatrix(matrix: Matrix, values: List<Float>) {
+        if (values.size == 9) matrix.setValues(values.toFloatArray())
     }
 
     // -- Export --
@@ -906,6 +1028,8 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
                 }.getOrNull()
             }
             if (savedUri != null) {
+                // Lưu dự án để mở lại đúng ảnh gốc từng ô khi bấm trong My Draft
+                saveTemplateDraft(savedUri)
                 InterAds.showAdsBreak(this@TemplateEditorActivity) {
                     startActivity(
                         Intent(this@TemplateEditorActivity, ShowImageActivity::class.java).apply {
@@ -921,7 +1045,7 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
 
     private fun saveToGallery(bitmap: Bitmap): Uri {
         val filename = "collage_${System.currentTimeMillis()}.jpg"
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val values = ContentValues().apply {
                 put(MediaStore.Images.Media.DISPLAY_NAME, filename)
                 put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
@@ -949,6 +1073,9 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
             )
             Uri.fromFile(file)
         }
+        // Đánh dấu draft này tạo từ Template (kèm template id) → mở lại đúng layout khi bấm trong My Draft
+        DraftStore.tag(this, uri.toString(), DraftType.TEMPLATE, templateData.id)
+        return uri
     }
 
 }

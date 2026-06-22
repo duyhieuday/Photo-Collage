@@ -140,6 +140,49 @@
 
             </LinearLayout>
 
+            <!-- Photo — thay ảnh từng ô (replace, giống template) -->
+            <LinearLayout
+                android:id="@+id/ll_photo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_item_tool"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/dimen_16dp"
+                    android:layout_marginVertical="20dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:fontFamily="@font/inter_medium"
+                        android:text="@string/replace_photos"
+                        android:textColor="#101828"
+                        android:textSize="14sp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/icCheckPhoto"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:padding="4dp"
+                        android:src="@drawable/ic_check_tool" />
+
+                </RelativeLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/listPhotoCell"
+                    android:layout_width="match_parent"
+                    android:layout_height="96dp"
+                    android:layout_marginHorizontal="@dimen/dimen_16dp"
+                    android:layout_marginBottom="@dimen/dimen_16dp" />
+
+            </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/ll_border"
                 android:layout_width="match_parent"

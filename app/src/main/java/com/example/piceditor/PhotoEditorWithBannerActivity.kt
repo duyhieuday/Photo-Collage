@@ -26,6 +26,10 @@ class PhotoEditorWithBannerActivity : PhotoEditorActivity(){
             return PhotoEditorActivity.getResultPages(data)
         }
 
+        fun getResultSourcePages(data: Intent?): List<PageInfo>? {
+            return PhotoEditorActivity.getResultSourcePages(data)
+        }
+
         fun clearCache(context: Context) {
             PhotoEditorActivity.clearCache(context)
         }

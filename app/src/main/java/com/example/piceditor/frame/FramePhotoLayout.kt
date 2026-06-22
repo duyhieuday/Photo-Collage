@@ -61,6 +61,13 @@ class FramePhotoLayout(
     private var mOutputScaleRatio = 1f
     private var mQuickActionClickListener: OnQuickActionClickListener? = null
 
+    // ── Replace image: bật mode rồi chạm vào ô để thay ảnh ──
+    var replaceMode = false
+    var onReplaceImage: ((FrameImageView) -> Unit)? = null
+
+    /** Danh sách các ô ảnh (để hiện thumbnail list ở tab Replace). */
+    val imageViews: List<FrameImageView> get() = mItemImageViews ?: emptyList()
+
 
     private val isNotLargeThan1Gb: Boolean
         get() {
@@ -245,6 +252,10 @@ class FramePhotoLayout(
 
     override fun onDoubleClickImage(view: FrameImageView) {
 
+    }
+
+    override fun onSingleClickImage(view: FrameImageView) {
+        if (replaceMode) onReplaceImage?.invoke(view)
     }
 
     override fun onFrameTouch(event: MotionEvent) {

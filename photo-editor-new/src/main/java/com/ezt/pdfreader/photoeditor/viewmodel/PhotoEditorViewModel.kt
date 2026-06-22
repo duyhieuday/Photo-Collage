@@ -75,7 +75,14 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
                         originalWidth = w,
                         originalHeight = h,
                         corners = info.corners,
-                        filterType = info.filterType
+                        filterType = info.filterType,
+                        rotation = info.rotation,
+                        flipX = info.flipX,
+                        flipY = info.flipY,
+                        brightness = info.brightness,
+                        contrast = info.contrast,
+                        saturation = info.saturation,
+                        warmth = info.warmth
                     )
                 }
             }
@@ -435,6 +442,25 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
 
     fun requestDeleteCurrentPage() {
         emitEvent(PhotoEditorEvent.ConfirmDeletePage(_currentPageIndex.value))
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // Draft — trả về state nguồn từng page (ảnh gốc + tham số) để lưu draft
+    // ═══════════════════════════════════════════════════════════════
+
+    fun sourcePageInfos(): List<PageInfo> = _pages.value.map { s ->
+        PageInfo(
+            uri = s.uri,
+            corners = s.corners,
+            filterType = s.filterType,
+            rotation = s.rotation,
+            flipX = s.flipX,
+            flipY = s.flipY,
+            brightness = s.brightness,
+            contrast = s.contrast,
+            saturation = s.saturation,
+            warmth = s.warmth
+        )
     }
 
     // ═══════════════════════════════════════════════════════════════

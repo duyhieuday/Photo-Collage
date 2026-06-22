@@ -1,14 +1,18 @@
 package com.example.piceditor.adapters
 
 import android.app.Activity
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.piceditor.DraftRouter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import com.example.piceditor.MyDraftActivity.formatDateTime
 import com.example.piceditor.R
-import com.example.piceditor.ShowImageActivity
 import com.example.piceditor.ads.InterAds
 import com.example.piceditor.databinding.ItemImageDraftSavedBinding
 import com.example.piceditor.databinding.ItemImageSavedBinding
@@ -62,14 +66,21 @@ class ImageDraftAdapter(
                 notifyItemChanged(position)
                 onSelectionChanged?.invoke(selectedPositions.size)
             } else {
-                // ✅ Normal mode: mở ShowImageActivity với URI của ảnh
+                // ✅ Normal mode: mở lại đúng editor (collage/ai/edit/template) với ảnh đã lưu
                 val context = holder.itemView.context
                 InterAds.showAdsBreak(context as Activity?) {
-                    context.startActivity(
-                        Intent(context, ShowImageActivity::class.java).apply {
-                            putExtra("image_uri", item.uri.toString())
+                    val owner = context as? LifecycleOwner
+                    if (owner != null) {
+                        // IO (đọc project.json + copy file) chạy NỀN, startActivity ở main → tránh ANR
+                        owner.lifecycleScope.launch {
+                            val intent = withContext(Dispatchers.IO) {
+                                DraftRouter.resolveIntent(context, item.uri)
+                            }
+                            context.startActivity(intent)
                         }
-                    )
+                    } else {
+                        DraftRouter.open(context, item.uri)
+                    }
                 }
             }
         }

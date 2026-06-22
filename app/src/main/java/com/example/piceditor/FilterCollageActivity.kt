@@ -19,18 +19,29 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.toColorInt
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import com.example.piceditor.MainActivity.Companion.isFromSaved
 import com.example.piceditor.adapters.FilterNameAdapter
 import com.example.piceditor.ads.InterAds
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityFilterCollageBinding
+import com.example.piceditor.draft.CollageDraft
+import com.example.piceditor.draft.DraftDrawData
+import com.example.piceditor.draft.DraftProject
+import com.example.piceditor.draft.DraftRepository
+import com.google.gson.Gson
 import com.example.piceditor.model.FilterData
 import com.example.piceditor.utils.AndroidUtils
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utilsApp.Constant
+import com.example.piceditor.utilsApp.DraftStore
+import com.example.piceditor.utilsApp.DraftType
 import com.example.piceditor.utilsApp.PreferenceUtil
 import java.io.File
 import java.io.FileOutputStream
@@ -68,6 +79,10 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(),
 
         // Sentinel: index 0 = original image
         const val INDEX_ORIGINAL = 0
+
+        // Draft: state collage do CollageActivity đính kèm để lưu dự án sau khi export
+        const val EXTRA_COLLAGE_DRAFT = "extra_collage_draft"
+        const val EXTRA_DRAW_DATA = "extra_draw_data"
     }
 
     lateinit var bmp: Bitmap
@@ -136,12 +151,20 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(),
             }
 
             isFromSaved = true
-            val finalUri = saveToGallery(screenShot)
-            InterAds.showAdsBreak(this@FilterCollageActivity) {
-                startActivity(Intent(this, ShowImageActivity::class.java).apply {
-                    putExtra("image_uri", finalUri.toString())
-                })
-                finish()
+            val bmp = screenShot   // đọc view → phải ở main thread
+            lifecycleScope.launch {
+                // Nén + ghi gallery + copy ảnh gốc draft chạy NỀN để không block UI (tránh ANR)
+                val finalUri = withContext(Dispatchers.IO) {
+                    val uri = saveToGallery(bmp)
+                    saveCollageDraft(uri)
+                    uri
+                }
+                InterAds.showAdsBreak(this@FilterCollageActivity) {
+                    startActivity(Intent(this@FilterCollageActivity, ShowImageActivity::class.java).apply {
+                        putExtra("image_uri", finalUri.toString())
+                    })
+                    finish()
+                }
             }
         }
 
@@ -202,12 +225,38 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(),
     private fun saveToGallery(bitmap: Bitmap): Uri {
         val fileName = "IMG_${System.currentTimeMillis()}.jpg"
 
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             // Android 10+ : use MediaStore with RELATIVE_PATH (scoped storage)
             saveToGalleryQ(bitmap, fileName)
         } else {
             // Android 9- : write directly to file (requires WRITE_EXTERNAL_STORAGE)
             saveToGalleryLegacy(bitmap, fileName)
+        }
+        // Đánh dấu draft này tạo từ Collage → mở lại đúng editor khi bấm trong My Draft
+        DraftStore.tag(this, uri.toString(), DraftType.COLLAGE)
+        return uri
+    }
+
+    // ── Draft: lưu dự án collage (ảnh gốc từng ô + sticker/chữ/vẽ) keyed theo URI export ──
+    private fun saveCollageDraft(exportUri: Uri) {
+        val draftJson = intent.getStringExtra(EXTRA_COLLAGE_DRAFT) ?: return
+        val draft = runCatching { Gson().fromJson(draftJson, CollageDraft::class.java) }.getOrNull() ?: return
+        val drawData = DraftDrawData.parse(intent.getStringExtra(EXTRA_DRAW_DATA))
+        runCatching {
+            val dir = DraftRepository.dirFor(this, exportUri)
+            val stashed = draft.imagePaths.mapIndexedNotNull { i, p ->
+                DraftRepository.stashImagePath(dir, p, "photo_$i.jpg")
+            }
+            val newDrawJson = DraftDrawData.stash(this, dir, drawData)
+            DraftRepository.save(
+                dir,
+                DraftProject(
+                    type = DraftType.COLLAGE.name,
+                    createdAt = System.currentTimeMillis(),
+                    drawDataJson = newDrawJson,
+                    collage = draft.copy(imagePaths = stashed)
+                )
+            )
         }
     }
 

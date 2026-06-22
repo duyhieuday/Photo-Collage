@@ -143,6 +143,7 @@
     <string name="delete">Xóa bỏ</string>
     <string name="template">Bản mẫu</string>
     <string name="replace">Thay thế</string>
+    <string name="tap_photo_to_replace">Chạm vào ảnh để thay thế</string>
     <string name="replace_photos">Thay thế ảnh</string>
     <string name="original">Nguyên bản</string>
     <string name="permission_title">Cần có sự cho phép</string>

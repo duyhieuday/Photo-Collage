@@ -104,6 +104,9 @@ class FrameImageView(context: Context, val photoItem: PhotoItem) : androidx.appc
         fun onLongClickImage(view: FrameImageView)
 
         fun onDoubleClickImage(view: FrameImageView)
+
+        // Chạm 1 lần vào ô — dùng cho chế độ Replace (thay ảnh ô này)
+        fun onSingleClickImage(view: FrameImageView)
     }
 
     init {
@@ -128,7 +131,9 @@ class FrameImageView(context: Context, val photoItem: PhotoItem) : androidx.appc
                     }
                 }
 
-                ResultContainer.getInstance().putImage(photoItem.imagePath!!, image!!)
+                // Ảnh có thể null (file mất/hỏng/decode lỗi/OOM) → KHÔNG dùng image!! để tránh NPE crash.
+                // Ô sẽ vẽ trống (onDraw đã kiểm tra image != null) thay vì làm sập app khi mở lại draft.
+                image?.let { ResultContainer.getInstance().putImage(photoItem.imagePath!!, it) }
 
             } else {
             }
@@ -154,6 +159,11 @@ class FrameImageView(context: Context, val photoItem: PhotoItem) : androidx.appc
                     if (mOnImageClickListener != null) {
                         mOnImageClickListener!!.onDoubleClickImage(this@FrameImageView)
                     }
+                    return true
+                }
+
+                override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                    mOnImageClickListener?.onSingleClickImage(this@FrameImageView)
                     return true
                 }
             })
@@ -285,25 +295,30 @@ class FrameImageView(context: Context, val photoItem: PhotoItem) : androidx.appc
         recycleImage()
         try {
             image = ImageDecoder.decodeFileToBitmap(imagePath)
+            // Decode lỗi (ảnh hỏng/không đọc được) → giữ ô trống, không crash
+            val bmp = image ?: run {
+                invalidate()
+                return
+            }
             mImageMatrix.set(
                 ImageUtils.createMatrixToDrawImageInCenterView(
                     viewWidth,
                     viewHeight,
-                    image!!.width.toFloat(),
-                    image!!.height.toFloat()
+                    bmp.width.toFloat(),
+                    bmp.height.toFloat()
                 )
             )
             mScaleMatrix.set(
                 ImageUtils.createMatrixToDrawImageInCenterView(
                     mOutputScale * viewWidth,
                     mOutputScale * viewHeight,
-                    image!!.width.toFloat(),
-                    image!!.height.toFloat()
+                    bmp.width.toFloat(),
+                    bmp.height.toFloat()
                 )
             )
             mTouchHandler!!.setMatrices(mImageMatrix, mScaleMatrix)
             invalidate()
-            ResultContainer.getInstance().putImage(photoItem.imagePath!!, image!!)
+            ResultContainer.getInstance().putImage(photoItem.imagePath!!, bmp)
         } catch (err: OutOfMemoryError) {
             err.printStackTrace()
         } catch (ex: Exception) {

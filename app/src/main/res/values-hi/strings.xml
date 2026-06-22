@@ -143,6 +143,7 @@
     <string name="delete">मिटाना</string>
     <string name="template">खाका</string>
     <string name="replace">प्रतिस्थापित करें</string>
+    <string name="tap_photo_to_replace">बदलने के लिए किसी फ़ोटो पर टैप करें</string>
     <string name="replace_photos">फ़ोटो बदलें</string>
     <string name="original">मूल</string>
     <string name="permission_title">अनुमति आवश्यक है</string>

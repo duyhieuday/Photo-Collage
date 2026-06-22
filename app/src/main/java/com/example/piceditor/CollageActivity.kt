@@ -28,13 +28,16 @@ import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IntDef
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.FileProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.piceditor.adapters.BackgroundAdapter
+import com.example.piceditor.adapters.CollageCellAdapter
 import com.example.piceditor.adapters.ColorAdapter
 import com.example.piceditor.adapters.FontAdapter
 import com.example.piceditor.adapters.FontItem
@@ -44,6 +47,9 @@ import com.example.piceditor.ads.InterAds
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityCollageBinding
+import com.example.piceditor.draft.CollageDraft
+import com.example.piceditor.draft.DraftDrawData
+import com.example.piceditor.draft.DraftRepository
 import com.example.piceditor.draw.DrawInteractListener
 import com.example.piceditor.draw.DrawerManager
 import com.example.piceditor.draw.model.draw.DrawPath
@@ -52,6 +58,7 @@ import com.example.piceditor.draw.model.draw.style.PaintStyle
 import com.example.piceditor.draw.model.sticker.StickerData
 import com.example.piceditor.draw.test.Beard
 import com.example.piceditor.draw.test.BeardAdapter
+import com.example.piceditor.frame.FrameImageView
 import com.example.piceditor.frame.FramePhotoLayout
 import com.example.piceditor.model.TemplateItem
 import com.example.piceditor.model.ToolItem
@@ -67,6 +74,9 @@ import com.yalantis.ucrop.UCrop
 import com.yalantis.ucrop.UCropFragment
 import com.yalantis.ucrop.UCropFragmentCallback
 import com.yalantis.ucrop.view.GestureCropImageView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -108,7 +118,20 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         const val TYPE_SHAPE = 1
         const val TYPE_ERASER = 2
         private const val CROP_FRAGMENT_TAG = "ucrop_fragment"
+        // URI ảnh export của draft → khôi phục ĐẦY ĐỦ dự án collage (ảnh gốc từng ô + sticker/chữ/vẽ)
+        const val EXTRA_DRAFT_URI = "extra_draft_uri"
     }
+
+    // -- Resume draft --
+    private var resumeDrawJson: String? = null
+
+    // -- Replace image (chạm ô để thay ảnh) --
+    private var replaceMode = false
+    private var replaceTargetView: FrameImageView? = null
+    private val pickReplaceLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            uri?.let { onReplaceImagePicked(it) }
+        }
 
     @Retention(AnnotationRetention.SOURCE)
     @IntDef(TYPE_GESTURE, TYPE_SHAPE, TYPE_ERASER)
@@ -265,6 +288,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                     val uri = saveTempBitmap(bitmap)
                     val intent = Intent(this, FilterCollageActivity::class.java)
                     intent.putExtra("image_uri", uri.toString())
+                    putCollageDraftExtras(intent)
                     startActivity(intent)
                     finish()
                 }
@@ -335,8 +359,25 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
             mSavedInstanceState = savedInstanceState
         }
 
-        mImageInTemplateCount = intent.getIntExtra("imagesinTemplate", 0)
-        val extraImagePaths   = intent.getStringArrayListExtra("selectedImages")
+        // Resume: nếu mở từ My Draft với dự án đã lưu → đọc state collage để khôi phục
+        val collageDraft = intent.getStringExtra(EXTRA_DRAFT_URI)
+            ?.let { Uri.parse(it) }
+            ?.let { DraftRepository.load(this, it) }
+            ?.let { resumeDrawJson = it.drawDataJson; it.collage }
+
+        mImageInTemplateCount = collageDraft?.imagePaths?.size
+            ?: intent.getIntExtra("imagesinTemplate", 0)
+        val extraImagePaths: ArrayList<String>? =
+            collageDraft?.let { ArrayList(it.imagePaths) }
+                ?: intent.getStringArrayListExtra("selectedImages")
+        collageDraft?.let {
+            mSpace = it.space
+            mCorner = it.corner
+            mBackgroundColor = it.backgroundColor
+            outputRotation = it.rotation
+            outputFlipH = it.flipH
+            outputFlipV = it.flipV
+        }
 
         binding.listBg.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.listBg.adapter = BackgroundAdapter(this, this)
@@ -353,6 +394,8 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                         binding.rlContainer.width, binding.rlContainer.height
                     )
                     buildLayout(mSelectedTemplateItem!!)
+                    restoreDrawDataIfNeeded()
+                    applyContainerTransform()
                     binding.rlContainer.viewTreeObserver.removeOnGlobalLayoutListener(this)
                 }
             })
@@ -362,7 +405,9 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         frameAdapter = FrameAdapter(this, mTemplateItemList!!, this)
         binding.listFrames.adapter = frameAdapter
 
-        mSelectedTemplateItem = mTemplateItemList!!.get(0)
+        mSelectedTemplateItem = collageDraft?.frameTitle
+            ?.let { title -> mTemplateItemList!!.firstOrNull { it.title == title } }
+            ?: mTemplateItemList!!.get(0)
         mSelectedTemplateItem!!.isSelected = true
 
         if (extraImagePaths != null) {
@@ -682,6 +727,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                 InterAds.showAdsBreak(this@CollageActivity) {
                     startActivity(Intent(this, FilterCollageActivity::class.java).apply {
                         putExtra("image_uri", uri.toString())
+                        putCollageDraftExtras(this)
                     })
                     finish()
                 }
@@ -703,6 +749,73 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
         return FileProvider.getUriForFile(this, "${packageName}.provider", file)
     }
 
+    // ── Draft: khôi phục sticker/chữ/vẽ khi resume ────────────────────
+    private fun restoreDrawDataIfNeeded() {
+        DraftDrawData.parse(resumeDrawJson)?.let {
+            binding.drawView.drawManager.setData(it)
+            syncUndoRedoUI()
+        }
+    }
+
+    // ── Draft: đính kèm state collage cho FilterCollageActivity lưu sau khi export ──
+    private fun putCollageDraftExtras(intent: Intent) {
+        val item = mSelectedTemplateItem ?: return
+        val paths = item.photoItemList.mapNotNull { it.imagePath }.filter { it.isNotEmpty() }
+        if (paths.isEmpty()) return
+        val draft = CollageDraft(
+            frameTitle = item.title ?: "",
+            imagePaths = paths,
+            space = mSpace,
+            corner = mCorner,
+            backgroundColor = mBackgroundColor,
+            rotation = outputRotation,
+            flipH = outputFlipH,
+            flipV = outputFlipV
+        )
+        intent.putExtra(FilterCollageActivity.EXTRA_COLLAGE_DRAFT, Gson().toJson(draft))
+        intent.putExtra(
+            FilterCollageActivity.EXTRA_DRAW_DATA,
+            Gson().toJson(binding.drawView.drawManager.data)
+        )
+    }
+
+    // ── Replace image: danh sách thumbnail ô ảnh (giống template) ──
+    private fun refreshPhotoCellList() {
+        val cells = mFramePhotoLayout?.imageViews ?: emptyList()
+        binding.listPhotoCell.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.listPhotoCell.adapter = CollageCellAdapter(cells) { view ->
+            replaceTargetView = view
+            pickReplaceLauncher.launch("image/*")
+        }
+    }
+
+    // ── Replace image: copy ảnh đã chọn ra cache rồi thay vào ô đang chọn ──
+    private fun onReplaceImagePicked(uri: Uri) {
+        val target = replaceTargetView ?: return
+        lifecycleScope.launch {
+            val path = withContext(Dispatchers.IO) { copyUriToCache(uri) }
+            if (path != null) {
+                target.setImagePath(path)
+                if (binding.llPhoto.isVisible) refreshPhotoCellList()
+            } else {
+                Toast.makeText(
+                    this@CollageActivity,
+                    getString(R.string.unable_to_read_image_file),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    private fun copyUriToCache(uri: Uri): String? = runCatching {
+        val f = File(cacheDir, "replace_${System.currentTimeMillis()}.jpg")
+        contentResolver.openInputStream(uri)?.use { input ->
+            f.outputStream().use { input.copyTo(it) }
+        } ?: return@runCatching null
+        f.absolutePath
+    }.getOrNull()
+
     private fun setUpTab() {
         val tools = mutableListOf(
             ToolItem(R.drawable.ic_layout,     getString(R.string.layout)),
@@ -713,6 +826,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
             ToolItem(R.drawable.ic_text,       getString(R.string.text)),
             ToolItem(R.drawable.ic_transform,  getString(R.string.transform)),
             ToolItem(R.drawable.ic_crop,       getString(R.string.crop)),
+            ToolItem(R.drawable.ic_replace_image, getString(R.string.replace)),
         )
 
         val adapter = ToolAdapter(tools) { _, pos ->
@@ -724,7 +838,12 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
             binding.llDraw.visibility      = View.GONE
             binding.llRatio.visibility     = View.GONE
             binding.llTransform.visibility = View.GONE
+            binding.llPhoto.visibility     = View.GONE
             binding.rcvTools.visibility    = View.GONE
+
+            // Tắt chế độ Replace khi chuyển sang tool khác
+            replaceMode = false
+            mFramePhotoLayout?.replaceMode = false
 
             when (pos) {
                 0 -> { // Layout
@@ -829,6 +948,18 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                     binding.drawView.setDrawingEnabled(false)
                     openCropOverlay()
                 }
+
+                8 -> { // Replace — danh sách thumbnail từng ô để thay ảnh (giống template)
+                    binding.llPhoto.visibility = View.VISIBLE
+                    binding.drawView.setDrawingEnabled(false)
+                    replaceMode = true
+                    mFramePhotoLayout?.replaceMode = true
+                    refreshPhotoCellList()
+                    binding.icCheckPhoto.setOnClickListener {
+                        binding.llPhoto.visibility = View.GONE
+                        binding.rcvTools.visibility = View.VISIBLE
+                    }
+                }
             }
         }
 
@@ -885,6 +1016,11 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
 
     fun buildLayout(item: TemplateItem) {
         mFramePhotoLayout = FramePhotoLayout(this, item.photoItemList)
+        mFramePhotoLayout!!.replaceMode = replaceMode
+        mFramePhotoLayout!!.onReplaceImage = { view ->
+            replaceTargetView = view
+            pickReplaceLauncher.launch("image/*")
+        }
 
         var viewWidth  = binding.rlContainer.width
         var viewHeight = binding.rlContainer.height

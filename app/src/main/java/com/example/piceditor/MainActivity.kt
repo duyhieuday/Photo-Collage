@@ -10,7 +10,6 @@ import android.os.SystemClock
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -22,6 +21,10 @@ import com.example.piceditor.ads.InterAds
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityMainBinding
+import com.example.piceditor.draft.DraftProject
+import com.example.piceditor.draft.DraftRepository
+import com.example.piceditor.draft.EditDraft
+import com.example.piceditor.draft.EditPageDraft
 import com.example.piceditor.model.ImageModel
 import com.example.piceditor.templates_editor.TemplateEditorActivity
 import com.example.piceditor.templates_editor.TemplatePickerActivity
@@ -29,8 +32,13 @@ import com.example.piceditor.templates_editor.TemplateRepository
 import com.example.piceditor.templates_editor.TemplateSectionAdapter
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utilsApp.Constant
+import com.example.piceditor.utilsApp.DraftStore
+import com.example.piceditor.utilsApp.DraftType
 import com.example.piceditor.utilsApp.PreferenceUtil
 import com.ezt.pdfreader.photoeditor.data.PageInfo
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 
 class MainActivity : BaseActivityNew<ActivityMainBinding>() {
@@ -55,9 +63,48 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
 
     private val editorLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            // getResult* đã set classloader + nuốt lỗi unparcel (tránh BadParcelableException trên API < 33)
             val pages = PhotoEditorWithBannerActivity.getResultPages(result.data)
-            pages?.forEach { Toast.makeText(this, "Edited: $it", Toast.LENGTH_SHORT).show() }
+            val sources = PhotoEditorWithBannerActivity.getResultSourcePages(result.data)
+            if (pages.isNullOrEmpty()) return@registerForActivityResult
+            // Tag + copy ảnh gốc + ghi project.json chạy NỀN để không block UI (tránh ANR)
+            lifecycleScope.launch(Dispatchers.IO) {
+                pages.forEachIndexed { i, exportUri ->
+                    DraftStore.tag(this@MainActivity, exportUri.toString(), DraftType.EDIT)
+                    sources?.getOrNull(i)?.let { saveEditDraft(exportUri, it) }
+                }
+            }
         }
+
+    private fun saveEditDraft(exportUri: Uri, info: PageInfo) {
+        runCatching {
+            val dir = DraftRepository.dirFor(this, exportUri)
+            val stashed = DraftRepository.stashImage(this, dir, info.uri, "page.jpg") ?: return
+            DraftRepository.save(
+                dir,
+                DraftProject(
+                    type = DraftType.EDIT.name,
+                    createdAt = System.currentTimeMillis(),
+                    edit = EditDraft(
+                        listOf(
+                            EditPageDraft(
+                                imagePath = stashed,
+                                corners = info.corners?.toList(),
+                                filter = info.filterType.name,
+                                rotation = info.rotation,
+                                flipX = info.flipX,
+                                flipY = info.flipY,
+                                brightness = info.brightness,
+                                contrast = info.contrast,
+                                saturation = info.saturation,
+                                warmth = info.warmth
+                            )
+                        )
+                    )
+                )
+            )
+        }
+    }
 
     private val permissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->

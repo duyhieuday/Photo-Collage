@@ -45,6 +45,10 @@ import com.example.piceditor.ads.InterAds
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityAfterRemoveBinding
+import com.example.piceditor.draft.AiDraft
+import com.example.piceditor.draft.DraftDrawData
+import com.example.piceditor.draft.DraftProject
+import com.example.piceditor.draft.DraftRepository
 import com.example.piceditor.draw.DrawInteractListener
 import com.example.piceditor.draw.DrawerManager
 import com.example.piceditor.draw.model.draw.DrawPath
@@ -57,6 +61,8 @@ import com.example.piceditor.model.ToolItem
 import com.example.piceditor.sticker.StickerPanelController
 import com.example.piceditor.utils.BarsUtils
 import com.example.piceditor.utilsApp.Constant
+import com.example.piceditor.utilsApp.DraftStore
+import com.example.piceditor.utilsApp.DraftType
 import com.example.piceditor.utilsApp.PreferenceUtil
 import com.yalantis.ucrop.UCrop
 import com.yalantis.ucrop.UCropFragment
@@ -72,12 +78,15 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
 
     companion object {
         const val EXTRA_SUBJECT_URL = "subject_url"
+        // URI ảnh export của draft → khôi phục ĐẦY ĐỦ dự án AI (ảnh subject + sticker/chữ/vẽ + transform)
+        const val EXTRA_DRAFT_URI = "extra_draft_uri"
         const val TYPE_GESTURE = 0
         const val TYPE_ERASER  = 2
         private const val CROP_FRAGMENT_TAG = "ucrop_fragment"
     }
 
     private var subjectUrl: String? = null
+    private var resumeDrawJson: String? = null
 
     // ── Draw state ────────────────────────────────────────
     private var drawerManager: DrawerManager? = null
@@ -109,7 +118,19 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
     override fun getFrame(): Int = 0
 
     override fun getDataFromIntent() {
-        subjectUrl = intent?.getStringExtra(EXTRA_SUBJECT_URL)
+        // Resume: mở từ My Draft với dự án đã lưu → nạp subject + transform + drawData
+        val aiDraft = intent?.getStringExtra(EXTRA_DRAFT_URI)
+            ?.let { Uri.parse(it) }
+            ?.let { DraftRepository.load(this, it) }
+            ?.let { resumeDrawJson = it.drawDataJson; it.ai }
+        if (aiDraft != null) {
+            subjectUrl = aiDraft.subjectPath
+            subjectRotation = aiDraft.rotation
+            subjectFlipH = aiDraft.flipH
+            subjectFlipV = aiDraft.flipV
+        } else {
+            subjectUrl = intent?.getStringExtra(EXTRA_SUBJECT_URL)
+        }
     }
 
     override fun doAfterOnCreate() {
@@ -143,6 +164,7 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
                     MainActivity.isFromSaved = true
                     val bitmap = exportComposite()
                     val finalUri = saveToGallery(bitmap)
+                    saveAiDraft(finalUri)
                     startActivity(Intent(this, ShowImageActivity::class.java).apply {
                         putExtra("image_uri", finalUri.toString())
                     })
@@ -395,10 +417,43 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
                     subjectBitmap = resource
                     binding.imgSubject.setImageBitmap(resource)
                     binding.imgSubject.post { applySubjectTransform() }
+                    restoreDrawDataIfNeeded()
                 }
 
                 override fun onLoadCleared(placeholder: Drawable?) {}
             })
+    }
+
+    // ── Draft: khôi phục sticker/chữ/vẽ khi resume ────────────────────
+    private fun restoreDrawDataIfNeeded() {
+        DraftDrawData.parse(resumeDrawJson)?.let {
+            getDrawerManager()?.setData(it)
+            syncUndoRedoUI()
+        }
+    }
+
+    // ── Draft: lưu dự án AI (ảnh subject + transform + sticker/chữ/vẽ) ──
+    private fun saveAiDraft(exportUri: Uri) {
+        val subject = subjectBitmap ?: return
+        val drawData = getDrawerManager()?.data
+        val rot = subjectRotation
+        val fh = subjectFlipH
+        val fv = subjectFlipV
+        runCatching {
+            val dir = DraftRepository.dirFor(this, exportUri)
+            val subjFile = File(dir, "subject.png")
+            FileOutputStream(subjFile).use { subject.compress(Bitmap.CompressFormat.PNG, 100, it) }
+            val newDrawJson = DraftDrawData.stash(this, dir, drawData)
+            DraftRepository.save(
+                dir,
+                DraftProject(
+                    type = com.example.piceditor.utilsApp.DraftType.AI.name,
+                    createdAt = System.currentTimeMillis(),
+                    drawDataJson = newDrawJson,
+                    ai = AiDraft(subjFile.absolutePath, rot, fh, fv)
+                )
+            )
+        }
     }
 
     private fun loadCroppedSubject(uri: Uri) {
@@ -822,11 +877,14 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
 
     private fun saveToGallery(bitmap: Bitmap): Uri {
         val fileName = "IMG_${System.currentTimeMillis()}.jpg"
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             saveToGalleryQ(bitmap, fileName)
         } else {
             saveToGalleryLegacy(bitmap, fileName)
         }
+        // Đánh dấu draft này tạo từ AI Remove → mở lại đúng editor khi bấm trong My Draft
+        DraftStore.tag(this, uri.toString(), DraftType.AI)
+        return uri
     }
 
     private fun saveToGalleryQ(bitmap: Bitmap, fileName: String): Uri {
