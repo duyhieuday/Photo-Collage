@@ -818,6 +818,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
 
     private fun setUpTab() {
         val tools = mutableListOf(
+            ToolItem(R.drawable.ic_replace_image, getString(R.string.replace)),
             ToolItem(R.drawable.ic_layout,     getString(R.string.layout)),
             ToolItem(R.drawable.ic_border,     getString(R.string.border)),
             ToolItem(R.drawable.ic_sticker,    getString(R.string.sticker)),
@@ -826,11 +827,11 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
             ToolItem(R.drawable.ic_text,       getString(R.string.text)),
             ToolItem(R.drawable.ic_transform,  getString(R.string.transform)),
             ToolItem(R.drawable.ic_crop,       getString(R.string.crop)),
-            ToolItem(R.drawable.ic_replace_image, getString(R.string.replace)),
         )
 
         val adapter = ToolAdapter(tools) { _, pos ->
             // Ẩn tất cả panel
+            binding.llPhoto.visibility     = View.GONE
             binding.llFrame.visibility     = View.GONE
             binding.llBorder.visibility    = View.GONE
             binding.llBg.visibility        = View.GONE
@@ -838,7 +839,6 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
             binding.llDraw.visibility      = View.GONE
             binding.llRatio.visibility     = View.GONE
             binding.llTransform.visibility = View.GONE
-            binding.llPhoto.visibility     = View.GONE
             binding.rcvTools.visibility    = View.GONE
 
             // Tắt chế độ Replace khi chuyển sang tool khác
@@ -846,7 +846,19 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
             mFramePhotoLayout?.replaceMode = false
 
             when (pos) {
-                0 -> { // Layout
+                0 -> { // Replace — danh sách thumbnail từng ô để thay ảnh (giống template)
+                    binding.llPhoto.visibility = View.VISIBLE
+                    binding.drawView.setDrawingEnabled(false)
+                    replaceMode = true
+                    mFramePhotoLayout?.replaceMode = true
+                    refreshPhotoCellList()
+                    binding.icCheckPhoto.setOnClickListener {
+                        binding.llPhoto.visibility = View.GONE
+                        binding.rcvTools.visibility = View.VISIBLE
+                    }
+                }
+
+                1 -> { // Layout
                     binding.llFrame.visibility = View.VISIBLE
                     binding.icCheckLayout.setOnClickListener {
                         binding.llFrame.visibility = View.GONE
@@ -855,7 +867,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                     binding.drawView.setDrawingEnabled(false)
                 }
 
-                1 -> { // Border
+                2 -> { // Border
                     binding.llBorder.visibility = View.VISIBLE
                     binding.tvGrid.text   = binding.seekbarSpace.progress.toString()
                     binding.tvCorner.text = binding.seekbarCorner.progress.toString()
@@ -866,7 +878,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                     binding.drawView.setDrawingEnabled(false)
                 }
 
-                2 -> { // Sticker
+                3 -> { // Sticker
                     binding.llSticker.visibility = View.VISIBLE
                     binding.icCheckSticker.setOnClickListener {
                         binding.llSticker.visibility = View.GONE
@@ -877,7 +889,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                     syncUndoRedoUI()
                 }
 
-                3 -> { // Background
+                4 -> { // Background
                     binding.llBg.visibility = View.VISIBLE
                     binding.icCheckBackground.setOnClickListener {
                         binding.llBg.visibility = View.GONE
@@ -886,7 +898,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                     binding.drawView.setDrawingEnabled(false)
                 }
 
-                4 -> { // Draw
+                5 -> { // Draw
                     binding.llDraw.visibility = View.VISIBLE
                     setupDrawPanel()
 
@@ -915,13 +927,13 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                     syncUndoRedoUI()
                 }
 
-                5 -> { // Text
+                6 -> { // Text
                     binding.rcvTools.visibility = View.VISIBLE
                     binding.drawView.setDrawingEnabled(false)
                     showAddTextDialog()
                 }
 
-                6 -> { // Transform
+                7 -> { // Transform
                     binding.llTransform.visibility = View.VISIBLE
                     binding.drawView.setDrawingEnabled(false)
 
@@ -943,22 +955,10 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
                     }
                 }
 
-                7 -> { // Crop
+                8 -> { // Crop
                     binding.rcvTools.visibility = View.VISIBLE
                     binding.drawView.setDrawingEnabled(false)
                     openCropOverlay()
-                }
-
-                8 -> { // Replace — danh sách thumbnail từng ô để thay ảnh (giống template)
-                    binding.llPhoto.visibility = View.VISIBLE
-                    binding.drawView.setDrawingEnabled(false)
-                    replaceMode = true
-                    mFramePhotoLayout?.replaceMode = true
-                    refreshPhotoCellList()
-                    binding.icCheckPhoto.setOnClickListener {
-                        binding.llPhoto.visibility = View.GONE
-                        binding.rcvTools.visibility = View.VISIBLE
-                    }
                 }
             }
         }
