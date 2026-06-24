@@ -13,6 +13,7 @@ import android.os.Looper;
 import com.example.piceditor.LanguageActivity;
 import com.example.piceditor.MainActivity;
 import com.example.piceditor.R;
+import com.example.piceditor.ads.iap.PremiumActivity;
 import com.example.piceditor.WeatherApplication;
 import com.example.piceditor.ads.GDPRRequestable;
 import com.example.piceditor.ads.InterAds;
@@ -101,10 +102,22 @@ public class SplashActivity extends BaseActivityNew<ActivitySplashBinding> {
 
 
 
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
-
             isIntented = true;
+            // P0 onboarding paywall: hiện paywall 1 LẦN ở first-run (dismissible) trước khi vào Home
+            // — điểm chuyển đổi cao nhất (Day-0, ~82-89% trial bắt đầu hôm cài đặt). Đóng (X/back)
+            // → MainActivity (xử lý bởi PremiumActivity.onBackPressed khi có extra "free_trial").
+            // Bỏ qua nếu đã hiện 1 lần hoặc user đã Premium.
+            boolean paywallShown = PreferenceUtil.getInstance(this).getValue("first_paywall_shown", false);
+            boolean isPremium = new com.example.piceditor.ads.Prefs(this).getPremium() == 1;
+            if (!paywallShown && !isPremium) {
+                PreferenceUtil.getInstance(this).setValue("first_paywall_shown", true);
+                Intent i = new Intent(this, PremiumActivity.class);
+                i.putExtra("free_trial", true);
+                startActivity(i);
+            } else {
+                startActivity(new Intent(this, MainActivity.class));
+            }
+            finish();
         }
     }
 

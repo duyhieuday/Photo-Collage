@@ -177,4 +177,26 @@
     <string name="image_saving_failed">Échec de ln\'enregistrement de ln\'image</string>
     <string name="the_image_box">La zone d\'image nn\'a pas été sélectionnée.</string>
 
+    <!-- ===== Premium / IAP screen ===== -->
+    <string name="iap_title_line1">Photo Collage</string>
+    <string name="iap_title_line2">Premium</string>
+    <string name="iap_yearly_plan">Forfait annuel</string>
+    <string name="iap_billed_yearly">Facturé chaque année</string>
+    <string name="iap_per_year">/an</string>
+    <string name="iap_weekly_plan">Forfait hebdomadaire</string>
+    <string name="iap_bill_weekly">Facturé chaque semaine</string>
+    <string name="iap_per_week">/semaine</string>
+    <string name="iap_subscribe_now">S\'abonner</string>
+    <string name="iap_cancel_anytime">Annulable à tout moment</string>
+    <string name="iap_best_choice">Meilleur choix</string>
+    <string name="iap_terms">Conditions générales</string>
+    <string name="iap_privacy_policy">Politique de confidentialité</string>
+    <string name="iap_feature_1">Mises en page exclusives pour les IG Stories &amp; Reels</string>
+    <string name="iap_feature_2">Une expérience créative sans interruption</string>
+    <string name="iap_feature_3">Une qualité d\'image nette jusqu\'à la 4K</string>
+    <string name="iap_restore">Restaurer les achats</string>
+    <string name="iap_save">Économisez %1$d%%</string>
+    <string name="iap_price_per_week">seulement %1$s/semaine</string>
+    <string name="iap_no_purchase">Aucun achat actif trouvé</string>
+    <string name="iap_remove_watermark">Supprimer le filigrane</string>
 </resources>

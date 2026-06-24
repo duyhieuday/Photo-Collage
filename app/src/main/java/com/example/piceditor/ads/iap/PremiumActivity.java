@@ -6,16 +6,21 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.android.billingclient.api.AcknowledgePurchaseParams;
 import com.android.billingclient.api.BillingClient;
@@ -34,7 +39,9 @@ import com.example.piceditor.splash.SplashActivity;
 import com.google.common.collect.ImmutableList;
 import com.universe.translate.ads.iap.IapConnector;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.List;
 
 
@@ -43,6 +50,7 @@ public class PremiumActivity extends FragmentActivity {
     private ImageView imgBack;
     public static String LIFETIME = "pro_lifetime";
     public static String MONTHLY = "1_mon";
+    public static String WEEKLY = "1_week";
     public static String MONTHLY_6 = "6_mon";
     public static String YEAR = "1_year";
     private IapConnector iapConnector;
@@ -54,6 +62,15 @@ public class PremiumActivity extends FragmentActivity {
     private ActivityPremiumBinding binding;
 
     private int selected = 0;
+
+    // Giá (micros) để tính per-week + SAVE% cho gói Yearly
+    private long weeklyMicros = 0L;
+    private long yearlyMicros = 0L;
+    private String priceCurrency = null;
+
+    // Carousel feature auto-scroll
+    private final Handler autoScrollHandler = new Handler(Looper.getMainLooper());
+    private Runnable autoScrollRunnable;
 
     public void setStatusBar(int color) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -142,7 +159,6 @@ public class PremiumActivity extends FragmentActivity {
                     if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                         // The BillingClient is ready. You can query purchases here.
                         showAllSub();
-                        showAllInApp();
                     }
                 }
 
@@ -164,15 +180,15 @@ public class PremiumActivity extends FragmentActivity {
             ImmutableList<QueryProductDetailsParams.Product> productList = ImmutableList.of(
                     //Product 1
                     QueryProductDetailsParams.Product.newBuilder()
-                            .setProductId(MONTHLY)
+                            .setProductId(WEEKLY)
                             .setProductType(BillingClient.ProductType.SUBS)
                             .build(),
 
-                    QueryProductDetailsParams.Product.newBuilder()
-                            .setProductId(MONTHLY_6)
-                            .setProductType(BillingClient.ProductType.SUBS)
-                            .build()
-                    ,
+//                    QueryProductDetailsParams.Product.newBuilder()
+//                            .setProductId(MONTHLY_6)
+//                            .setProductType(BillingClient.ProductType.SUBS)
+//                            .build()
+//                    ,
                     QueryProductDetailsParams.Product.newBuilder()
                             .setProductId(YEAR)
                             .setProductType(BillingClient.ProductType.SUBS)
@@ -201,20 +217,25 @@ public class PremiumActivity extends FragmentActivity {
                                         for ( ProductDetails entry : prodDetailsList) {
                                             Log.e("xxx", "onPricesUpdated: " + entry);
                                             String sku = entry.getProductId();
-                                            String price = entry.getSubscriptionOfferDetails().get(0).getPricingPhases().getPricingPhaseList().get(0).getFormattedPrice();
                                             try {
-                                                if (sku.equalsIgnoreCase(MONTHLY)) {
+                                                List<ProductDetails.PricingPhase> phases = entry.getSubscriptionOfferDetails().get(0).getPricingPhases().getPricingPhaseList();
+                                                ProductDetails.PricingPhase recurring = phases.get(phases.size() - 1);
+                                                String price = recurring.getFormattedPrice();
+                                                long micros = recurring.getPriceAmountMicros();
+                                                priceCurrency = recurring.getPriceCurrencyCode();
+                                                if (sku.equalsIgnoreCase(WEEKLY)) {
                                                     binding.tvWeeklyPrice.setText(price);
-                                                }else if(sku.equalsIgnoreCase(MONTHLY_6)){
-                                                    binding.tvPrice2.setText(price);
-                                                }else if(sku.equalsIgnoreCase(YEAR)){
+                                                    weeklyMicros = micros;
+                                                } else if (sku.equalsIgnoreCase(YEAR)) {
                                                     binding.tvYearlyPrice.setText(price);
+                                                    yearlyMicros = micros;
                                                 }
                                             } catch (Exception e) {
                                                 Log.e("xxx", "showProducts: "+e.getMessage());
                                                 e.printStackTrace();
                                             }
                                         }
+                                        updateYearlySavings();
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
@@ -266,7 +287,7 @@ public class PremiumActivity extends FragmentActivity {
                                             String price = entry.getOneTimePurchaseOfferDetails().getFormattedPrice();
                                             try {
                                                 if (sku.equalsIgnoreCase(LIFETIME)) {
-                                                    binding.tvPrice4.setText(price);
+                                                    Log.d("xxx", "lifetime price: " + price);
                                                 }
                                             } catch (Exception e) {
                                                 Log.e("xxx", "showProducts: "+e.getMessage());
@@ -296,7 +317,7 @@ public class PremiumActivity extends FragmentActivity {
                     ImmutableList.of(
                             BillingFlowParams.ProductDetailsParams.newBuilder()
                                     .setProductDetails(productDetails)
-                                    .setOfferToken(productDetails.getSubscriptionOfferDetails().get(0).getOfferToken())
+                                    .setOfferToken(pickOfferToken(productDetails))
                                     .build()
                     );
             BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
@@ -381,6 +402,9 @@ public class PremiumActivity extends FragmentActivity {
     private void initView() {
 
         selectYearly();
+        setupCarousel();
+
+        binding.tvRestore.setOnClickListener(v -> restorePurchases());
 
         binding.layoutYearly.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -414,7 +438,7 @@ public class PremiumActivity extends FragmentActivity {
                 }else {
                     try {
                         for (ProductDetails productDetail : productDetailsList){
-                            if(productDetail.getProductId().equals(MONTHLY)){
+                            if(productDetail.getProductId().equals(WEEKLY)){
                                 launchPurchaseFlow(productDetail);
                                 return;
                             }
@@ -537,48 +561,150 @@ public class PremiumActivity extends FragmentActivity {
 
     }
 
-    private void disableAllBorder(){
-        binding.viewBorder1.setVisibility(View.GONE);
-        binding.viewBorder2.setVisibility(View.GONE);
-        binding.viewBorder3.setVisibility(View.GONE);
-        binding.viewBorder4.setVisibility(View.GONE);
-    }
-
-    private void enableBorder(View view){
-        view.setVisibility(View.VISIBLE);
-    }
-
-
-
-
 
     private void selectYearly() {
-        binding.layoutYearly.setBackgroundResource(R.drawable.bg_option_selected);
-        binding.layoutWeekly.setBackgroundResource(R.drawable.bg_option_unselected);
-
-        binding.icYearly.setImageResource(R.drawable.ic_radio_selected);
-        binding.icWeekly.setImageResource(R.drawable.ic_radio_unselected);
-        binding.tvYearly.setTextColor(Color.WHITE);
-        binding.tvYearlyPrice.setTextColor(Color.WHITE);
-        binding.tvWeekly.setTextColor(Color.BLACK);
-        binding.tvWeeklyPrice.setTextColor(Color.BLACK);
+        binding.layoutYearly.setBackgroundResource(R.drawable.bg_iap_plan_selected);
+        binding.layoutWeekly.setBackgroundResource(R.drawable.bg_iap_plan_unselected);
+        binding.tvYearlyPrice.setTextColor(Color.parseColor("#B3FF10"));
+        binding.tvWeeklyPrice.setTextColor(Color.WHITE);
         selected = 0;
-
-
     }
 
     private void selectWeekly() {
-        binding.layoutWeekly.setBackgroundResource(R.drawable.bg_option_selected);
-        binding.layoutYearly.setBackgroundResource(R.drawable.bg_option_unselected);
-
-        binding.icWeekly.setImageResource(R.drawable.ic_radio_selected);
-        binding.icYearly.setImageResource(R.drawable.ic_radio_unselected);
-
-        binding.tvYearly.setTextColor(Color.BLACK);
-        binding.tvYearlyPrice.setTextColor(Color.BLACK);
-        binding.tvWeekly.setTextColor(Color.WHITE);
-        binding.tvWeeklyPrice.setTextColor(Color.WHITE);
-
+        binding.layoutWeekly.setBackgroundResource(R.drawable.bg_iap_plan_selected);
+        binding.layoutYearly.setBackgroundResource(R.drawable.bg_iap_plan_unselected);
+        binding.tvWeeklyPrice.setTextColor(Color.parseColor("#B3FF10"));
+        binding.tvYearlyPrice.setTextColor(Color.WHITE);
         selected = 1;
+    }
+
+    // ── Carousel feature (ViewPager2 + dots + auto-scroll) ──
+    private void setupCarousel() {
+        // Khớp thứ tự ảnh trong IapFeatureAdapter: Remove ads (feature_2) lên đầu
+        String[] captions = {
+                getString(R.string.iap_feature_2),
+                getString(R.string.iap_feature_1),
+                getString(R.string.iap_feature_3)
+        };
+        binding.viewPager.setAdapter(new IapFeatureAdapter(captions));
+        binding.viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                updateDots(position);
+            }
+        });
+        updateDots(0);
+
+        // Tự chuyển trang mỗi 3.5s (runnable tự re-post để chạy liên tục)
+        autoScrollRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (binding.viewPager.getAdapter() != null) {
+                    int count = binding.viewPager.getAdapter().getItemCount();
+                    if (count > 0) {
+                        int next = (binding.viewPager.getCurrentItem() + 1) % count;
+                        binding.viewPager.setCurrentItem(next, true);
+                    }
+                }
+                autoScrollHandler.postDelayed(this, 3500);
+            }
+        };
+        autoScrollHandler.postDelayed(autoScrollRunnable, 3500);
+    }
+
+    private void updateDots(int pos) {
+        View[] dots = {binding.dot1, binding.dot2, binding.dot3};
+        for (int i = 0; i < dots.length; i++) {
+            ViewGroup.LayoutParams lp = dots[i].getLayoutParams();
+            lp.width = dpToPx(i == pos ? 30 : 6);
+            dots[i].setLayoutParams(lp);
+            dots[i].setBackgroundResource(i == pos
+                    ? R.drawable.bg_iap_dot_active
+                    : R.drawable.bg_iap_dot_inactive);
+        }
+    }
+
+    private int dpToPx(int dp) {
+        return Math.round(dp * getResources().getDisplayMetrics().density);
+    }
+
+    // Tính "Save X% · only $Y/week" cho gói Yearly từ giá micros (chỉ hiện khi đã có cả 2 giá)
+    private void updateYearlySavings() {
+        try {
+            if (weeklyMicros > 0 && yearlyMicros > 0 && priceCurrency != null) {
+                double yearlyPerWeek = (yearlyMicros / 1_000_000.0) / 52.0;
+                double weekly = weeklyMicros / 1_000_000.0;
+                int pct = (int) Math.round((1.0 - (yearlyPerWeek / weekly)) * 100.0);
+                NumberFormat nf = NumberFormat.getCurrencyInstance();
+                try {
+                    Currency cur = Currency.getInstance(priceCurrency);
+                    nf.setCurrency(cur);
+                    int fd = cur.getDefaultFractionDigits();
+                    nf.setMinimumFractionDigits(fd);
+                    nf.setMaximumFractionDigits(fd);
+                } catch (Exception ignored) {}
+                String perWeekStr = nf.format(yearlyPerWeek);
+                StringBuilder sb = new StringBuilder();
+                if (pct > 0) sb.append(getString(R.string.iap_save, pct)).append("  ·  ");
+                sb.append(getString(R.string.iap_price_per_week, perWeekStr));
+                binding.tvYearlySave.setText(sb.toString());
+                binding.tvYearlySave.setVisibility(View.VISIBLE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Khôi phục giao dịch (Restore Purchases) — bắt buộc theo policy Play
+    private void restorePurchases() {
+        try {
+            if (billingClient == null) return;
+            billingClient.queryPurchasesAsync(
+                    QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS).build(),
+                    (billingResult, list) -> runOnUiThread(() -> {
+                        boolean found = false;
+                        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                            for (Purchase purchase : list) {
+                                if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
+                                    found = true;
+                                    verifySubPurchase(purchase);
+                                }
+                            }
+                        }
+                        if (!found) {
+                            Toast.makeText(PremiumActivity.this, getString(R.string.iap_no_purchase), Toast.LENGTH_SHORT).show();
+                        }
+                    })
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Ưu tiên offer có free-trial (phase giá = 0); không có thì dùng offer mặc định
+    private String pickOfferToken(ProductDetails productDetails) {
+        try {
+            List<ProductDetails.SubscriptionOfferDetails> offers = productDetails.getSubscriptionOfferDetails();
+            if (offers == null || offers.isEmpty()) return "";
+            for (ProductDetails.SubscriptionOfferDetails offer : offers) {
+                for (ProductDetails.PricingPhase phase : offer.getPricingPhases().getPricingPhaseList()) {
+                    if (phase.getPriceAmountMicros() == 0) {
+                        return offer.getOfferToken();
+                    }
+                }
+            }
+            return offers.get(0).getOfferToken();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return productDetails.getSubscriptionOfferDetails().get(0).getOfferToken();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (autoScrollRunnable != null) {
+            autoScrollHandler.removeCallbacks(autoScrollRunnable);
+        }
+        super.onDestroy();
     }
 }

@@ -37,6 +37,7 @@ import com.example.piceditor.utilsApp.DraftType
 import com.example.piceditor.utilsApp.PreferenceUtil
 import com.ezt.pdfreader.photoeditor.data.PageInfo
 import androidx.lifecycle.lifecycleScope
+import com.example.piceditor.ads.iap.PremiumActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
@@ -349,6 +350,12 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
             InterAds.showAdsBreak(this@MainActivity) {
                 startActivity(Intent(this, SettingActivity::class.java))
             }
+        }
+
+        binding.icPro.setOnClickListener {
+            if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
+            mLastClickTime = SystemClock.elapsedRealtime()
+            startActivity(Intent(this, PremiumActivity::class.java))
         }
 
         binding.llEdit.setOnClickListener {

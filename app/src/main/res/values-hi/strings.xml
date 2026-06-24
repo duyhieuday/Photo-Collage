@@ -177,4 +177,26 @@
     <string name="image_saving_failed">छवि सहेजने में विफलता</string>
     <string name="the_image_box">इमेज बॉक्स का चयन नहीं किया गया है।</string>
 
+    <!-- ===== Premium / IAP screen ===== -->
+    <string name="iap_title_line1">Photo Collage</string>
+    <string name="iap_title_line2">Premium</string>
+    <string name="iap_yearly_plan">वार्षिक प्लान</string>
+    <string name="iap_billed_yearly">सालाना बिलिंग</string>
+    <string name="iap_per_year">/साल</string>
+    <string name="iap_weekly_plan">साप्ताहिक प्लान</string>
+    <string name="iap_bill_weekly">साप्ताहिक बिलिंग</string>
+    <string name="iap_per_week">/हफ़्ता</string>
+    <string name="iap_subscribe_now">अभी सब्सक्राइब करें</string>
+    <string name="iap_cancel_anytime">कभी भी रद्द करें</string>
+    <string name="iap_best_choice">सबसे बेहतर</string>
+    <string name="iap_terms">नियम और शर्तें</string>
+    <string name="iap_privacy_policy">गोपनीयता नीति</string>
+    <string name="iap_feature_1">IG Stories &amp; Reels के लिए ख़ास लेआउट</string>
+    <string name="iap_feature_2">बिना रुकावट क्रिएटिव अनुभव</string>
+    <string name="iap_feature_3">4K तक एकदम साफ़ क्वालिटी</string>
+    <string name="iap_restore">खरीदारी पुनर्स्थापित करें</string>
+    <string name="iap_save">%1$d%% बचाएँ</string>
+    <string name="iap_price_per_week">केवल %1$s/सप्ताह</string>
+    <string name="iap_no_purchase">कोई सक्रिय खरीदारी नहीं मिली</string>
+    <string name="iap_remove_watermark">वॉटरमार्क हटाएँ</string>
 </resources>

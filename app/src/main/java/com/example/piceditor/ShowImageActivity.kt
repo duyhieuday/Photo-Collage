@@ -16,6 +16,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.example.piceditor.ads.InterAds
+import com.example.piceditor.ads.Prefs
+import com.example.piceditor.ads.iap.PremiumActivity
 import com.example.piceditor.base.BaseActivityNew
 import com.example.piceditor.base.BaseFragment
 import com.example.piceditor.databinding.ActivityShowImageBinding
@@ -112,6 +114,18 @@ class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnCl
         binding.icFaceBook.setOnClickListener  { shareToApp("com.facebook.katana") }
         binding.icTiktok.setOnClickListener    { shareToTikTok() }
         binding.icMore.setOnClickListener      { shareImage() }
+
+        // Upsell "Remove watermark" — chỉ hiện cho user FREE (Premium/RemoveAd thì ẩn).
+        // Ảnh đã lưu có watermark → bấm mở Premium để gỡ. Khớp với WatermarkUtil.
+        val prefs = Prefs(this)
+        if (prefs.getPremium() == 1 || prefs.isRemoveAd) {
+            binding.tvRemoveWatermark.visibility = View.GONE
+        } else {
+            binding.tvRemoveWatermark.visibility = View.VISIBLE
+            binding.tvRemoveWatermark.setOnClickListener {
+                startActivity(Intent(this, PremiumActivity::class.java))
+            }
+        }
     }
 
     private fun setUpTemp() {

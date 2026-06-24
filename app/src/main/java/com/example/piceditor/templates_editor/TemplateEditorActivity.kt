@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.ContentValues
 import android.graphics.*
 import android.media.MediaScannerConnection
+import com.ezt.pdfreader.photoeditor.util.WatermarkUtil
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -1045,6 +1046,8 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
 
     private fun saveToGallery(bitmap: Bitmap): Uri {
         val filename = "collage_${System.currentTimeMillis()}.jpg"
+        // Watermark cho user FREE (Premium trả về bitmap gốc; lỗi -> fallback gốc)
+        val wmBitmap = WatermarkUtil.applyIfFree(this@TemplateEditorActivity, bitmap)
         val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val values = ContentValues().apply {
                 put(MediaStore.Images.Media.DISPLAY_NAME, filename)
@@ -1055,7 +1058,7 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
             val uri = contentResolver.insert(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values
             ) ?: throw Exception("Insert failed")
-            contentResolver.openOutputStream(uri)?.use { bitmap.compress(Bitmap.CompressFormat.JPEG, 95, it) }
+            contentResolver.openOutputStream(uri)?.use { wmBitmap.compress(Bitmap.CompressFormat.JPEG, 95, it) }
             values.clear()
             values.put(MediaStore.Images.Media.IS_PENDING, 0)
             contentResolver.update(uri, values, null, null)
@@ -1066,7 +1069,7 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
                 .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
                 .resolve("PhotoCollage").also { it.mkdirs() }
             val file = dir.resolve(filename)
-            file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 95, it) }
+            file.outputStream().use { wmBitmap.compress(Bitmap.CompressFormat.JPEG, 95, it) }
             @Suppress("DEPRECATION")
             MediaScannerConnection.scanFile(
                 this, arrayOf(file.absolutePath), arrayOf("image/jpeg"), null

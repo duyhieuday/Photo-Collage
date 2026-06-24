@@ -6,6 +6,7 @@ import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import com.ezt.pdfreader.photoeditor.util.WatermarkUtil
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Matrix
@@ -877,10 +878,12 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
 
     private fun saveToGallery(bitmap: Bitmap): Uri {
         val fileName = "IMG_${System.currentTimeMillis()}.jpg"
+        // Watermark cho user FREE (Premium trả về bitmap gốc; lỗi -> fallback gốc)
+        val wmBitmap = WatermarkUtil.applyIfFree(this, bitmap)
         val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            saveToGalleryQ(bitmap, fileName)
+            saveToGalleryQ(wmBitmap, fileName)
         } else {
-            saveToGalleryLegacy(bitmap, fileName)
+            saveToGalleryLegacy(wmBitmap, fileName)
         }
         // Đánh dấu draft này tạo từ AI Remove → mở lại đúng editor khi bấm trong My Draft
         DraftStore.tag(this, uri.toString(), DraftType.AI)

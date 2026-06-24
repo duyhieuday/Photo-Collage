@@ -178,4 +178,27 @@
     <string name="image_saving_failed">Image saving failed</string>
     <string name="the_image_box">The image box has not been selected.</string>
 
+    <!-- ===== Premium / IAP screen ===== -->
+    <string name="iap_title_line1">Photo Collage</string>
+    <string name="iap_title_line2">Premium</string>
+    <string name="iap_yearly_plan">Yearly Plan</string>
+    <string name="iap_billed_yearly">Billed yearly</string>
+    <string name="iap_per_year">/year</string>
+    <string name="iap_weekly_plan">Weekly Plan</string>
+    <string name="iap_bill_weekly">Bill weekly</string>
+    <string name="iap_per_week">/week</string>
+    <string name="iap_subscribe_now">Subscribe Now</string>
+    <string name="iap_cancel_anytime">Cancel anytime</string>
+    <string name="iap_best_choice">Best choice</string>
+    <string name="iap_terms">Terms &amp; Conditions</string>
+    <string name="iap_privacy_policy">Privacy Policy</string>
+    <string name="iap_feature_1">Exclusive layouts for IG Stories &amp; Reels</string>
+    <string name="iap_feature_2">Uninterrupted creative experience</string>
+    <string name="iap_feature_3">Crystal clear quality up to 4K</string>
+    <string name="iap_restore">Restore Purchases</string>
+    <string name="iap_save">Save %1$d%%</string>
+    <string name="iap_price_per_week">only %1$s/week</string>
+    <string name="iap_no_purchase">No active purchase found</string>
+    <string name="iap_remove_watermark">Remove Watermark</string>
+
 </resources>

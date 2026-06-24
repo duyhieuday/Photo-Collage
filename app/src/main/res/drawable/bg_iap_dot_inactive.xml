@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dot carousel không active: chấm tròn #9FB2A6 mờ (alpha ~20%) -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="#339FB2A6" />
+</shape>

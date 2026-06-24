@@ -72,6 +72,26 @@
                     android:layout_marginHorizontal="14dp"
                     android:scaleType="centerCrop" />
 
+                <!-- Upsell: bỏ watermark (overlay đáy ảnh, ẩn cho Premium; set runtime) -->
+                <TextView
+                    android:id="@+id/tvRemoveWatermark"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/imgShow"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/bg_iap_subscribe"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:fontFamily="@font/inter_semi_bold"
+                    android:gravity="center"
+                    android:paddingHorizontal="18dp"
+                    android:paddingVertical="9dp"
+                    android:text="@string/iap_remove_watermark"
+                    android:textColor="#1A1A1A"
+                    android:textSize="13sp"
+                    android:visibility="gone" />
+
                 <!-- BUTTON -->
                 <TextView
                     android:id="@+id/btnMakeAnother"

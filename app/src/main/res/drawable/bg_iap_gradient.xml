@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Nền IAP: khớp đúng dải xanh đã bake trong ảnh carousel
+     (mép trên ảnh #0B0E17 → mép dưới ảnh #2B3C1C) để ảnh tan vào nền, không lộ đường ghép màu.
+     trên dark navy → giữa olive trầm (#2B3C1C) → dưới near-black -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="270"
+        android:startColor="#0B0E17"
+        android:centerColor="#2B3C1C"
+        android:endColor="#0C0F07"
+        android:type="linear" />
+</shape>

@@ -4,15 +4,15 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.ezt.photo.collage.maker1",
+  "applicationId": "com.ezt.photo.collage.maker",
   "variantName": "release",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 1,
-      "versionName": "1.0",
+      "versionCode": 3,
+      "versionName": "1.0.3",
       "outputFile": "app-release.apk"
     }
   ],

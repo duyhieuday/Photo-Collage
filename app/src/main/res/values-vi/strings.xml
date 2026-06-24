@@ -177,4 +177,26 @@
     <string name="image_saving_failed">Lưu ảnh không thành công</string>
     <string name="the_image_box">Hộp hình ảnh chưa được chọn.</string>
 
+    <!-- ===== Premium / IAP screen ===== -->
+    <string name="iap_title_line1">Photo Collage</string>
+    <string name="iap_title_line2">Premium</string>
+    <string name="iap_yearly_plan">Gói năm</string>
+    <string name="iap_billed_yearly">Thanh toán theo năm</string>
+    <string name="iap_per_year">/năm</string>
+    <string name="iap_weekly_plan">Gói tuần</string>
+    <string name="iap_bill_weekly">Thanh toán theo tuần</string>
+    <string name="iap_per_week">/tuần</string>
+    <string name="iap_subscribe_now">Đăng ký ngay</string>
+    <string name="iap_cancel_anytime">Hủy bất cứ lúc nào</string>
+    <string name="iap_best_choice">Tốt nhất</string>
+    <string name="iap_terms">Điều khoản &amp; Điều kiện</string>
+    <string name="iap_privacy_policy">Chính sách bảo mật</string>
+    <string name="iap_feature_1">Bố cục độc quyền cho IG Stories &amp; Reels</string>
+    <string name="iap_feature_2">Trải nghiệm sáng tạo liền mạch</string>
+    <string name="iap_feature_3">Chất lượng sắc nét đến 4K</string>
+    <string name="iap_restore">Khôi phục giao dịch</string>
+    <string name="iap_save">Tiết kiệm %1$d%%</string>
+    <string name="iap_price_per_week">chỉ %1$s/tuần</string>
+    <string name="iap_no_purchase">Không tìm thấy giao dịch nào</string>
+    <string name="iap_remove_watermark">Xoá watermark</string>
 </resources>

@@ -56,6 +56,16 @@
                             android:fontFamily="@font/carterone_regular"
                             android:layout_centerInParent="true" />
 
+                        <ImageView
+                            android:id="@+id/icPro"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/ic_pro"
+                            android:padding="8dp"
+                            android:scaleType="fitCenter"
+                            android:layout_centerVertical="true"
+                            android:layout_alignParentEnd="true" />
+
                     </RelativeLayout>
 
                     <!-- ACTION BUTTONS -->

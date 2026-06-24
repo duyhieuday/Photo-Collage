@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.*
 import android.net.Uri
+import com.ezt.pdfreader.photoeditor.util.WatermarkUtil
 import android.os.*
 import android.provider.MediaStore
 import android.view.LayoutInflater
@@ -225,12 +226,14 @@ class FilterCollageActivity : BaseActivityNew<ActivityFilterCollageBinding>(),
     private fun saveToGallery(bitmap: Bitmap): Uri {
         val fileName = "IMG_${System.currentTimeMillis()}.jpg"
 
+        // Watermark cho user FREE (Premium trả về bitmap gốc; lỗi -> fallback gốc)
+        val wmBitmap = WatermarkUtil.applyIfFree(this, bitmap)
         val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             // Android 10+ : use MediaStore with RELATIVE_PATH (scoped storage)
-            saveToGalleryQ(bitmap, fileName)
+            saveToGalleryQ(wmBitmap, fileName)
         } else {
             // Android 9- : write directly to file (requires WRITE_EXTERNAL_STORAGE)
-            saveToGalleryLegacy(bitmap, fileName)
+            saveToGalleryLegacy(wmBitmap, fileName)
         }
         // Đánh dấu draft này tạo từ Collage → mở lại đúng editor khi bấm trong My Draft
         DraftStore.tag(this, uri.toString(), DraftType.COLLAGE)

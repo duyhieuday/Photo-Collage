@@ -17,6 +17,7 @@ import com.ezt.pdfreader.photoeditor.data.FilterType
 import com.ezt.pdfreader.photoeditor.data.PageInfo
 import com.ezt.pdfreader.photoeditor.data.PageState
 import com.ezt.pdfreader.photoeditor.util.BitmapLoader
+import com.ezt.pdfreader.photoeditor.util.WatermarkUtil
 import com.mct.dockit.core.DockitMode
 import com.mct.dockit.proc.image.DockitImageCrop
 import com.mct.dockit.proc.image.DockitImageProc
@@ -531,10 +532,12 @@ class PhotoEditorViewModel(application: Application) : AndroidViewModel(applicat
         bitmap: Bitmap,
         fileName: String
     ): Uri? {
+        // Watermark cho user FREE (Premium trả về bitmap gốc; lỗi -> fallback gốc)
+        val wmBitmap = WatermarkUtil.applyIfFree(context, bitmap)
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            saveBitmapQ(context, bitmap, fileName)
+            saveBitmapQ(context, wmBitmap, fileName)
         } else {
-            saveBitmapLegacy(context, bitmap, fileName)
+            saveBitmapLegacy(context, wmBitmap, fileName)
         }
     }
 
