@@ -29,6 +29,15 @@ public class BannerAds {
 
     private static final String BANNER_ID_DEFAULT = "ca-app-pub-1484248692768692/3173702719";
 
+    private static boolean isPremiumUser() {
+        try {
+            Prefs p = new Prefs(WeatherApplication.get());
+            return p.getPremium() == 1 || p.isRemoveAd();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public static AdSize getAdSize(Activity activity) {
         Display display = activity.getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics();
@@ -87,6 +96,11 @@ public class BannerAds {
 
     public static void initBannerAds(Activity ctx) {
         try {
+            if (isPremiumUser()) {
+                final LinearLayout c = ctx.findViewById(R.id.adView_container);
+                if (c != null) c.setVisibility(View.GONE);
+                return;
+            }
             final AdView mAdViewBanner = new AdView(ctx);
             mAdViewBanner.setAdSize(getAdSize(ctx));
             mAdViewBanner.setAdUnitId(BuildConfig.DEBUG ? BANNER_TEST_ID : BANNER_ID_DEFAULT);
@@ -149,6 +163,10 @@ public class BannerAds {
 //        if(!PreferenceUtil.getInstance(ctx).getValue(Constant.SharePrefKey.HEHE, false)){
 //            return;
 //        }
+        if (isPremiumUser()) {
+            try { if (viewRoot != null) viewRoot.setVisibility(View.GONE); } catch (Exception ignored) {}
+            return;
+        }
         if (!isInitBanner) {
             try {
                 viewRoot = LayoutInflater.from(ctx).inflate(R.layout.ab_banner_ads, null);

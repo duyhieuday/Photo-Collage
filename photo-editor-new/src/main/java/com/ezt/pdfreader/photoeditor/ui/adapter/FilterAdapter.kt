@@ -19,7 +19,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class FilterAdapter(
-    private val onFilterSelected: (FilterType) -> Unit
+    private val onFilterSelected: (FilterType) -> Unit,
+    // Soft-sell gate: user đã premium chưa + cách hiện dialog mời Premium.
+    // Mặc định coi như premium (không gate) để giữ tương thích nơi gọi cũ.
+    private val isPremiumUser: () -> Boolean = { true },
+    private val onPremiumGate: (proceed: () -> Unit) -> Unit = { it() }
 ) : RecyclerView.Adapter<FilterAdapter.FilterViewHolder>() {
 
     private val filters = FilterType.entries.toList()
@@ -75,11 +79,17 @@ class FilterAdapter(
             binding.cardFilter.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION && position != selectedPosition) {
-                    val oldPosition = selectedPosition
-                    selectedPosition = position
-                    notifyItemChanged(oldPosition)
-                    notifyItemChanged(position)
-                    onFilterSelected(filters[position])
+                    val filterType = filters[position]
+                    val select = {
+                        val oldPosition = selectedPosition
+                        selectedPosition = position
+                        notifyItemChanged(oldPosition)
+                        notifyItemChanged(position)
+                        onFilterSelected(filterType)
+                    }
+                    // Filter premium + user free → dialog mời Premium ("Continue" vẫn cho dùng)
+                    if (filterType.isPremium && !isPremiumUser()) onPremiumGate(select)
+                    else select()
                 }
             }
         }
@@ -87,8 +97,8 @@ class FilterAdapter(
         fun bind(filterType: FilterType, isSelected: Boolean) {
             binding.tvFilterName.text = filterType.displayName
 
-            // Premium crown icon
-//            binding.ivCrown.isVisible = filterType.isPremium
+            // Premium crown icon: chỉ hiện cho filter premium khi user FREE
+            binding.ivCrown.isVisible = filterType.isPremium && !isPremiumUser()
 
             // Selection state
             binding.cardFilter.strokeColor = binding.root.context.getColor(

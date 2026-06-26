@@ -100,6 +100,13 @@ abstract class PhotoEditorActivity : AppCompatActivity() {
     abstract fun isPremium(): Boolean
     abstract fun openPaywall()
 
+    /**
+     * Soft-sell upsell khi user FREE chạm tính năng premium (vd filter premium).
+     * Hiện dialog mời lên Premium; "Continue" vẫn gọi [onContinue] để dùng tiếp.
+     * App module override để hiển thị dialog thật; mặc định không chặn.
+     */
+    open fun showPremiumUpsell(onContinue: () -> Unit) = onContinue()
+
     private fun setupWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dialog upsell premium (soft-sell) — đồng bộ màn Premium -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog_premium"
+    android:orientation="vertical"
+    android:paddingHorizontal="24dp"
+    android:paddingTop="24dp"
+    android:paddingBottom="20dp">
+
+    <!-- Emblem vàng -->
+    <ImageView
+        android:layout_width="76dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center_horizontal"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_premium_emblem"
+        android:importantForAccessibility="no" />
+
+    <!-- Tiêu đề -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/inter_semi_bold"
+        android:text="@string/iap_premium_feature_title"
+        android:textColor="#FCFCFD"
+        android:textSize="22sp" />
+
+    <!-- Bullet benefits -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="18dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_check_lime"
+                android:importantForAccessibility="no" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:fontFamily="@font/inter_medium"
+                android:text="@string/iap_benefit_1"
+                android:textColor="#ECF3E6"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_check_lime"
+                android:importantForAccessibility="no" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:fontFamily="@font/inter_medium"
+                android:text="@string/iap_benefit_2"
+                android:textColor="#ECF3E6"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_check_lime"
+                android:importantForAccessibility="no" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:fontFamily="@font/inter_medium"
+                android:text="@string/iap_benefit_3"
+                android:textColor="#ECF3E6"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- CTA chính: Go Premium (lime) -->
+    <TextView
+        android:id="@+id/btnGoPremium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/bg_iap_subscribe"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/inter_semi_bold"
+        android:gravity="center"
+        android:paddingVertical="14dp"
+        android:text="@string/iap_go_premium"
+        android:textColor="#1A1A1A"
+        android:textSize="16sp" />
+
+    <!-- Phụ: Continue (vẫn cho dùng free) -->
+    <TextView
+        android:id="@+id/btnContinueFree"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/inter_regular"
+        android:padding="8dp"
+        android:text="@string/iap_continue"
+        android:textColor="#9FB394"
+        android:textSize="14sp" />
+</LinearLayout>

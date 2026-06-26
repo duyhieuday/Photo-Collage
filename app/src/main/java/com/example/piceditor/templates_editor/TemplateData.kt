@@ -10,7 +10,11 @@ data class TemplateData(
     val thumbRes: Int,
     val cellRects: List<RectF>,
     val maskMode: MaskMode = MaskMode.WHITE
-)
+) {
+    // Cách A: template có số thứ tự >= 6 trong category là PREMIUM (giữ ~5 đầu/category free)
+    val isPremium: Boolean
+        get() = (id.filter { it.isDigit() }.toIntOrNull() ?: 0) >= 6
+}
 
 enum class MaskMode {
     WHITE,

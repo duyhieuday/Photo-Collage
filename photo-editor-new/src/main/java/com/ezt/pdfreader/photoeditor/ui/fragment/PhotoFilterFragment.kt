@@ -106,11 +106,16 @@ class PhotoFilterFragment : Fragment() {
         binding.bottomBar.isVisible = true
         binding.filterPanel.isVisible = false
 
-        filterAdapter = FilterAdapter { filterType ->
-            viewModel.applyFilter(filterType)
-            pagerAdapter.reloadImage(viewModel.currentPageIndex.value)
-            binding.btnFilterApplyToAll.isVisible = viewModel.pages.value.size > 1
-        }
+        val hostActivity = requireActivity() as PhotoEditorActivity
+        filterAdapter = FilterAdapter(
+            onFilterSelected = { filterType ->
+                viewModel.applyFilter(filterType)
+                pagerAdapter.reloadImage(viewModel.currentPageIndex.value)
+                binding.btnFilterApplyToAll.isVisible = viewModel.pages.value.size > 1
+            },
+            isPremiumUser = { hostActivity.isPremium() },
+            onPremiumGate = { proceed -> hostActivity.showPremiumUpsell(proceed) }
+        )
         binding.rvFilters.apply {
             adapter = filterAdapter
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)

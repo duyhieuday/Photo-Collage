@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import com.example.piceditor.ads.BannerAds
 import com.example.piceditor.ads.BannerCollapsibleAds
 import com.example.piceditor.ads.Prefs
+import com.example.piceditor.ads.iap.PremiumActivity
+import com.example.piceditor.ads.iap.PremiumUpsell
 import com.example.piceditor.utilsApp.Constant
 import com.example.piceditor.utilsApp.PreferenceUtil
 import com.ezt.pdfreader.photoeditor.data.PageInfo
@@ -72,6 +74,11 @@ class PhotoEditorWithBannerActivity : PhotoEditorActivity(){
     }
 
     override fun openPaywall() {
+        startActivity(Intent(this, PremiumActivity::class.java))
+    }
 
+    /** Soft-sell: filter premium + user free → dialog mời Premium ("Continue" vẫn cho dùng). */
+    override fun showPremiumUpsell(onContinue: () -> Unit) {
+        PremiumUpsell.showFeatureDialog(this, onContinue)
     }
 }

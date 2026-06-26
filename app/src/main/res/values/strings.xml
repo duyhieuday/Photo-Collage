@@ -200,5 +200,14 @@
     <string name="iap_price_per_week">only %1$s/week</string>
     <string name="iap_no_purchase">No active purchase found</string>
     <string name="iap_remove_watermark">Remove Watermark</string>
+    <string name="iap_start_trial">Start Free Trial</string>
+    <string name="iap_trial_then">%1$d-day free trial, then %2$s · Cancel anytime</string>
+    <string name="iap_premium_feature_title">Premium Feature</string>
+    <string name="iap_premium_feature_msg">Unlock premium templates &amp; tools, watermark-free export and an ad-free experience with Premium.</string>
+    <string name="iap_go_premium">Go Premium</string>
+    <string name="iap_continue">Continue</string>
+    <string name="iap_benefit_1">All premium templates &amp; tools</string>
+    <string name="iap_benefit_2">No watermark on exports</string>
+    <string name="iap_benefit_3">Ad-free experience</string>
 
 </resources>

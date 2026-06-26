@@ -32,10 +32,15 @@ public class NativeFullScreen {
 
     public static void loadNative(Context context) {
 
-//        Prefs prefs = new Prefs(context);
-//        if (prefs.getPremium()) {
-//            return;
-//        }
+        // Premium / RemoveAd -> không load native ad
+        try {
+            Prefs prefs = new Prefs(context);
+            if (prefs.getPremium() == 1 || prefs.isRemoveAd()) {
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         VideoOptions videoOptions = new VideoOptions.Builder().setStartMuted(true).build();
 
         NativeAdOptions adOptions =
@@ -57,11 +62,16 @@ public class NativeFullScreen {
     }
 
     public static void showNative(Context context, View ctx, String vitri) {
-//        Prefs prefs = new Prefs(context);
-//        if (prefs.getPremium()) {
-//            ctx.findViewById(R.id.native_ads).setVisibility(View.GONE);
-//            return;
-//        }
+        // Premium / RemoveAd -> ẩn native ad
+        try {
+            Prefs prefs = new Prefs(context);
+            if (prefs.getPremium() == 1 || prefs.isRemoveAd()) {
+                ctx.findViewById(R.id.native_ads).setVisibility(View.GONE);
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (nativeAds.size() == 0) {
             ctx.findViewById(R.id.native_ads).setVisibility(View.GONE);
         } else {

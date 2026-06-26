@@ -199,4 +199,13 @@
     <string name="iap_price_per_week">seulement %1$s/semaine</string>
     <string name="iap_no_purchase">Aucun achat actif trouvé</string>
     <string name="iap_remove_watermark">Supprimer le filigrane</string>
+    <string name="iap_start_trial">Commencer l\'essai gratuit</string>
+    <string name="iap_trial_then">%1$d jours d\'essai gratuit, puis %2$s · Annulable à tout moment</string>
+    <string name="iap_premium_feature_title">Fonction Premium</string>
+    <string name="iap_premium_feature_msg">Débloquez les modèles &amp; outils premium, l\'export sans filigrane et une expérience sans publicité avec Premium.</string>
+    <string name="iap_go_premium">Passer à Premium</string>
+    <string name="iap_continue">Continuer</string>
+    <string name="iap_benefit_1">Tous les modèles &amp; outils premium</string>
+    <string name="iap_benefit_2">Export sans filigrane</string>
+    <string name="iap_benefit_3">Expérience sans publicité</string>
 </resources>

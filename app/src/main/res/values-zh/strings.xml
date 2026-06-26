@@ -199,4 +199,13 @@
     <string name="iap_price_per_week">仅 %1$s/周</string>
     <string name="iap_no_purchase">未找到有效购买</string>
     <string name="iap_remove_watermark">去除水印</string>
+    <string name="iap_start_trial">开始免费试用</string>
+    <string name="iap_trial_then">免费试用 %1$d 天，之后 %2$s · 随时可取消</string>
+    <string name="iap_premium_feature_title">高级功能</string>
+    <string name="iap_premium_feature_msg">升级 Premium 解锁高级模板与工具、无水印导出和无广告体验。</string>
+    <string name="iap_go_premium">升级 Premium</string>
+    <string name="iap_continue">继续</string>
+    <string name="iap_benefit_1">全部高级模板与工具</string>
+    <string name="iap_benefit_2">导出无水印</string>
+    <string name="iap_benefit_3">无广告体验</string>
 </resources>

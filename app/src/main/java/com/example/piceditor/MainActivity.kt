@@ -38,6 +38,7 @@ import com.example.piceditor.utilsApp.PreferenceUtil
 import com.ezt.pdfreader.photoeditor.data.PageInfo
 import androidx.lifecycle.lifecycleScope
 import com.example.piceditor.ads.iap.PremiumActivity
+import com.example.piceditor.ads.iap.PremiumUpsell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
@@ -346,6 +347,9 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
     private fun setupClick() {
         checkAndRequestPermission()
 
+        // Badge premium trên AI Remove — ẩn nếu user đã Premium
+        binding.icRemovePro.visibility = if (PremiumUpsell.isPremium(this)) View.GONE else View.VISIBLE
+
         binding.btnMenu.setOnClickListener {
             InterAds.showAdsBreak(this@MainActivity) {
                 startActivity(Intent(this, SettingActivity::class.java))
@@ -390,15 +394,22 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         }
 
         binding.llRemove.setOnClickListener {
-            checkAndRequestPermission()
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
             mLastClickTime = SystemClock.elapsedRealtime()
-            InterAds.showAdsBreak(this@MainActivity) {
-                val intent = Intent(this, SelectImageActivity::class.java).apply {
-                    putExtra("max_image_count", 1)
-                    putExtra("from_remove", true)
+            val proceed = {
+                checkAndRequestPermission()
+                InterAds.showAdsBreak(this@MainActivity) {
+                    startActivity(Intent(this, SelectImageActivity::class.java).apply {
+                        putExtra("max_image_count", 1)
+                        putExtra("from_remove", true)
+                    })
                 }
-                startActivity(intent)
+            }
+            // Soft-sell: AI Remove là tính năng premium → free user thấy dialog mời Premium (Continue vẫn cho dùng)
+            if (PremiumUpsell.isPremium(this)) {
+                proceed()
+            } else {
+                PremiumUpsell.showFeatureDialog(this, proceed)
             }
         }
     }

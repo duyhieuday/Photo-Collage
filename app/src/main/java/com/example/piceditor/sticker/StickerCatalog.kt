@@ -6,6 +6,9 @@ object StickerCatalog {
 
     private const val FOLDER = "images"
 
+    // Số sticker FREE đầu mỗi category (mirror rule template: ~5 đầu free, còn lại premium).
+    private const val FREE_PER_CATEGORY = 5
+
     // Bỏ qua các pack không phải sticker (thumbnail, tạm thời)
     private val EXCLUDED_PREFIXES = setOf("thumb", "temp")
 
@@ -36,9 +39,15 @@ object StickerCatalog {
 
         val sortedPrefixes = groups.keys.sortedWith(prefixComparator())
         return sortedPrefixes.map { prefix ->
+            // Cách A (đồng bộ template): mỗi category để ~5 sticker đầu FREE, từ thứ 6 trở đi PREMIUM.
             val items = groups.getValue(prefix)
                 .sortedBy { it.first }
-                .map { (_, fileName) -> StickerItem("file:///android_asset/$FOLDER/$fileName") }
+                .mapIndexed { index, (_, fileName) ->
+                    StickerItem(
+                        assetPath = "file:///android_asset/$FOLDER/$fileName",
+                        isPremium = index >= FREE_PER_CATEGORY
+                    )
+                }
             StickerCategory(id = prefix, preview = items.first(), items = items)
         }
     }

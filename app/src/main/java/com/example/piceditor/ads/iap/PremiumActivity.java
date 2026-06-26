@@ -67,6 +67,9 @@ public class PremiumActivity extends FragmentActivity {
     private long weeklyMicros = 0L;
     private long yearlyMicros = 0L;
     private String priceCurrency = null;
+    // Free-trial framing: giá đã format + số ngày trial mỗi gói (0 = không có trial)
+    private String weeklyPriceFmt = null, yearlyPriceFmt = null;
+    private int weeklyTrialDays = 0, yearlyTrialDays = 0;
 
     // Carousel feature auto-scroll
     private final Handler autoScrollHandler = new Handler(Looper.getMainLooper());
@@ -226,9 +229,13 @@ public class PremiumActivity extends FragmentActivity {
                                                 if (sku.equalsIgnoreCase(WEEKLY)) {
                                                     binding.tvWeeklyPrice.setText(price);
                                                     weeklyMicros = micros;
+                                                    weeklyPriceFmt = price;
+                                                    weeklyTrialDays = trialDays(entry);
                                                 } else if (sku.equalsIgnoreCase(YEAR)) {
                                                     binding.tvYearlyPrice.setText(price);
                                                     yearlyMicros = micros;
+                                                    yearlyPriceFmt = price;
+                                                    yearlyTrialDays = trialDays(entry);
                                                 }
                                             } catch (Exception e) {
                                                 Log.e("xxx", "showProducts: "+e.getMessage());
@@ -236,6 +243,7 @@ public class PremiumActivity extends FragmentActivity {
                                             }
                                         }
                                         updateYearlySavings();
+                                        updateTrialFraming();
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
@@ -568,6 +576,7 @@ public class PremiumActivity extends FragmentActivity {
         binding.tvYearlyPrice.setTextColor(Color.parseColor("#B3FF10"));
         binding.tvWeeklyPrice.setTextColor(Color.WHITE);
         selected = 0;
+        updateTrialFraming();
     }
 
     private void selectWeekly() {
@@ -576,6 +585,63 @@ public class PremiumActivity extends FragmentActivity {
         binding.tvWeeklyPrice.setTextColor(Color.parseColor("#B3FF10"));
         binding.tvYearlyPrice.setTextColor(Color.WHITE);
         selected = 1;
+        updateTrialFraming();
+    }
+
+    // Free-trial framing: nếu gói đang chọn có free-trial offer (Play Console) thì hiện
+    // "X-day free trial, then {giá} · Cancel anytime" + đổi CTA sang "Start Free Trial".
+    // Không có trial -> giữ "Subscribe Now" / "Cancel anytime". Defensive, không phụ thuộc gì thêm.
+    @SuppressLint("SetTextI18n")
+    private void updateTrialFraming() {
+        try {
+            boolean yearly = (selected == 0);
+            int days = yearly ? yearlyTrialDays : weeklyTrialDays;
+            String priceFmt = yearly ? yearlyPriceFmt : weeklyPriceFmt;
+            String period = getString(yearly ? R.string.iap_per_year : R.string.iap_per_week);
+            if (days > 0 && priceFmt != null) {
+                binding.tvCancel.setText(getString(R.string.iap_trial_then, days, priceFmt + period));
+                binding.tvSubscribe.setText(getString(R.string.iap_start_trial));
+            } else {
+                binding.tvCancel.setText(getString(R.string.iap_cancel_anytime));
+                binding.tvSubscribe.setText(getString(R.string.iap_subscribe_now));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Số ngày free-trial của 1 SKU (0 nếu không có offer trial). Tìm offer có phase giá = 0.
+    private int trialDays(ProductDetails pd) {
+        try {
+            if (pd.getSubscriptionOfferDetails() == null) return 0;
+            for (ProductDetails.SubscriptionOfferDetails offer : pd.getSubscriptionOfferDetails()) {
+                for (ProductDetails.PricingPhase phase : offer.getPricingPhases().getPricingPhaseList()) {
+                    if (phase.getPriceAmountMicros() == 0) {
+                        return periodToDays(phase.getBillingPeriod());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    // ISO-8601 billing period (vd "P3D", "P1W", "P1M") -> số ngày.
+    private int periodToDays(String iso) {
+        try {
+            if (iso == null) return 0;
+            int days = 0;
+            java.util.regex.Matcher mw = java.util.regex.Pattern.compile("(\\d+)W").matcher(iso);
+            if (mw.find()) days += Integer.parseInt(mw.group(1)) * 7;
+            java.util.regex.Matcher md = java.util.regex.Pattern.compile("(\\d+)D").matcher(iso);
+            if (md.find()) days += Integer.parseInt(md.group(1));
+            java.util.regex.Matcher mm = java.util.regex.Pattern.compile("(\\d+)M").matcher(iso);
+            if (mm.find()) days += Integer.parseInt(mm.group(1)) * 30;
+            return days;
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     // ── Carousel feature (ViewPager2 + dots + auto-scroll) ──

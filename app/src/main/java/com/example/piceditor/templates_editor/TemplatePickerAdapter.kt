@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.example.piceditor.R
+import com.example.piceditor.ads.iap.PremiumUpsell
 
 /**
  * Adapter card dọc (9:16) dùng cho hàng cuộn ngang trong mỗi category.
@@ -21,6 +22,7 @@ class TemplatePickerAdapter(
 
     inner class VH(view: View) : RecyclerView.ViewHolder(view) {
         val thumb: ImageView = view.findViewById(R.id.imgThumb)
+        val badge: ImageView? = view.findViewById(R.id.icTemplatePro)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
@@ -43,7 +45,15 @@ class TemplatePickerAdapter(
             .dontAnimate()
             .into(holder.thumb)
 
-        holder.itemView.setOnClickListener { onPick(t) }
+        // Soft-sell gate: template premium + user free -> badge 👑 + dialog mời Premium ("Continue" vẫn cho dùng)
+        val ctx = holder.itemView.context
+        val locked = t.isPremium && !PremiumUpsell.isPremium(ctx)
+        holder.badge?.visibility = if (locked) View.VISIBLE else View.GONE
+        holder.itemView.setOnClickListener {
+            val act = ctx as? android.app.Activity
+            if (locked && act != null) PremiumUpsell.showFeatureDialog(act) { onPick(t) }
+            else onPick(t)
+        }
     }
 
     override fun getItemCount() = templates.size

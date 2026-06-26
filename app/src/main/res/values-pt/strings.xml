@@ -199,4 +199,13 @@
     <string name="iap_price_per_week">apenas %1$s/semana</string>
     <string name="iap_no_purchase">Nenhuma compra ativa encontrada</string>
     <string name="iap_remove_watermark">Remover marca d\'água</string>
+    <string name="iap_start_trial">Iniciar teste grátis</string>
+    <string name="iap_trial_then">%1$d dias grátis, depois %2$s · Cancele quando quiser</string>
+    <string name="iap_premium_feature_title">Recurso Premium</string>
+    <string name="iap_premium_feature_msg">Desbloqueie modelos &amp; ferramentas premium, exportação sem marca d\'água e experiência sem anúncios com o Premium.</string>
+    <string name="iap_go_premium">Assinar Premium</string>
+    <string name="iap_continue">Continuar</string>
+    <string name="iap_benefit_1">Todos os modelos &amp; ferramentas premium</string>
+    <string name="iap_benefit_2">Exportação sem marca d\'água</string>
+    <string name="iap_benefit_3">Experiência sem anúncios</string>
 </resources>

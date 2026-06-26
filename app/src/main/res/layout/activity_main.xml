@@ -77,31 +77,47 @@
                         android:gravity="center"
                         android:weightSum="3">
 
-                        <LinearLayout
+                        <FrameLayout
                             android:id="@+id/llRemove"
                             android:layout_width="0dp"
                             android:layout_height="80dp"
                             android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center"
                             android:background="@drawable/bg_card"
+                            android:clickable="true"
+                            android:focusable="true"
                             android:visibility="visible"
-                            android:layout_marginEnd="6dp"
-                            >
+                            android:layout_marginEnd="6dp">
 
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:gravity="center">
+
+                                <ImageView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/ic_remove_main" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:text="@string/ai_remove"
+                                    android:textSize="14sp"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/inter_medium" />
+                            </LinearLayout>
+
+                            <!-- Badge premium (ẩn cho user Premium — set runtime) -->
                             <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/ic_remove_main" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"
-                                android:text="@string/ai_remove"
-                                android:textSize="14sp"
-                                android:layout_marginTop="4dp"
-                                android:fontFamily="@font/inter_medium" />
-                        </LinearLayout>
+                                android:id="@+id/icRemovePro"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_gravity="top|end"
+                                android:layout_margin="6dp"
+                                android:src="@drawable/ic_pro"
+                                android:importantForAccessibility="no" />
+                        </FrameLayout>
 
                         <LinearLayout
                             android:id="@+id/llEdit"

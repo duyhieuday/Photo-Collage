@@ -199,4 +199,13 @@
     <string name="iap_price_per_week">chỉ %1$s/tuần</string>
     <string name="iap_no_purchase">Không tìm thấy giao dịch nào</string>
     <string name="iap_remove_watermark">Xoá watermark</string>
+    <string name="iap_start_trial">Bắt đầu dùng thử miễn phí</string>
+    <string name="iap_trial_then">Dùng thử miễn phí %1$d ngày, sau đó %2$s · Huỷ bất cứ lúc nào</string>
+    <string name="iap_premium_feature_title">Tính năng Premium</string>
+    <string name="iap_premium_feature_msg">Mở khoá template &amp; công cụ premium, xuất ảnh không watermark và trải nghiệm không quảng cáo với Premium.</string>
+    <string name="iap_go_premium">Lên Premium</string>
+    <string name="iap_continue">Tiếp tục</string>
+    <string name="iap_benefit_1">Toàn bộ template &amp; công cụ premium</string>
+    <string name="iap_benefit_2">Xuất ảnh không watermark</string>
+    <string name="iap_benefit_3">Không quảng cáo</string>
 </resources>

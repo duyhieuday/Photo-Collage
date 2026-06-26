@@ -199,4 +199,13 @@
     <string name="iap_price_per_week">केवल %1$s/सप्ताह</string>
     <string name="iap_no_purchase">कोई सक्रिय खरीदारी नहीं मिली</string>
     <string name="iap_remove_watermark">वॉटरमार्क हटाएँ</string>
+    <string name="iap_start_trial">मुफ़्त ट्रायल शुरू करें</string>
+    <string name="iap_trial_then">%1$d-दिन का मुफ़्त ट्रायल, फिर %2$s · कभी भी रद्द करें</string>
+    <string name="iap_premium_feature_title">प्रीमियम सुविधा</string>
+    <string name="iap_premium_feature_msg">Premium के साथ प्रीमियम टेम्पलेट और टूल्स, बिना वॉटरमार्क एक्सपोर्ट और बिना विज्ञापन अनुभव अनलॉक करें।</string>
+    <string name="iap_go_premium">Premium लें</string>
+    <string name="iap_continue">जारी रखें</string>
+    <string name="iap_benefit_1">सभी प्रीमियम टेम्पलेट और टूल्स</string>
+    <string name="iap_benefit_2">बिना वॉटरमार्क एक्सपोर्ट</string>
+    <string name="iap_benefit_3">विज्ञापन-मुक्त अनुभव</string>
 </resources>
