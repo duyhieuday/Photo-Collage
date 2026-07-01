@@ -224,6 +224,18 @@ public class WeatherApplication extends Application{
         @Override
         public void onActivityResumed(Activity activity) {
             Adjust.onResume();
+            // Tracking màn hình: chỉ Activity của app (bỏ AdActivity/GMS/hệ thống)
+            try {
+                if (activity.getClass().getName().startsWith("com.example.piceditor")) {
+                    String name = activity.getClass().getSimpleName();
+                    if (name.endsWith("Activity")) {
+                        name = name.substring(0, name.length() - "Activity".length());
+                    }
+                    trackingEvent("screen_" + name);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         @Override

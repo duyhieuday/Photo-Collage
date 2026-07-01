@@ -81,4 +81,9 @@ class PhotoEditorWithBannerActivity : PhotoEditorActivity(){
     override fun showPremiumUpsell(onContinue: () -> Unit) {
         PremiumUpsell.showFeatureDialog(this, onContinue)
     }
+
+    /** Cầu nối tracking từ module editor → WeatherApplication. */
+    override fun trackEvent(event: String, key: String, value: String) {
+        WeatherApplication.trackingEvent(event, key, value)
+    }
 }

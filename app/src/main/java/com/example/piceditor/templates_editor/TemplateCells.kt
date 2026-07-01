@@ -59,7 +59,16 @@ object TemplateCells {
         "sm07" to listOf(RectF(0f, 0f, 562f, 667f), RectF(562f, 0f, 1125f, 667f), RectF(0f, 667f, 562f, 1334f), RectF(562f, 667f, 1125f, 1334f), RectF(0f, 1334f, 562f, 2000f), RectF(562f, 1334f, 1125f, 2000f)),
         "sm08" to listOf(RectF(21f, 151f, 368f, 620f), RectF(21f, 640f, 368f, 1109f), RectF(21f, 1130f, 368f, 1599f), RectF(388f, 286f, 735f, 755f), RectF(388f, 776f, 735f, 1245f), RectF(388f, 1265f, 735f, 1734f), RectF(757f, 400f, 1104f, 869f), RectF(757f, 889f, 1104f, 1358f), RectF(757f, 1379f, 1104f, 1848f)),
         "sm09" to listOf(RectF(133f, 188f, 527f, 583f), RectF(110f, 625f, 506f, 1020f), RectF(88f, 1062f, 483f, 1457f), RectF(608f, 763f, 1004f, 1159f), RectF(626f, 1200f, 1022f, 1596f)),
-        "sp01" to listOf(RectF(175f, 329f, 946f, 924f), RectF(147f, 1098f, 951f, 1687f))
+        "sp01" to listOf(RectF(175f, 329f, 946f, 924f), RectF(147f, 1098f, 951f, 1687f)),
+        "sp02" to listOf(RectF(144f, 316f, 902f, 846f), RectF(270f, 837f, 775f, 1359f), RectF(128f, 1382f, 886f, 1898f)),
+        "sp03" to listOf(RectF(280f, 98f, 844f, 507f), RectF(256f, 917f, 856f, 1346f), RectF(251f, 1467f, 854f, 1905f)),
+        "sp04" to listOf(RectF(191f, 108f, 752f, 846f), RectF(531f, 1070f, 1098f, 1828f)),
+        "sp05" to listOf(RectF(199f, 485f, 915f, 972f), RectF(244f, 1101f, 874f, 1662f)),
+        "sp06" to listOf(RectF(76f, 316f, 700f, 878f), RectF(76f, 920f, 700f, 1482f)),
+        "sp07" to listOf(RectF(143f, 555f, 980f, 1393f)),
+        "sp08" to listOf(RectF(575f, 148f, 1104f, 678f), RectF(532f, 730f, 1062f, 1260f), RectF(489f, 1312f, 1019f, 1843f)),
+        "sp09" to listOf(RectF(185f, 142f, 945f, 898f)),
+        "sp10" to listOf(RectF(149f, 161f, 745f, 836f), RectF(324f, 1109f, 946f, 1825f))
     )
 
     // Goc xoay (do) song song voi rects[id]. Chi liet ke template co o nghieng.
@@ -88,30 +97,41 @@ object TemplateCells {
         "sm04" to listOf(-8f, 4.5f),
         "sm05" to listOf(0f, 15.5f, 15.4f, 15.7f),
         "sm09" to listOf(3f, 3f, 3f, -2.5f, -2.5f),
-        "sp01" to listOf(3.4f, -5.4f)
+        "sp01" to listOf(3.4f, -5.4f),
+        "sp02" to listOf(-8.5f, 0f, 4.5f),
+        "sp03" to listOf(-1.5f, -0.5f, -0.5f),
+        "sp04" to listOf(0.5f, 0.5f),
+        "sp05" to listOf(5f, -3.5f),
+        "sp07" to listOf(-7f),
+        "sp08" to listOf(4f, 4f, 4f),
+        "sp10" to listOf(16f, -12.5f)
     )
 
     val masks: Map<String, MaskMode> = mapOf(
-        "cp08" to MaskMode.WHITE,
-        "is07" to MaskMode.GRAY,
-        "sm04" to MaskMode.GRAY2,
+        "sp09" to MaskMode.WHITE,
         "cp02" to MaskMode.GRAY,
+        "sp03" to MaskMode.GRAY,
+        "is08" to MaskMode.GRAY,
         "sm03" to MaskMode.GRAY,
-        "sm01" to MaskMode.WHITE,
+        "sp07" to MaskMode.GRAY,
+        "is06" to MaskMode.WHITE,
+        "is07" to MaskMode.GRAY,
+        "is12" to MaskMode.GRAY,
+        "sm02" to MaskMode.GRAY2,
+        "cp07" to MaskMode.GRAY,
+        "sp08" to MaskMode.WHITE,
+        "gs01" to MaskMode.GRAY,
         "gs05" to MaskMode.WHITE,
-        "is05" to MaskMode.GRAY,
+        "sm01" to MaskMode.WHITE,
         "cp06" to MaskMode.WHITE,
+        "sm05" to MaskMode.GRAY,
         "sp01" to MaskMode.GRAY,
         "sm07" to MaskMode.GRAY,
-        "is12" to MaskMode.GRAY,
-        "is08" to MaskMode.GRAY,
-        "gs01" to MaskMode.GRAY,
-        "sm02" to MaskMode.GRAY2,
-        "is06" to MaskMode.WHITE,
+        "cp08" to MaskMode.WHITE,
         "gs02" to MaskMode.WHITE,
-        "bd02" to MaskMode.GRAY,
-        "sm05" to MaskMode.GRAY,
-        "cp07" to MaskMode.GRAY
+        "sm04" to MaskMode.GRAY2,
+        "is05" to MaskMode.GRAY,
+        "bd02" to MaskMode.GRAY
     )
 }
 

@@ -103,21 +103,20 @@ public class SplashActivity extends BaseActivityNew<ActivitySplashBinding> {
 
 
             isIntented = true;
-            // P0 onboarding paywall: hiện paywall 1 LẦN ở first-run (dismissible) trước khi vào Home
-            // — điểm chuyển đổi cao nhất (Day-0, ~82-89% trial bắt đầu hôm cài đặt). Đóng (X/back)
-            // → MainActivity (xử lý bởi PremiumActivity.onBackPressed khi có extra "free_trial").
-            // Bỏ qua nếu đã hiện 1 lần hoặc user đã Premium.
-            boolean paywallShown = PreferenceUtil.getInstance(this).getValue("first_paywall_shown", false);
-            boolean isPremium = new com.example.piceditor.ads.Prefs(this).getPremium() == 1;
-            if (!paywallShown && !isPremium) {
-                PreferenceUtil.getInstance(this).setValue("first_paywall_shown", true);
-                Intent i = new Intent(this, PremiumActivity.class);
-                i.putExtra("free_trial", true);
-                startActivity(i);
+            // Nếu remote BẬT onboarding (test_obd==yes && hehe) + lần đầu chạy → vào luồng onboarding
+            // (LanguageActivity → ABOnBoarding → [Premium first-run] → Home).
+            // Nếu KHÔNG remote onboarding → hiện paywall first-run (dismissible) rồi Home như bình thường.
+            boolean showObd = PreferenceUtil.getInstance(this)
+                    .getValue(Constant.SharePrefKey.TEST_OBD, "no").equals("yes")
+                    && PreferenceUtil.getInstance(this)
+                    .getValue(Constant.SharePrefKey.HEHE, false);
+            if (showObd && isFirstRun) {
+                startActivity(new Intent(this, LanguageActivity.class));
+                finish();
             } else {
-                startActivity(new Intent(this, MainActivity.class));
+                // Paywall first-run (Day-0, điểm chuyển đổi cao nhất) hoặc thẳng Home. Tự finish().
+                PremiumActivity.startFirstRunPaywallOrHome(this);
             }
-            finish();
         }
     }
 

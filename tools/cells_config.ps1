@@ -104,9 +104,29 @@ $CELLS = [ordered]@{
   # sm09 Best Trip: o TRANG trong khung tan; dai trai 3 o NGHIENG +3 deg, dai phai 2 o -2.5 deg - minrect white
   "sm09"=@(@(133,188,527,583,3),@(110,625,506,1020,3),@(88,1062,483,1457,3),@(608,763,1004,1159,-2.5),@(626,1200,1022,1596,-2.5))
 
-  # ---- Sports (sp01 only image; vector-masked white polaroids) ----
+  # ---- Sports ----
   # sp01 (GRAY mask - clip dung pixel xam 237; o XOAY de noi dung anh nghieng theo polaroid)
   "sp01"=@(@(175,329,946,924,3.4),@(147,1098,951,1687,-5.4))
+  # sp02 SPECIAL MATCH: 3 o XAM 237 (top/bottom nghieng -8.5/4.5, giua thang) -> GRAY (minrect)
+  "sp02"=@(@(144,316,902,846,-8.5),@(270,837,775,1359),@(128,1382,886,1898,4.5))
+  # sp03 tennis: 3 o XAM tem rang cua (gan thang) -> GRAY (mask cat theo mep tem)
+  "sp03"=@(@(280,98,844,507,-1.5),@(256,917,856,1346,-0.5),@(251,1467,854,1905,-0.5))
+  # sp04 badminton: 2 o polaroid ruot TRANG (gan thang) -> NONE + rect
+  "sp04"=@(@(191,108,752,846,0.5),@(531,1070,1098,1828,0.5))
+  # sp05 Queen Futsal: 2 o TRANG tren so tay nghieng (5 / -3.5) -> NONE + rect
+  "sp05"=@(@(199,485,915,972,5),@(244,1101,874,1662,-3.5))
+  # sp06 scoreboard: 2 o XAM doc thang trong khung trang -> GRAY
+  "sp06"=@(@(76,316,700,878),@(76,920,700,1482))
+  # sp07 HALF TIME: 1 o XAM lon polaroid nghieng -7 -> GRAY
+  "sp07"=@(,@(143,555,980,1393,-7))
+  # sp08 GAME DAY: 3 o TRANG trong dai phim DEN nghieng nhe 4 -> WHITE (giu khung den)
+  "sp08"=@(@(575,148,1104,678,4),@(532,730,1062,1260,4),@(489,1312,1019,1843,4))
+  # sp09 KIDS FOOTBALL CLUB: 1 o HINH TRON trang -> WHITE (mask clip theo vong tron).
+  # Circle that (do theo nguong mask app r,g,b>240): left 189, right 941 (rong nhat y=520), center(565,520) r~376.
+  # Rect bao trong ca vong tron; nen xanh/trophy/glove ngoai circle deu non-white nen mask tu loai (khong lo anh).
+  "sp09"=@(,@(185,142,945,898))
+  # sp10: 2 o polaroid XAM nghieng (16 / -12.5) -> GRAY
+  "sp10"=@(@(149,161,745,836,16),@(324,1109,946,1825,-12.5))
 }
 
 # Mask clip anh dung theo pixel khung (chinh xac, o chi can bao trum):
@@ -119,4 +139,8 @@ $MASKS = @{ "is05"="GRAY"; "is12"="GRAY"; "sm05"="GRAY"; "sp01"="GRAY"; "is06"="
             "sm01"="WHITE"; "sm02"="GRAY2"; "sm03"="GRAY"; "sm04"="GRAY2"; "sm07"="GRAY";
             "is07"="GRAY"; "is08"="GRAY";
             "bd02"="GRAY"; "cp02"="GRAY"; "cp07"="GRAY"; "cp08"="WHITE";
-            "gs01"="GRAY"; "gs05"="WHITE"; "gs02"="WHITE" }
+            "gs01"="GRAY"; "gs05"="WHITE"; "gs02"="WHITE";
+            "sp03"="GRAY"; "sp07"="GRAY";
+            "sp08"="WHITE"; "sp09"="WHITE" }
+# Ghi chu Sports: sp02/sp06/sp10 = o CHU NHAT -> NONE (mask GRAY toan cuc gay bleed cheo khi rect nghieng cham lo xam
+#   o ben canh; NONE gioi han anh trong rect tung o). sp03 (tem rang cua) + sp07 giu GRAY (can clip hinh khong-chu-nhat).

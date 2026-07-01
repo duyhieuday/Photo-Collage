@@ -32,6 +32,7 @@ import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.QueryProductDetailsParams;
 import com.android.billingclient.api.QueryPurchasesParams;
 import com.example.piceditor.MainActivity;
+import com.example.piceditor.WeatherApplication;
 import com.example.piceditor.R;
 import com.example.piceditor.ads.Prefs;
 import com.example.piceditor.databinding.ActivityPremiumBinding;
@@ -417,6 +418,7 @@ public class PremiumActivity extends FragmentActivity {
         binding.layoutYearly.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                WeatherApplication.trackingEvent("select_plan", "plan", "yearly");
                 selectYearly();
             }
         });
@@ -424,6 +426,7 @@ public class PremiumActivity extends FragmentActivity {
         binding.layoutWeekly.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                WeatherApplication.trackingEvent("select_plan", "plan", "weekly");
                 selectWeekly();
             }
         });
@@ -432,6 +435,7 @@ public class PremiumActivity extends FragmentActivity {
         binding.btnGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                WeatherApplication.trackingEvent("click_subscribe", "plan", selected == 0 ? "yearly" : "weekly");
                 if(selected == 0){
                     try {
                         for (ProductDetails productDetail : productDetailsList){
@@ -588,23 +592,13 @@ public class PremiumActivity extends FragmentActivity {
         updateTrialFraming();
     }
 
-    // Free-trial framing: nếu gói đang chọn có free-trial offer (Play Console) thì hiện
-    // "X-day free trial, then {giá} · Cancel anytime" + đổi CTA sang "Start Free Trial".
-    // Không có trial -> giữ "Subscribe Now" / "Cancel anytime". Defensive, không phụ thuộc gì thêm.
+    // ĐÃ TẮT free-trial theo yêu cầu: luôn "mua thẳng" -> CTA "Subscribe Now" + "Cancel anytime",
+    // KHÔNG bao giờ hiện framing "X-day free trial / Start Free Trial" dù Play Console có offer trial.
     @SuppressLint("SetTextI18n")
     private void updateTrialFraming() {
         try {
-            boolean yearly = (selected == 0);
-            int days = yearly ? yearlyTrialDays : weeklyTrialDays;
-            String priceFmt = yearly ? yearlyPriceFmt : weeklyPriceFmt;
-            String period = getString(yearly ? R.string.iap_per_year : R.string.iap_per_week);
-            if (days > 0 && priceFmt != null) {
-                binding.tvCancel.setText(getString(R.string.iap_trial_then, days, priceFmt + period));
-                binding.tvSubscribe.setText(getString(R.string.iap_start_trial));
-            } else {
-                binding.tvCancel.setText(getString(R.string.iap_cancel_anytime));
-                binding.tvSubscribe.setText(getString(R.string.iap_subscribe_now));
-            }
+            binding.tvCancel.setText(getString(R.string.iap_cancel_anytime));
+            binding.tvSubscribe.setText(getString(R.string.iap_subscribe_now));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -747,23 +741,51 @@ public class PremiumActivity extends FragmentActivity {
         }
     }
 
-    // Ưu tiên offer có free-trial (phase giá = 0); không có thì dùng offer mặc định
+    // MUA THẲNG: chọn offer KHÔNG có free-trial (mọi phase đều có giá > 0).
+    // (Trước đây ưu tiên offer trial; nay bỏ trial theo yêu cầu → luôn tính tiền ngay.)
     private String pickOfferToken(ProductDetails productDetails) {
         try {
             List<ProductDetails.SubscriptionOfferDetails> offers = productDetails.getSubscriptionOfferDetails();
             if (offers == null || offers.isEmpty()) return "";
             for (ProductDetails.SubscriptionOfferDetails offer : offers) {
+                boolean hasFreePhase = false;
                 for (ProductDetails.PricingPhase phase : offer.getPricingPhases().getPricingPhaseList()) {
                     if (phase.getPriceAmountMicros() == 0) {
-                        return offer.getOfferToken();
+                        hasFreePhase = true;
+                        break;
                     }
                 }
+                if (!hasFreePhase) {
+                    return offer.getOfferToken();
+                }
             }
-            return offers.get(0).getOfferToken();
+            // Nếu mọi offer đều kèm trial/intro, dùng offer cuối (thường là base plan gốc, trả tiền ngay).
+            return offers.get(offers.size() - 1).getOfferToken();
         } catch (Exception e) {
             e.printStackTrace();
             return productDetails.getSubscriptionOfferDetails().get(0).getOfferToken();
         }
+    }
+
+    /**
+     * First-run paywall dùng chung: hiện PremiumActivity (dismissible, extra "free_trial") ĐÚNG 1 LẦN
+     * rồi vào Home; nếu đã hiện (cờ "first_paywall_shown") hoặc user đã Premium → vào thẳng Home.
+     * Luôn finish() [from]. Dùng cho cả nhánh KHÔNG onboarding (SplashActivity) lẫn sau onboarding (ABOnBoarding).
+     */
+    public static void startFirstRunPaywallOrHome(android.app.Activity from) {
+        boolean paywallShown = com.example.piceditor.utilsApp.PreferenceUtil.getInstance(from)
+                .getValue("first_paywall_shown", false);
+        boolean isPremium = new Prefs(from).getPremium() == 1;
+        if (!paywallShown && !isPremium) {
+            com.example.piceditor.utilsApp.PreferenceUtil.getInstance(from)
+                    .setValue("first_paywall_shown", true);
+            Intent i = new Intent(from, PremiumActivity.class);
+            i.putExtra("free_trial", true);
+            from.startActivity(i);
+        } else {
+            from.startActivity(new Intent(from, MainActivity.class));
+        }
+        from.finish();
     }
 
     @Override

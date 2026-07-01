@@ -208,5 +208,6 @@
     <string name="iap_benefit_1">All premium templates &amp; tools</string>
     <string name="iap_benefit_2">No watermark on exports</string>
     <string name="iap_benefit_3">Ad-free experience</string>
+    <string name="iap_remove_ads_title">Remove ads forever?</string>
 
 </resources>

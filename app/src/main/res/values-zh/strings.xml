@@ -208,4 +208,5 @@
     <string name="iap_benefit_1">全部高级模板与工具</string>
     <string name="iap_benefit_2">导出无水印</string>
     <string name="iap_benefit_3">无广告体验</string>
+    <string name="iap_remove_ads_title">永久去除广告？</string>
 </resources>

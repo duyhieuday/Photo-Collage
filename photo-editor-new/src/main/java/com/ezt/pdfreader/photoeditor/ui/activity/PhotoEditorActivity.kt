@@ -107,6 +107,12 @@ abstract class PhotoEditorActivity : AppCompatActivity() {
      */
     open fun showPremiumUpsell(onContinue: () -> Unit) = onContinue()
 
+    /**
+     * Tracking analytics — app module override để đẩy về WeatherApplication.trackingEvent.
+     * Module editor không phụ thuộc app nên mặc định no-op.
+     */
+    open fun trackEvent(event: String, key: String, value: String) {}
+
     private fun setupWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

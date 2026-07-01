@@ -106,8 +106,17 @@ object TemplateRepository {
             TemplateData("sm08", "SM08", R.drawable.temp_sm08, R.drawable.thumb_sm08, cells("sm08"), mask("sm08")),
             TemplateData("sm09", "SM09", R.drawable.temp_sm09, R.drawable.thumb_sm09, cells("sm09"), mask("sm09")),
 
-            // ── Sports (SP01 từ folder Popular vì folder Sports rỗng) ──
-            TemplateData("sp01", "SP01", R.drawable.temp_sp01, R.drawable.thumb_sp01, cells("sp01"), mask("sp01"))
+            // ── Sports ──
+            TemplateData("sp01", "SP01", R.drawable.temp_sp01, R.drawable.thumb_sp01, cells("sp01"), mask("sp01")),
+            TemplateData("sp02", "SP02", R.drawable.temp_sp02, R.drawable.thumb_sp02, cells("sp02"), mask("sp02")),
+            TemplateData("sp03", "SP03", R.drawable.temp_sp03, R.drawable.thumb_sp03, cells("sp03"), mask("sp03")),
+            TemplateData("sp04", "SP04", R.drawable.temp_sp04, R.drawable.thumb_sp04, cells("sp04"), mask("sp04")),
+            TemplateData("sp05", "SP05", R.drawable.temp_sp05, R.drawable.thumb_sp05, cells("sp05"), mask("sp05")),
+            TemplateData("sp06", "SP06", R.drawable.temp_sp06, R.drawable.thumb_sp06, cells("sp06"), mask("sp06")),
+            TemplateData("sp07", "SP07", R.drawable.temp_sp07, R.drawable.thumb_sp07, cells("sp07"), mask("sp07")),
+            TemplateData("sp08", "SP08", R.drawable.temp_sp08, R.drawable.thumb_sp08, cells("sp08"), mask("sp08")),
+            TemplateData("sp09", "SP09", R.drawable.temp_sp09, R.drawable.thumb_sp09, cells("sp09"), mask("sp09")),
+            TemplateData("sp10", "SP10", R.drawable.temp_sp10, R.drawable.thumb_sp10, cells("sp10"), mask("sp10"))
         )
     }
 

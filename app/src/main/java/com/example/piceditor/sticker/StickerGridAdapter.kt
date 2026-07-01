@@ -11,6 +11,7 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.piceditor.R
+import com.example.piceditor.WeatherApplication
 import com.example.piceditor.ads.iap.PremiumUpsell
 
 class StickerGridAdapter(
@@ -50,6 +51,9 @@ class StickerGridAdapter(
             val pos = holder.adapterPosition
             if (pos == RecyclerView.NO_POSITION) return@setOnClickListener
             val pick = {
+                WeatherApplication.trackingEvent(
+                    "select_sticker", "sticker", item.assetPath.substringAfterLast('/')
+                )
                 val prev = selectedIndex
                 selectedIndex = pos
                 if (prev != -1) notifyItemChanged(prev)

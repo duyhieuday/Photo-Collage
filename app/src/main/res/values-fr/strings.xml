@@ -208,4 +208,5 @@
     <string name="iap_benefit_1">Tous les modèles &amp; outils premium</string>
     <string name="iap_benefit_2">Export sans filigrane</string>
     <string name="iap_benefit_3">Expérience sans publicité</string>
+    <string name="iap_remove_ads_title">Supprimer les pubs pour toujours ?</string>
 </resources>

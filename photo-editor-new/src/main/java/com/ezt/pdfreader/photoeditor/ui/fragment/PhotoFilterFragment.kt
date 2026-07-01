@@ -109,6 +109,7 @@ class PhotoFilterFragment : Fragment() {
         val hostActivity = requireActivity() as PhotoEditorActivity
         filterAdapter = FilterAdapter(
             onFilterSelected = { filterType ->
+                hostActivity.trackEvent("select_filter", "filter", filterType.name)
                 viewModel.applyFilter(filterType)
                 pagerAdapter.reloadImage(viewModel.currentPageIndex.value)
                 binding.btnFilterApplyToAll.isVisible = viewModel.pages.value.size > 1

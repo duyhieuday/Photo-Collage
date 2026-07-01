@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.piceditor.MainActivity;
+import com.example.piceditor.ads.iap.PremiumActivity;
 import com.example.piceditor.R;
 import com.example.piceditor.ads.Callback;
 import com.example.piceditor.ads.InterAds;
@@ -91,15 +92,13 @@ public class ABOnBoardingActivity extends BaseActivityNew<AbActivityOnBoardingBi
                     InterAds.showAdsBreak(ABOnBoardingActivity.this, new Callback() {
                         @Override
                         public void callback() {
-                            Intent intent = new Intent(ABOnBoardingActivity.this, MainActivity.class);
-                            startActivity(intent);
-                            finish();
+                            // Sau onboarding → paywall first-run (dismissible) rồi Home. Tự finish().
+                            PremiumActivity.startFirstRunPaywallOrHome(ABOnBoardingActivity.this);
                         }
                     });
                 }else {
-                    Intent intent = new Intent(ABOnBoardingActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
+                    // Sau onboarding → paywall first-run (dismissible) rồi Home. Tự finish().
+                    PremiumActivity.startFirstRunPaywallOrHome(ABOnBoardingActivity.this);
                 }
             }
         });

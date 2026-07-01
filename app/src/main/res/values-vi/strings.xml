@@ -208,4 +208,5 @@
     <string name="iap_benefit_1">Toàn bộ template &amp; công cụ premium</string>
     <string name="iap_benefit_2">Xuất ảnh không watermark</string>
     <string name="iap_benefit_3">Không quảng cáo</string>
+    <string name="iap_remove_ads_title">Bỏ quảng cáo vĩnh viễn?</string>
 </resources>

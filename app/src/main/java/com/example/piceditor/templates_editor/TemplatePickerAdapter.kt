@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.example.piceditor.R
+import com.example.piceditor.WeatherApplication
 import com.example.piceditor.ads.iap.PremiumUpsell
 
 /**
@@ -50,6 +51,7 @@ class TemplatePickerAdapter(
         val locked = t.isPremium && !PremiumUpsell.isPremium(ctx)
         holder.badge?.visibility = if (locked) View.VISIBLE else View.GONE
         holder.itemView.setOnClickListener {
+            WeatherApplication.trackingEvent("select_template", "template", t.id)
             val act = ctx as? android.app.Activity
             if (locked && act != null) PremiumUpsell.showFeatureDialog(act) { onPick(t) }
             else onPick(t)

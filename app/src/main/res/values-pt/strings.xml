@@ -208,4 +208,5 @@
     <string name="iap_benefit_1">Todos os modelos &amp; ferramentas premium</string>
     <string name="iap_benefit_2">Exportação sem marca d\'água</string>
     <string name="iap_benefit_3">Experiência sem anúncios</string>
+    <string name="iap_remove_ads_title">Remover anúncios para sempre?</string>
 </resources>

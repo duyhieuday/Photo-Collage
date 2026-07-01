@@ -208,4 +208,5 @@
     <string name="iap_benefit_1">सभी प्रीमियम टेम्पलेट और टूल्स</string>
     <string name="iap_benefit_2">बिना वॉटरमार्क एक्सपोर्ट</string>
     <string name="iap_benefit_3">विज्ञापन-मुक्त अनुभव</string>
+    <string name="iap_remove_ads_title">विज्ञापन हमेशा के लिए हटाएँ?</string>
 </resources>

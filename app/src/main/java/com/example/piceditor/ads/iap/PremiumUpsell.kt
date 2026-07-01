@@ -4,9 +4,14 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import java.util.concurrent.atomic.AtomicBoolean
 import com.example.piceditor.R
 import com.example.piceditor.ads.Prefs
 
@@ -42,11 +47,55 @@ object PremiumUpsell {
                 dialog.dismiss()
                 onContinue()
             }
-            if (!activity.isFinishing) dialog.show()
+            if (!activity.isFinishing) dialog.show() else onContinue()
         } catch (e: Exception) {
             // Lỗi gì cũng không chặn người dùng — cứ cho tiếp tục
             e.printStackTrace()
             onContinue()
         }
     }
+
+    /**
+     * Prompt "bỏ quảng cáo" sau khi ĐÓNG interstitial (skip-ads → pay).
+     * Java-friendly (Runnable). Dù user đóng kiểu gì — Go Premium / Continue / back / tap ngoài —
+     * [onProceed] CHẮC CHẮN chạy đúng 1 LẦN để luồng điều hướng sau ad không bị kẹt.
+     */
+    @JvmStatic
+    fun showRemoveAdsDialog(activity: Activity, onProceed: Runnable) {
+        // [onProceed] chạy đúng 1 LẦN dù đi nhánh nào (show / lỗi / activity finishing).
+        val proceeded = AtomicBoolean(false)
+        val proceedOnce = Runnable { if (proceeded.compareAndSet(false, true)) onProceed.run() }
+        // Hoãn 1 nhịp: interstitial vừa đóng, window activity gọi thường CHƯA resume xong →
+        // show ngay dễ dính BadToken. Post lên main looper + delay nhỏ cho chắc.
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (activity.isFinishing || activity.isDestroyed) { proceedOnce.run(); return@postDelayed }
+            try {
+                val dialog = Dialog(activity)
+                val view = LayoutInflater.from(activity).inflate(R.layout.dialog_premium_upsell, null)
+                dialog.setContentView(view)
+                dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+                dialog.window?.setLayout(
+                    (activity.resources.displayMetrics.widthPixels * 0.86f).toInt(),
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                dialog.setCancelable(true)
+                // Đổi tiêu đề sang hướng "bỏ quảng cáo" (các bullet đã bao gồm ad-free/no-watermark)
+                view.findViewById<TextView?>(R.id.tvUpsellTitle)?.setText(R.string.iap_remove_ads_title)
+                // Đóng kiểu nào (Go Premium / Continue / back / ngoài) cũng proceed đúng 1 lần
+                dialog.setOnDismissListener { proceedOnce.run() }
+                view.findViewById<View>(R.id.btnGoPremium).setOnClickListener {
+                    activity.startActivity(Intent(activity, PremiumActivity::class.java))
+                    dialog.dismiss()
+                }
+                view.findViewById<View>(R.id.btnContinueFree).setOnClickListener { dialog.dismiss() }
+                dialog.show()
+                Log.d(TAG, "RemoveAds upsell shown")
+            } catch (e: Exception) {
+                Log.e(TAG, "RemoveAds upsell show failed", e)
+                proceedOnce.run()
+            }
+        }, 500)
+    }
+
+    private const val TAG = "PremiumUpsell"
 }

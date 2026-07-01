@@ -14,6 +14,7 @@ import com.adjust.sdk.AdjustAdRevenue;
 import com.adjust.sdk.AdjustConfig;
 import com.example.piceditor.BuildConfig;
 import com.example.piceditor.WeatherApplication;
+import com.example.piceditor.ads.iap.PremiumUpsell;
 import com.example.piceditor.utilsApp.Constant;
 import com.example.piceditor.utilsApp.PreferenceUtil;
 import com.google.android.gms.ads.AdError;
@@ -38,6 +39,21 @@ public class InterAds {
     private static long loadTimeAd = 0;
 
     public static int flagQC = 1;
+
+    // Skip-ads → pay: cứ mỗi N lần ĐÓNG interstitial thì chào "bỏ quảng cáo" (soft-sell, chỉ user FREE).
+    private static final int REMOVE_ADS_UPSELL_EVERY = 2;
+    private static int interDismissCount = 0;
+
+    private static boolean shouldShowRemoveAdsUpsell() {
+        try {
+            Prefs p = new Prefs(WeatherApplication.get());
+            if (p.getPremium() == 1 || p.isRemoveAd()) return false;
+        } catch (Exception e) {
+            return false;
+        }
+        interDismissCount++;
+        return interDismissCount % REMOVE_ADS_UPSELL_EVERY == 0;
+    }
 
     public static void initInterAds(final Context ac, Callback callback) {
         if (isCanLoadAds()) {
@@ -234,7 +250,12 @@ public class InterAds {
                         }
                     }
                 }else {
-                    callback.callback();
+                    // Skip-ads → pay: chào "bỏ quảng cáo" (dialog đảm bảo gọi callback đúng 1 lần dù đóng kiểu gì)
+                    if (shouldShowRemoveAdsUpsell()) {
+                        PremiumUpsell.showRemoveAdsDialog(context, () -> callback.callback());
+                    } else {
+                        callback.callback();
+                    }
                     Log.e("call111111111", "call4: "  );
                 }
             }

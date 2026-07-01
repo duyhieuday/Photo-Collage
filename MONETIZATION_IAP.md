@@ -29,32 +29,28 @@
 ### 4. P0 Monetization
 | # | Hạng mục | Cách làm | Verify |
 |---|---|---|---|
-| 1 | **Onboarding / first-run paywall** | `SplashActivity.intent()`: lần đầu (cờ `first_paywall_shown`) + chưa Premium → mở Premium (extra `free_trial`, **dismissible** → Home). Lần sau vào thẳng Home. | ✅ Máy ảo |
+| 1 | **Onboarding / first-run paywall** | `SplashActivity.intent()`: **nếu remote BẬT onboarding** (`test_obd=="yes" && hehe`) + first-run → Language→ABOnBoarding→**Premium**→Home. **Nếu KHÔNG onboarding** → paywall first-run (extra `free_trial`, **dismissible**→Home) 1 lần (cờ `first_paywall_shown`), lần sau thẳng Home. Logic paywall gom vào helper `PremiumActivity.startFirstRunPaywallOrHome(Activity)` (dùng cả Splash lẫn ABOnBoarding). | ✅ Pixel (nhánh no-onboarding); nhánh onboarding build-verified (remote chưa có key test_obd) |
 | 2 | **"Remove ads" lên #1** carousel | Reorder ảnh + caption (app ad-first → benefit mạnh nhất) | ✅ |
 | 3 | **Restore Purchases** | Link footer → `queryPurchasesAsync` + feedback (bắt buộc theo policy Play) | ✅ Máy ảo |
 | 4 | **per-week + SAVE%** gói Yearly | Tính từ `priceAmountMicros` ("Save 91% · only ₫4,557/week"), ẩn tới khi có giá | ✅ Pixel (giá thật) |
-| 5 | **Auto chọn trial offer** | `pickOfferToken()` ưu tiên offer có phase giá = 0 | ✅ build |
+| 5 | ~~**Auto chọn trial offer**~~ → **ĐÃ BỎ trial, mua thẳng** | `pickOfferToken()` giờ chọn offer KHÔNG có phase giá=0 (mua thẳng, tính tiền ngay) | ✅ Pixel |
 | 6 | **Watermark trên export free** | `WatermarkUtil.applyIfFree()` — vẽ "Photo Collage" góc dưới-phải cho user FREE; Premium/RemoveAd → bitmap gốc; lỗi → fallback gốc (không vỡ save). Inject ở **4 điểm export cuối**. | ✅ Máy ảo |
 | 7 | **Upsell "Remove Watermark"** | Chip lime ở màn kết quả `ShowImageActivity` (cover collage + template + AI-remove) → tap mở Premium | ✅ Máy ảo |
-| 8 | **Free-trial framing** | `updateTrialFraming()`: có trial offer → "X-day free trial, then {giá} · Cancel anytime" + CTA "Start Free Trial"; không có → giữ như cũ | ✅ build (xem Cần làm) |
+| 8 | ~~**Free-trial framing**~~ → **ĐÃ TẮT (mua thẳng)** | `updateTrialFraming()` giờ LUÔN hiện "Subscribe Now" / "Cancel anytime", không bao giờ hiện "Start Free Trial" dù Play Console có offer trial. `trialDays()`/`periodToDays()` giữ lại (giá trị không dùng) để dễ bật lại sau. | ✅ Pixel |
 
 ---
 
 ## ⏳ CẦN LÀM
 
-### 🔑 Việc của bạn (chặn #8 hoạt động thật)
-- **Tạo free-trial offer trong Google Play Console** cho SKU `1_week` và/hoặc `1_year` (vd 3 ngày).
-  → Code đã sẵn sàng: tự nhận offer, hiện framing, cho mua trial. Sau khi bật, mình test trên Pixel thật giúp.
-
 ### P1 — đòn bẩy tiếp theo (theo nghiên cứu)
 - **Feature-gate (lever #2)** — Soft-sell:
   - ✅ **AI Remove**: badge 👑 trên nút + tap (free) → dialog mời Premium ("Go Premium" / "Continue" vẫn cho dùng). Util chung `PremiumUpsell` (`ads/iap/PremiumUpsell.kt`). Verified máy ảo.
   - ✅ **Template premium** (Cách A): template số thứ tự ≥6/category = premium (~5 đầu/category free). Badge 👑 + gate đặt trong `TemplatePickerAdapter` (funnel chung → cover Home/picker/ShowImage/see-all). Verified máy ảo.
-  - ✅ **Filter premium** (editor photo-edit-new): `FilterType.isPremium` (Auto/Enhance/BW = premium; Original/Grayscale/Invert free). Badge 👑 `ivCrown` + tap premium → dialog mời Premium. Cầu nối qua **abstract `PhotoEditorActivity.showPremiumUpsell()`** (app subclass `PhotoEditorWithBannerActivity` override = `PremiumUpsell.showFeatureDialog`) vì module editor KHÔNG import được app. `openPaywall()` cũng đã fill (mở `PremiumActivity`). Build PASS. ⚠️ **CHƯA verify trên emulator**: path "Edit" (single-photo) crash sẵn trên emulator x86_64 — `UnsatisfiedLinkError: libdk_*.so not found` (`DockitDocumentDetector` ở `PhotoEditorViewModel.kt:115`, lib chỉ build cho ARM). Lỗi NÀY có sẵn, không liên quan gate. → test filter trên **Pixel thật**.
+  - ✅ **Filter premium** (editor photo-edit-new): `FilterType.isPremium` (Auto/Enhance/BW = premium; Original/Grayscale/Invert free). Badge 👑 `ivCrown` + tap premium → dialog mời Premium. Cầu nối qua **abstract `PhotoEditorActivity.showPremiumUpsell()`** (app subclass `PhotoEditorWithBannerActivity` override = `PremiumUpsell.showFeatureDialog`) vì module editor KHÔNG import được app. `openPaywall()` cũng đã fill (mở `PremiumActivity`). Build PASS. ✅ **Verified Pixel 6a thật**: Edit→ảnh→Crop→Next→Filter → badge 👑 hiện đúng trên Auto/Enhance/BW (Original/Grayscale/Invert không), tap premium → dialog "Premium Feature" → "Continue" vẫn áp filter. (Emulator x86_64 KHÔNG test được path này: crash sẵn `UnsatisfiedLinkError: libdk_*.so` — `DockitDocumentDetector`/`PhotoEditorViewModel.kt:115`, lib chỉ build ARM; không liên quan gate.)
   - ✅ **Sticker premium** (Cách A): `StickerItem.isPremium` — mỗi category ~5 sticker đầu free, từ thứ 6 premium (`FREE_PER_CATEGORY=5` trong `StickerCatalog`). Badge `stickerPro` + gate trong `StickerGridAdapter` (dùng `PremiumUpsell` trực tiếp). Build PASS. ✅ **Verified máy ảo**: CollageActivity→Sticker → badge hiện đúng từ sticker thứ 6 (index≥5) → tap premium hiện dialog "Premium Feature" → "Continue" vẫn thêm sticker.
   - ⛔ **Effect**: KHÔNG có panel effect rời trong editor (chỉ slider adjust contrast/brightness/saturation/warmth = tool free). Không gate.
 - **Premium ad-exemption** — ✅ verify trải nghiệm premium sạch (không badge/banner/ads). Fix 2 gap: `NativeFullScreen` (check premium bị comment) + `BannerAds` init (load banner cho premium). Các ad full-screen vốn đã exempt sẵn.
-- **"Skip ads → pay"**: lúc/đóng interstitial chào "Bỏ quảng cáo mãi mãi" → Premium.
+- ✅ **"Skip ads → pay"**: sau khi ĐÓNG interstitial chào "Remove ads forever?" → Premium. Hook `InterAds.onAdDismissedFullScreenContent` (nhánh non-native-after-inter), cứ mỗi `REMOVE_ADS_UPSELL_EVERY=2` lần đóng inter + user FREE. Dialog `PremiumUpsell.showRemoveAdsDialog()` (reuse `dialog_premium_upsell.xml`, đổi title `iap_remove_ads_title`; post-delayed 500ms tránh BadToken lúc window chuyển cảnh; callback đảm bảo chạy đúng 1 lần dù đóng kiểu gì → không kẹt luồng sau ad). ✅ **Verified Pixel thật**: đóng inter → dialog hiện → Continue → điều hướng tiếp bình thường.
 - **Rewarded unlock**: "Xem quảng cáo để dùng AI Remove 1 lần" (soft-sell, giữ phần thưởng khan hiếm).
 - Upsell watermark cho **single-photo editor** (hiện setResult→Home, không có result screen).
 

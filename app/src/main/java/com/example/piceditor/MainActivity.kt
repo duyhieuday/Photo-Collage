@@ -359,10 +359,12 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         binding.icPro.setOnClickListener {
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
             mLastClickTime = SystemClock.elapsedRealtime()
+            WeatherApplication.trackingEvent("click_crown")
             startActivity(Intent(this, PremiumActivity::class.java))
         }
 
         binding.llEdit.setOnClickListener {
+            WeatherApplication.trackingEvent("click_edit")
             openGallery()
         }
 
@@ -370,6 +372,7 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
             checkAndRequestPermission()
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
             mLastClickTime = SystemClock.elapsedRealtime()
+            WeatherApplication.trackingEvent("click_collage")
             InterAds.showAdsBreak(this@MainActivity) {
                 startActivity(Intent(this, SelectImageActivity::class.java))
             }
@@ -379,6 +382,7 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
             checkAndRequestPermission()
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
             mLastClickTime = SystemClock.elapsedRealtime()
+            WeatherApplication.trackingEvent("click_create")
             InterAds.showAdsBreak(this@MainActivity) {
                 startActivity(Intent(this, SelectImageActivity::class.java))
             }
@@ -388,6 +392,7 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
             checkAndRequestPermission()
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
             mLastClickTime = SystemClock.elapsedRealtime()
+            WeatherApplication.trackingEvent("click_draft")
             InterAds.showAdsBreak(this@MainActivity) {
                 startActivity(Intent(this, MyDraftActivity::class.java))
             }
@@ -396,6 +401,7 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
         binding.llRemove.setOnClickListener {
             if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) return@setOnClickListener
             mLastClickTime = SystemClock.elapsedRealtime()
+            WeatherApplication.trackingEvent("click_ai_remove")
             val proceed = {
                 checkAndRequestPermission()
                 InterAds.showAdsBreak(this@MainActivity) {

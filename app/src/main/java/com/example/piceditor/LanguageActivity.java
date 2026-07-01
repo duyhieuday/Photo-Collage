@@ -151,6 +151,8 @@ public class LanguageActivity extends BaseActivityNew<ActivityLanguageBinding> {
             public void onClick(View v) {
                 if (PreferenceUtil.getInstance(LanguageActivity.this).getValue(Constant.SharePrefKey.TEST_OBD, "no").equals("yes") && PreferenceUtil.getInstance(getApplicationContext()).getValue(Constant.SharePrefKey.HEHE, false)) {
                     if (Prefs.getBoolean(Prefs.Key.FIRST_ONBOARDING, true)) {
+                        // Đánh dấu đã chọn ngôn ngữ để Splash không route lại LanguageActivity (tránh lặp onboarding).
+                        Prefs.putBoolean(Prefs.Key.KEY_LANGUAGE, false);
                         sharedPreferences = getSharedPreferences("signLanguage", MODE_PRIVATE);
                         String signLanguage = sharedPreferences.getString("getSignLanguage", null);
                         if (signLanguage == null) {
