@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.piceditor.R
+import com.example.piceditor.WeatherApplication
 import com.example.piceditor.ads.InterAds
 
 /**
@@ -52,6 +53,9 @@ class TemplateSectionAdapter(
     }
 
     private fun openCategory(ctx: android.content.Context, section: TemplateRepository.CategorySection) {
+        // Track category được mở (See All / tên category) — bỏ emoji, chỉ giữ chữ+số+space cho gọn.
+        val cat = section.title.filter { it.isLetterOrDigit() || it == ' ' }.trim()
+        WeatherApplication.trackingEvent("select_category", "category", cat)
         val open = { CategoryTemplatesActivity.start(ctx, section.title, section.templates) }
         if (ctx is Activity) InterAds.showAdsBreak(ctx) { open() } else open()
     }

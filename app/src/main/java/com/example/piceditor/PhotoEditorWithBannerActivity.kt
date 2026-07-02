@@ -68,10 +68,8 @@ class PhotoEditorWithBannerActivity : PhotoEditorActivity(){
         }
     }
 
-    override fun isPremium(): Boolean {
-        val prefs = Prefs(WeatherApplication.get())
-        return prefs.premium == 1 || prefs.isRemoveAd
-    }
+    // Dùng chung PremiumUpsell.isPremium → tự tôn trọng cờ IAP (HEHE=false coi như premium, filter không gate).
+    override fun isPremium(): Boolean = PremiumUpsell.isPremium(this)
 
     override fun openPaywall() {
         startActivity(Intent(this, PremiumActivity::class.java))

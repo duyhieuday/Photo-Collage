@@ -14,6 +14,8 @@ import android.widget.TextView
 import java.util.concurrent.atomic.AtomicBoolean
 import com.example.piceditor.R
 import com.example.piceditor.ads.Prefs
+import com.example.piceditor.utilsApp.Constant
+import com.example.piceditor.utilsApp.PreferenceUtil
 
 /**
  * Soft-sell feature-gating dùng chung.
@@ -32,7 +34,17 @@ object PremiumUpsell {
     @JvmField
     var suppressRemoveAdsOnce: Boolean = false
 
+    /**
+     * IAP có được BẬT không (cờ tổng HEHE, set từ remote config).
+     * HEHE=false → app KHÔNG có gì liên quan IAP: không paywall/crown/badge/gate/watermark.
+     */
+    @JvmStatic
+    fun isIapEnabled(context: Context): Boolean =
+        PreferenceUtil.getInstance(context).getValue(Constant.SharePrefKey.HEHE, false)
+
     fun isPremium(context: Context): Boolean {
+        // IAP tắt → coi như đã "premium" (mở khoá mọi tính năng, KHÔNG hiện badge/dialog gate).
+        if (!isIapEnabled(context)) return true
         val prefs = Prefs(context)
         return prefs.getPremium() == 1 || prefs.isRemoveAd
     }

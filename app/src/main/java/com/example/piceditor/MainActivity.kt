@@ -347,7 +347,8 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
     private fun setupClick() {
         checkAndRequestPermission()
 
-        // Badge premium trên AI Remove — ẩn nếu user đã Premium
+        // Crown (vào Premium) + badge premium — ẩn HẾT nếu IAP tắt (HEHE=false).
+        binding.icPro.visibility = if (PremiumUpsell.isIapEnabled(this)) View.VISIBLE else View.GONE
         binding.icRemovePro.visibility = if (PremiumUpsell.isPremium(this)) View.GONE else View.VISIBLE
 
         binding.btnMenu.setOnClickListener {

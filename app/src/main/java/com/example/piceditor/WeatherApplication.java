@@ -329,15 +329,26 @@ public class WeatherApplication extends Application{
                 public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
                     try {
                         if(billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK){
+                            // Gói bán chính là SUBSCRIPTION (1_year/1_mon) -> PHẢI query SUBS,
+                            // rồi mới đến INAPP (lifetime). Truoc day chi query INAPP -> subscriber mat premium moi lan mo app.
+                            // Chi setPremium(0) khi CA HAI query THANH CONG va deu rong (tranh reset nham khi query loi).
                             finalBillingClient.queryPurchasesAsync(
-                                    QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build(), (billingResult1, list) -> {
-                                        if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK){
-                                            if(list.size()>0){
-                                                prefs.setPremium(1); // set 1 to activate premium feature
-                                            }else {
-                                                prefs.setPremium(0); // set 0 to de-activate premium feature
-                                            }
+                                    QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS).build(), (subResult, subList) -> {
+                                        boolean subOk = subResult.getResponseCode() == BillingClient.BillingResponseCode.OK;
+                                        if (subOk && hasActivePurchase(subList)) {
+                                            prefs.setPremium(1);
+                                            return;
                                         }
+                                        finalBillingClient.queryPurchasesAsync(
+                                                QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build(), (inappResult, inappList) -> {
+                                                    boolean inappOk = inappResult.getResponseCode() == BillingClient.BillingResponseCode.OK;
+                                                    if (inappOk && hasActivePurchase(inappList)) {
+                                                        prefs.setPremium(1);
+                                                    } else if (subOk && inappOk) {
+                                                        prefs.setPremium(0); // ca 2 loai deu khong co purchase -> khong premium
+                                                    }
+                                                    // else: co query loi -> GIU NGUYEN premium, lan mo app sau check lai
+                                                });
                                     });
                         }
                     } catch (Exception e) {
@@ -347,6 +358,15 @@ public class WeatherApplication extends Application{
         } catch (Exception e) {
 
         }
+    }
+
+    // Có ít nhất 1 purchase ở trạng thái PURCHASED (bỏ qua PENDING/UNSPECIFIED).
+    private static boolean hasActivePurchase(java.util.List<com.android.billingclient.api.Purchase> list) {
+        if (list == null) return false;
+        for (com.android.billingclient.api.Purchase p : list) {
+            if (p.getPurchaseState() == com.android.billingclient.api.Purchase.PurchaseState.PURCHASED) return true;
+        }
+        return false;
     }
 
     private void fetchConfig() {

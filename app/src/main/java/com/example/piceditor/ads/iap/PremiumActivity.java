@@ -359,24 +359,26 @@ public class PremiumActivity extends FragmentActivity {
     }
 
     void verifySubPurchase(Purchase purchases) {
-
         try {
-            AcknowledgePurchaseParams acknowledgePurchaseParams = AcknowledgePurchaseParams
-                    .newBuilder()
-                    .setPurchaseToken(purchases.getPurchaseToken())
-                    .build();
+            // Chỉ kích hoạt khi đã PURCHASED (bỏ qua PENDING/UNSPECIFIED).
+            if (purchases.getPurchaseState() != Purchase.PurchaseState.PURCHASED) return;
 
-            billingClient.acknowledgePurchase(acknowledgePurchaseParams, billingResult -> {
-                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                    //use prefs to set premium
-                    //  Toast.makeText(Subscriptions.this, "Subscription activated, Enjoy!", Toast.LENGTH_SHORT).show();
-                    //Setting premium to 1
-                    // 1 - premium
-                    // 0 - no premium
-                    prefs.setPremium(1);
-                    restart();
-                }
-            });
+            boolean wasPremium = prefs.getPremium() == 1;
+            // Kích hoạt premium NGAY khi PURCHASED — kể cả purchase đã acknowledge từ trước
+            // (trước đây set premium NẰM TRONG callback acknowledge -> sub đã ack thì ack lại lỗi -> Restore không chạy).
+            prefs.setPremium(1);
+
+            // Acknowledge CHỈ KHI chưa (Google auto-refund sau 3 ngày nếu không ack; ack lại purchase đã ack -> lỗi).
+            if (!purchases.isAcknowledged()) {
+                AcknowledgePurchaseParams acknowledgePurchaseParams = AcknowledgePurchaseParams
+                        .newBuilder()
+                        .setPurchaseToken(purchases.getPurchaseToken())
+                        .build();
+                billingClient.acknowledgePurchase(acknowledgePurchaseParams, billingResult -> {});
+            }
+
+            // Chỉ restart khi VỪA chuyển 0->1 (tránh restart lặp khi onResume/restore gọi lại lúc đã premium).
+            if (!wasPremium) restart();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -773,10 +775,11 @@ public class PremiumActivity extends FragmentActivity {
      * Luôn finish() [from]. Dùng cho cả nhánh KHÔNG onboarding (SplashActivity) lẫn sau onboarding (ABOnBoarding).
      */
     public static void startFirstRunPaywallOrHome(android.app.Activity from) {
+        boolean iapOn = PremiumUpsell.isIapEnabled(from);   // HEHE=false -> KHÔNG paywall, thẳng Home
         boolean paywallShown = com.example.piceditor.utilsApp.PreferenceUtil.getInstance(from)
                 .getValue("first_paywall_shown", false);
         boolean isPremium = new Prefs(from).getPremium() == 1;
-        if (!paywallShown && !isPremium) {
+        if (iapOn && !paywallShown && !isPremium) {
             com.example.piceditor.utilsApp.PreferenceUtil.getInstance(from)
                     .setValue("first_paywall_shown", true);
             Intent i = new Intent(from, PremiumActivity.class);

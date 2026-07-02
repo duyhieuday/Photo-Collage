@@ -22,6 +22,11 @@ object WatermarkUtil {
 
     private fun isPremium(context: Context): Boolean {
         return try {
+            // IAP tắt (cờ tổng HEHE=false, key "hehe" trong prefs "myBase") -> KHÔNG đóng watermark
+            // (không có Premium để upsell thì watermark vô nghĩa).
+            if (!context.getSharedPreferences("myBase", Context.MODE_PRIVATE).getBoolean("hehe", false)) {
+                return true
+            }
             val id = context.resources.getIdentifier("app_name", "string", context.packageName)
             val prefsName = if (id != 0) context.getString(id) else context.packageName
             val sp = context.getSharedPreferences(prefsName, Context.MODE_PRIVATE)
