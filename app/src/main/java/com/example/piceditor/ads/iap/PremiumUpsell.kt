@@ -23,6 +23,15 @@ import com.example.piceditor.ads.Prefs
  */
 object PremiumUpsell {
 
+    /**
+     * Sau khi bấm "Continue" ở feature-gate dialog, onContinue thường gọi InterAds.showAdsBreak
+     * → interstitial. Nếu KHÔNG chặn, khi đóng inter sẽ bắn tiếp dialog "Remove ads forever?"
+     * (cùng layout) → user tưởng "vẫn dialog cũ", phải Continue lần nữa.
+     * Cờ này báo InterAds BỎ QUA remove-ads-upsell cho ĐÚNG 1 lần inter kế tiếp (tránh chồng 2 upsell).
+     */
+    @JvmField
+    var suppressRemoveAdsOnce: Boolean = false
+
     fun isPremium(context: Context): Boolean {
         val prefs = Prefs(context)
         return prefs.getPremium() == 1 || prefs.isRemoveAd
@@ -44,6 +53,8 @@ object PremiumUpsell {
                 activity.startActivity(Intent(activity, PremiumActivity::class.java))
             }
             view.findViewById<View>(R.id.btnContinueFree).setOnClickListener {
+                // onContinue có thể mở interstitial → chặn remove-ads-upsell chồng lên sau khi đóng inter.
+                suppressRemoveAdsOnce = true
                 dialog.dismiss()
                 onContinue()
             }

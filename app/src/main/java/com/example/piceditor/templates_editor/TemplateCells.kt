@@ -67,7 +67,7 @@ object TemplateCells {
         "sp06" to listOf(RectF(76f, 316f, 700f, 878f), RectF(76f, 920f, 700f, 1482f)),
         "sp07" to listOf(RectF(143f, 555f, 980f, 1393f)),
         "sp08" to listOf(RectF(575f, 148f, 1104f, 678f), RectF(532f, 730f, 1062f, 1260f), RectF(489f, 1312f, 1019f, 1843f)),
-        "sp09" to listOf(RectF(185f, 142f, 945f, 898f)),
+        "sp09" to listOf(RectF(183f, 135f, 945f, 898f)),
         "sp10" to listOf(RectF(149f, 161f, 745f, 836f), RectF(324f, 1109f, 946f, 1825f))
     )
 

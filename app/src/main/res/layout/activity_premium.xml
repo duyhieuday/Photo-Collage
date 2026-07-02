@@ -335,6 +335,7 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="12dp"
                     android:gravity="center_vertical"
+                    android:visibility="gone"
                     android:orientation="horizontal">
 
                     <TextView

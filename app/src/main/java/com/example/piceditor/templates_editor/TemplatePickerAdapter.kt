@@ -7,6 +7,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.piceditor.R
 import com.example.piceditor.WeatherApplication
 import com.example.piceditor.ads.iap.PremiumUpsell
@@ -36,14 +37,17 @@ class TemplatePickerAdapter(
         val t = templates[position]
 
         // Preview dùng thumb_ (ảnh đã điền sẵn ảnh mẫu) cho card đẹp.
-        // Load qua Glide: decode background + downsample + cache → vuốt mượt.
         // RGB_565 (16-bit) + override nhỏ để giảm RAM.
+        // TẮT cache ĐĨA (DiskCacheStrategy.NONE): drawable template có thể đổi nội dung mà GIỮ nguyên resource id
+        // -> Glide phục vụ bản cache đĩa CŨ (bền qua các lần mở app/update) khiến preview không khớp template thật.
+        // Không tắt memory-cache: RAM chỉ tồn tại trong phiên (mở lại app là mới) nên không gây stale, mà vẫn cuộn mượt.
         Glide.with(holder.thumb)
             .load(t.thumbRes)
             .format(DecodeFormat.PREFER_RGB_565)
             .override(THUMB_W, THUMB_H)
             .centerCrop()
             .dontAnimate()
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
             .into(holder.thumb)
 
         // Soft-sell gate: template premium + user free -> badge 👑 + dialog mời Premium ("Continue" vẫn cho dùng)

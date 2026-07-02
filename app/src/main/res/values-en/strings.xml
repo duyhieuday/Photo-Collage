@@ -187,7 +187,7 @@
     <string name="iap_bill_weekly">Bill weekly</string>
     <string name="iap_per_week">/week</string>
     <string name="iap_subscribe_now">Subscribe Now</string>
-    <string name="iap_cancel_anytime">Cancel anytime</string>
+    <string name="iap_cancel_anytime">You can unsubscribe at any time</string>
     <string name="iap_best_choice">Best choice</string>
     <string name="iap_terms">Terms &amp; Conditions</string>
     <string name="iap_privacy_policy">Privacy Policy</string>

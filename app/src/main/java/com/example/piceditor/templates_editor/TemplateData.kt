@@ -101,8 +101,8 @@ object TemplateRepository {
             TemplateData("sm04", "SM04", R.drawable.temp_sm04, R.drawable.thumb_sm04, cells("sm04"), mask("sm04")),
             TemplateData("sm05", "SM05", R.drawable.temp_sm05, R.drawable.thumb_sm05, cells("sm05"), mask("sm05")),
             TemplateData("sm06", "SM06", R.drawable.temp_sm06, R.drawable.thumb_sm06, cells("sm06"), mask("sm06")),
-            // thumb_sm07 import bị lệch design (hiking) so với temp_sm07 (puzzle) -> preview dùng temp_ cho khớp.
-            TemplateData("sm07", "SM07", R.drawable.temp_sm07, R.drawable.temp_sm07, cells("sm07"), mask("sm07")),
+            // thumb_sm07 (Thumb_SM07.png) giờ đã khớp layout puzzle temp_sm07 -> preview dùng thumb_ (mẫu điền ảnh hiking).
+            TemplateData("sm07", "SM07", R.drawable.temp_sm07, R.drawable.thumb_sm07, cells("sm07"), mask("sm07")),
             TemplateData("sm08", "SM08", R.drawable.temp_sm08, R.drawable.thumb_sm08, cells("sm08"), mask("sm08")),
             TemplateData("sm09", "SM09", R.drawable.temp_sm09, R.drawable.thumb_sm09, cells("sm09"), mask("sm09")),
 

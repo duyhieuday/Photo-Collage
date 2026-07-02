@@ -187,7 +187,7 @@
     <string name="iap_bill_weekly">साप्ताहिक बिलिंग</string>
     <string name="iap_per_week">/हफ़्ता</string>
     <string name="iap_subscribe_now">अभी सब्सक्राइब करें</string>
-    <string name="iap_cancel_anytime">कभी भी रद्द करें</string>
+    <string name="iap_cancel_anytime">आप किसी भी समय सदस्यता समाप्त कर सकते हैंं</string>
     <string name="iap_best_choice">सबसे बेहतर</string>
     <string name="iap_terms">नियम और शर्तें</string>
     <string name="iap_privacy_policy">गोपनीयता नीति</string>

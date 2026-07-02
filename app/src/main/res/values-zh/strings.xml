@@ -187,7 +187,7 @@
     <string name="iap_bill_weekly">按周计费</string>
     <string name="iap_per_week">/周</string>
     <string name="iap_subscribe_now">立即订阅</string>
-    <string name="iap_cancel_anytime">随时可取消</string>
+    <string name="iap_cancel_anytime">您可以随时取消订阅</string>
     <string name="iap_best_choice">最划算</string>
     <string name="iap_terms">条款 &amp; 条件</string>
     <string name="iap_privacy_policy">隐私政策</string>

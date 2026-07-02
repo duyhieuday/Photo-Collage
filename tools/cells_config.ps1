@@ -122,9 +122,9 @@ $CELLS = [ordered]@{
   # sp08 GAME DAY: 3 o TRANG trong dai phim DEN nghieng nhe 4 -> WHITE (giu khung den)
   "sp08"=@(@(575,148,1104,678,4),@(532,730,1062,1260,4),@(489,1312,1019,1843,4))
   # sp09 KIDS FOOTBALL CLUB: 1 o HINH TRON trang -> WHITE (mask clip theo vong tron).
-  # Circle that (do theo nguong mask app r,g,b>240): left 189, right 941 (rong nhat y=520), center(565,520) r~376.
-  # Rect bao trong ca vong tron; nen xanh/trophy/glove ngoai circle deu non-white nen mask tu loai (khong lo anh).
-  "sp09"=@(,@(185,142,945,898))
+  # Circle that (do theo nguong mask app r,g,b>240): top 137, bottom 895, left 189, right 941 (rong nhat y=520).
+  # Rect bao trong ca vong tron (margin ~4px moi phia); nen xanh/trophy/glove/net ngoai circle non-white nen mask tu loai.
+  "sp09"=@(,@(183,135,945,898))
   # sp10: 2 o polaroid XAM nghieng (16 / -12.5) -> GRAY
   "sp10"=@(@(149,161,745,836,16),@(324,1109,946,1825,-12.5))
 }

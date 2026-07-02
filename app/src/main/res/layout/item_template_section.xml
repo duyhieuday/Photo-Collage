@@ -15,7 +15,7 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:paddingHorizontal="@dimen/dimen_16dp"
-        android:paddingVertical="@dimen/dimen_8dp">
+        android:paddingVertical="12dp">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvCategoryTitle"
@@ -33,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_button_back"
-            android:padding="4dp"
+            android:padding="8dp"
             android:contentDescription="@null"
             app:tint="#1D2939" />
     </LinearLayout>

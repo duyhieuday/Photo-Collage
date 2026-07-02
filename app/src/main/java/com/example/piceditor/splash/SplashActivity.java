@@ -11,7 +11,6 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.example.piceditor.LanguageActivity;
-import com.example.piceditor.MainActivity;
 import com.example.piceditor.R;
 import com.example.piceditor.ads.iap.PremiumActivity;
 import com.example.piceditor.WeatherApplication;
@@ -81,27 +80,6 @@ public class SplashActivity extends BaseActivityNew<ActivitySplashBinding> {
     private void intent(String debug) {
         boolean isFirstRun = Prefs.getBoolean(Prefs.Key.KEY_LANGUAGE, true);
         if (!isIntented) {
-//            if (PreferenceUtil.getInstance(getApplicationContext()).getValue(Constant.SharePrefKey.HEHE, false)) {
-//                if (isFirstRun) {
-//                    startActivity(new Intent(this, LanguageActivity.class));
-//                    finish();
-//                } else {
-//                    if(PreferenceUtil.getInstance(getApplicationContext()).getValue(Constant.SharePrefKey.FIRST_FLOW, "no").equals("yes")){
-//                        startActivity(new Intent(this, LanguageActivity.class));
-//                        finish();
-//                    }else {
-//                        startActivity(new Intent(this, MainActivity.class));
-//                        finish();
-//                    }
-//                }
-//            } else {
-//                startActivity(new Intent(this, MainActivity.class));
-//                finish();
-//            }
-
-
-
-
             isIntented = true;
             // Nếu remote BẬT onboarding (test_obd==yes && hehe) + lần đầu chạy → vào luồng onboarding
             // (LanguageActivity → ABOnBoarding → [Premium first-run] → Home).

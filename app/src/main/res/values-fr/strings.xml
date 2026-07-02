@@ -187,7 +187,7 @@
     <string name="iap_bill_weekly">Facturé chaque semaine</string>
     <string name="iap_per_week">/semaine</string>
     <string name="iap_subscribe_now">S\'abonner</string>
-    <string name="iap_cancel_anytime">Annulable à tout moment</string>
+    <string name="iap_cancel_anytime">Vous pouvez vous désabonner à tout moment</string>
     <string name="iap_best_choice">Meilleur choix</string>
     <string name="iap_terms">Conditions générales</string>
     <string name="iap_privacy_policy">Politique de confidentialité</string>

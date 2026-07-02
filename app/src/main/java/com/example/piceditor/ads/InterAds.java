@@ -45,6 +45,12 @@ public class InterAds {
     private static int interDismissCount = 0;
 
     private static boolean shouldShowRemoveAdsUpsell() {
+        // Vừa Continue ở feature-gate dialog -> inter này thuộc luồng đó -> BỎ QUA remove-ads 1 lần
+        // để không chồng 2 upsell (user tưởng "vẫn dialog cũ", phải Continue lần nữa).
+        if (PremiumUpsell.suppressRemoveAdsOnce) {
+            PremiumUpsell.suppressRemoveAdsOnce = false;
+            return false;
+        }
         try {
             Prefs p = new Prefs(WeatherApplication.get());
             if (p.getPremium() == 1 || p.isRemoveAd()) return false;

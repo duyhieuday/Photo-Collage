@@ -7,7 +7,6 @@ import android.widget.TextView;
 
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.example.piceditor.MainActivity;
 import com.example.piceditor.ads.iap.PremiumActivity;
 import com.example.piceditor.R;
 import com.example.piceditor.ads.Callback;
