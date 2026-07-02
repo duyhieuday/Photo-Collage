@@ -134,6 +134,7 @@
         android:focusable="true"
         android:fontFamily="@font/inter_regular"
         android:padding="8dp"
+        android:alpha="0.2"
         android:text="@string/iap_continue"
         android:textColor="#9FB394"
         android:textSize="14sp" />
