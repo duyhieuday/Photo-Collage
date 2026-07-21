@@ -1,6 +1,7 @@
 package com.example.piceditor.uiFragments
 
 import android.annotation.SuppressLint
+import android.content.ContentResolver
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
@@ -26,7 +27,8 @@ class GalleryFragment : BaseFragment<FragmentGalleryBinding>() {
     private var allImages = ArrayList<String>()
     private var currentImages = ArrayList<String>()
 
-    private lateinit var adapter: GalleryImageAdapter
+    // Nullable: user có thể bấm tab TRƯỚC khi load ảnh xong (setListener chạy trước initData)
+    private var adapter: GalleryImageAdapter? = null
     private var listener: OnSelectImageListener? = null
 
     override fun getLayoutRes() = R.layout.fragment_gallery
@@ -44,19 +46,19 @@ class GalleryFragment : BaseFragment<FragmentGalleryBinding>() {
 
     override fun setListener() {
         binding.tabAll.setOnClickListener {
-            adapter.updateData(allImages)
+            adapter?.updateData(allImages)
             updateTabUI(binding.tabAll)
         }
 
         binding.tabCamera.setOnClickListener {
             val cameraImages = allImages.filter { it.contains("Camera") }
-            adapter.updateData(ArrayList(cameraImages))
+            adapter?.updateData(ArrayList(cameraImages))
             updateTabUI(binding.tabCamera)
         }
 
         binding.tabDownload.setOnClickListener {
             val downloadImages = allImages.filter { it.contains("Pictures") }
-            adapter.updateData(ArrayList(downloadImages))
+            adapter?.updateData(ArrayList(downloadImages))
             updateTabUI(binding.tabDownload)
         }
     }
@@ -83,41 +85,53 @@ class GalleryFragment : BaseFragment<FragmentGalleryBinding>() {
     }
 
     private fun loadImages() {
-        lifecycleScope.launch {
+        // Lấy resolver NGAY trên main thread khi fragment còn attach — query chạy ở IO có thể
+        // kết thúc sau khi user back ra, lúc đó requireContext() sẽ ném IllegalStateException.
+        val resolver = context?.applicationContext?.contentResolver ?: return
+
+        // viewLifecycleOwner: coroutine bị huỷ khi view destroy → không đụng binding chết.
+        viewLifecycleOwner.lifecycleScope.launch {
             binding.progressBar.visibility = View.VISIBLE
 
-            val images = withContext(Dispatchers.IO) { getAllImages() }
+            val images = withContext(Dispatchers.IO) { getAllImages(resolver) }
+
+            // Fragment đã detach trong lúc load → bỏ qua, không dựng adapter nữa.
+            val ctx = context ?: return@launch
+            if (!isAdded) return@launch
 
             binding.progressBar.visibility = View.GONE
 
             allImages    = images
             currentImages = ArrayList(images)
 
-            adapter = GalleryImageAdapter(requireContext(), currentImages) { path ->
+            val newAdapter = GalleryImageAdapter(ctx, currentImages) { path ->
                 listener?.onSelectImage(path)
             }
+            adapter = newAdapter
 
-            binding.recyclerView.adapter = adapter
+            binding.recyclerView.adapter = newAdapter
 
             // ✅ Pass adapter lên SelectImageActivity để sync badge khi xóa
-            (activity as? SelectImageActivity)?.setGalleryAdapter(adapter)
+            (activity as? SelectImageActivity)?.setGalleryAdapter(newAdapter)
         }
     }
 
     @SuppressLint("Range")
-    private fun getAllImages(): ArrayList<String> {
+    private fun getAllImages(resolver: ContentResolver): ArrayList<String> {
         val list = ArrayList<String>()
         val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor: Cursor? = requireContext().contentResolver.query(
-            uri, projection, null, null,
-            MediaStore.Images.Media.DATE_ADDED + " DESC"
-        )
+        val cursor: Cursor? = runCatching {
+            resolver.query(
+                uri, projection, null, null,
+                MediaStore.Images.Media.DATE_ADDED + " DESC"
+            )
+        }.getOrNull()
         cursor?.use {
-            if (it.moveToFirst()) {
+            val dataCol = it.getColumnIndex(MediaStore.Images.Media.DATA)
+            if (dataCol >= 0 && it.moveToFirst()) {
                 do {
-                    val path = it.getString(it.getColumnIndex(MediaStore.Images.Media.DATA))
-                    list.add(path)
+                    it.getString(dataCol)?.let { path -> list.add(path) }
                 } while (it.moveToNext())
             }
         }

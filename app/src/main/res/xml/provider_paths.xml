@@ -1,3 +1,8 @@
 <paths>
     <cache-path name="cache" path="." />
+    <!-- ShowImageActivity ghi share_image.jpg vào externalCacheDir
+         (/storage/emulated/0/Android/data/<pkg>/cache) → phải khai báo, nếu không
+         FileProvider.getUriForFile ném IllegalArgumentException "Failed to find configured root". -->
+    <external-cache-path name="external_cache" path="." />
+    <external-files-path name="external_files" path="." />
 </paths>

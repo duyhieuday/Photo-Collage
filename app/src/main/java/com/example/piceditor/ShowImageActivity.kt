@@ -188,11 +188,23 @@ class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnCl
     // Prepare share file (chạy background 1 lần duy nhất)
     // ──────────────────────────────────────────────────────
 
+    // Thư mục ghi file share. externalCacheDir có thể null (không có storage) →
+    // fallback cacheDir. Cả 2 đều đã khai báo trong res/xml/provider_paths.xml.
+    private val shareCacheDir: File
+        get() = externalCacheDir ?: cacheDir
+
+    // FileProvider ném IllegalArgumentException nếu file nằm ngoài các root đã khai báo
+    // → bọc lại, trả null để caller hiện toast thay vì crash.
+    private fun uriForShareFile(file: File): Uri? =
+        runCatching { FileProvider.getUriForFile(this, "$packageName.provider", file) }
+            .onFailure { it.printStackTrace() }
+            .getOrNull()
+
     private fun prepareShareFile(bmp: Bitmap) {
         shareJob?.cancel()
         shareJob = lifecycleScope.launch(Dispatchers.IO) {
             runCatching {
-                val f = File(externalCacheDir, "share_image.jpg")
+                val f = File(shareCacheDir, "share_image.jpg")
                 FileOutputStream(f).use { bmp.compress(Bitmap.CompressFormat.JPEG, 95, it) }
                 cachedShareFile = f
             }
@@ -207,9 +219,7 @@ class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnCl
         val file = cachedShareFile
         if (file != null && file.exists()) {
             // ✅ File đã sẵn sàng → trả về ngay, 0ms lag
-            val uri = FileProvider.getUriForFile(this, "$packageName.provider", file)
-            onReady(uri)
-            return
+            uriForShareFile(file)?.let { onReady(it); return }
         }
 
         // File chưa sẵn sàng (bitmap vẫn đang load) → fallback ghi file rồi share
@@ -221,12 +231,22 @@ class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnCl
         shareJob?.cancel()
         shareJob = lifecycleScope.launch {
             val f = withContext(Dispatchers.IO) {
-                val f = File(externalCacheDir, "share_image.jpg")
-                FileOutputStream(f).use { bmp.compress(Bitmap.CompressFormat.JPEG, 95, it) }
-                f
+                runCatching {
+                    val f = File(shareCacheDir, "share_image.jpg")
+                    FileOutputStream(f).use { bmp.compress(Bitmap.CompressFormat.JPEG, 95, it) }
+                    f
+                }.getOrNull()
+            }
+            if (f == null) {
+                Toast.makeText(this@ShowImageActivity, getString(R.string.image_not_ready), Toast.LENGTH_SHORT).show()
+                return@launch
             }
             cachedShareFile = f
-            val uri = FileProvider.getUriForFile(this@ShowImageActivity, "$packageName.provider", f)
+            val uri = uriForShareFile(f)
+            if (uri == null) {
+                Toast.makeText(this@ShowImageActivity, getString(R.string.image_not_ready), Toast.LENGTH_SHORT).show()
+                return@launch
+            }
             onReady(uri)
         }
     }
@@ -266,9 +286,7 @@ class ShowImageActivity : BaseActivityNew<ActivityShowImageBinding>(), View.OnCl
         }
         // Fallback: dùng cached file qua FileProvider
         val file = cachedShareFile
-        return if (file != null && file.exists()) {
-            FileProvider.getUriForFile(this, "$packageName.provider", file)
-        } else null
+        return if (file != null && file.exists()) uriForShareFile(file) else null
     }
 
     private fun shareToTikTok() {

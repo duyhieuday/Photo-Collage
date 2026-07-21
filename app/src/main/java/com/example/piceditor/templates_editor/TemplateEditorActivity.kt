@@ -48,6 +48,7 @@ import com.example.piceditor.draw.test.BeardAdapter
 import com.example.piceditor.adapters.ToolAdapter
 import com.example.piceditor.model.ToolItem
 import com.example.piceditor.utils.BarsUtils
+import com.example.piceditor.utils.CropCache
 import com.example.piceditor.utilsApp.Constant
 import com.example.piceditor.utilsApp.DraftStore
 import com.example.piceditor.utilsApp.DraftType
@@ -89,6 +90,8 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
         const val TYPE_GESTURE = 0
         const val TYPE_SHAPE   = 1
         const val TYPE_ERASER  = 2
+        // Cạnh dài tối đa của ảnh nạp vào ô — chặn crash "draw too large bitmap" với ảnh 50MP.
+        private const val MAX_PHOTO_DIM = 2048
         private const val CROP_FRAGMENT_TAG = "ucrop_fragment"
     }
 
@@ -135,6 +138,7 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
     // -- Crop --
     private var cropFragment: UCropFragment? = null
     private var cropDestUri: Uri? = null
+    private var cropSrcFile: File? = null
 
     // -- Gallery launcher --
     private val pickImageLauncher =
@@ -637,7 +641,9 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
             return
         }
 
-        val srcFile = File(cacheDir, "crop_src_${System.currentTimeMillis()}.jpg")
+        CropCache.purgeStale(this)
+
+        val srcFile = CropCache.newSrcFile(this)
         try {
             FileOutputStream(srcFile).use { bmp.compress(Bitmap.CompressFormat.JPEG, 95, it) }
         } catch (e: Exception) {
@@ -645,9 +651,10 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
             Toast.makeText(this, getString(R.string.image_not_ready), Toast.LENGTH_SHORT).show()
             return
         }
+        cropSrcFile = srcFile
 
         val srcUri = Uri.fromFile(srcFile)
-        val destFile = File(cacheDir, "crop_dest_${System.currentTimeMillis()}.jpg")
+        val destFile = CropCache.newDestFile(this)
         cropDestUri = Uri.fromFile(destFile)
 
         val options = UCrop.Options().apply {
@@ -737,6 +744,9 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
             supportFragmentManager.beginTransaction().remove(it).commitAllowingStateLoss()
         }
         cropFragment = null
+        // uCrop đã đọc xong ảnh nguồn (dù crop thành công, lỗi hay user huỷ) → xoá luôn.
+        CropCache.delete(cropSrcFile)
+        cropSrcFile = null
     }
 
     // -- UCropFragmentCallback --
@@ -747,18 +757,47 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
         if (result.mResultCode == RESULT_OK) {
             val uri = result.mResultData?.let { UCrop.getOutput(it) } ?: cropDestUri
             closeCropOverlay()
-            if (uri != null) {
-                InterAds.showAdsBreak(this@TemplateEditorActivity) {
-                    startActivity(Intent(this, ShowImageActivity::class.java).apply {
-                        putExtra("image_uri", uri.toString())
-                    })
-                    finish()
-                }
-            }
+            if (uri != null) exportCropResult(uri)
         } else if (result.mResultCode == UCrop.RESULT_ERROR) {
             result.mResultData?.let { UCrop.getError(it) }?.printStackTrace()
-            Toast.makeText(this, "Crop that bai", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.crop_failed), Toast.LENGTH_SHORT).show()
             closeCropOverlay()
+        }
+    }
+
+    /**
+     * UCrop ghi kết quả ra file TẠM trong cacheDir → [UCrop.getOutput] là URI `file://`.
+     *
+     * KHÔNG được forward thẳng URI đó sang ShowImageActivity:
+     *  1. Ảnh không hề vào gallery dù màn sau ghi "Saved!", cũng không lên My Draft.
+     *  2. File nằm trong cache → hệ thống có thể xoá bất cứ lúc nào.
+     *  3. scheme != "content" nên ShowImageActivity phải share qua FileProvider — chính là
+     *     nguồn crash "Failed to find configured root" trước đây.
+     *
+     * → Lưu vào MediaStore đúng như nút Save (watermark + tag draft) rồi mới mở màn kết quả.
+     */
+    private fun exportCropResult(cropUri: Uri) {
+        lifecycleScope.launch {
+            val savedUri = withContext(Dispatchers.IO) {
+                runCatching {
+                    val bmp = decodeUriBitmap(cropUri) ?: throw IOException("Cannot read crop result")
+                    saveToGallery(bmp)
+                }.getOrNull()
+            }
+            // Ảnh đã vào MediaStore → file kết quả tạm trong cache không còn ai đọc.
+            CropCache.delete(cropUri.path?.let { File(it) })
+            cropDestUri = null
+            if (savedUri == null) {
+                Toast.makeText(this@TemplateEditorActivity, getString(R.string.crop_failed), Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+            saveTemplateDraft(savedUri)
+            InterAds.showAdsBreak(this@TemplateEditorActivity) {
+                startActivity(Intent(this@TemplateEditorActivity, ShowImageActivity::class.java).apply {
+                    putExtra("image_uri", savedUri.toString())
+                })
+                finish()
+            }
         }
     }
 
@@ -899,18 +938,46 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
 
     private fun openGallery() { pickImageLauncher.launch("image/*") }
 
+    /**
+     * Sample size để cạnh dài của ảnh ≤ [MAX_PHOTO_DIM].
+     *
+     * Ảnh camera 50MP decode full-size = ~200MB (ARGB_8888) > giới hạn 100MB của hardware
+     * canvas → RuntimeException "Canvas: trying to draw too large bitmap" khi TemplateEditorView
+     * vẽ ô ảnh. Luôn hạ mẫu ngay từ lúc decode (cũng đỡ tốn RAM, ô ảnh trên màn hình rất nhỏ).
+     */
+    private fun sampleSizeFor(w: Int, h: Int): Int {
+        if (w <= 0 || h <= 0) return 1
+        var sample = 1
+        while (maxOf(w, h) / sample > MAX_PHOTO_DIM) sample *= 2
+        return sample
+    }
+
     private suspend fun decodeUriBitmap(uri: Uri): Bitmap? = withContext(Dispatchers.IO) {
         runCatching {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 val source = ImageDecoder.createSource(contentResolver, uri)
-                ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
+                ImageDecoder.decodeBitmap(source) { decoder, info, _ ->
                     decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+                    decoder.setTargetSampleSize(
+                        sampleSizeFor(info.size.width, info.size.height)
+                    )
                 }
             } else {
-                @Suppress("DEPRECATION")
-                MediaStore.Images.Media.getBitmap(contentResolver, uri)
+                decodeUriBitmapLegacy(uri)
             }
         }.getOrNull()
+    }
+
+    /** Decode có hạ mẫu cho API < 28 (thay MediaStore.Images.Media.getBitmap vốn decode full-size). */
+    private fun decodeUriBitmapLegacy(uri: Uri): Bitmap? {
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
+        val opts = BitmapFactory.Options().apply {
+            inSampleSize = sampleSizeFor(bounds.outWidth, bounds.outHeight)
+        }
+        return contentResolver.openInputStream(uri)?.use {
+            BitmapFactory.decodeStream(it, null, opts)
+        }
     }
 
     private fun loadImageFromUri(uri: Uri) {
@@ -969,7 +1036,13 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
     }
 
     private suspend fun decodeFileBitmap(path: String): Bitmap? = withContext(Dispatchers.IO) {
-        runCatching { BitmapFactory.decodeFile(path) }.getOrNull()
+        runCatching {
+            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            BitmapFactory.decodeFile(path, bounds)
+            BitmapFactory.decodeFile(path, BitmapFactory.Options().apply {
+                inSampleSize = sampleSizeFor(bounds.outWidth, bounds.outHeight)
+            })
+        }.getOrNull()
     }
 
     // ── Lưu dự án template (ảnh gốc từng ô + matrix + sticker/chữ/vẽ) ──
@@ -1070,11 +1143,25 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
                 .resolve("PhotoCollage").also { it.mkdirs() }
             val file = dir.resolve(filename)
             file.outputStream().use { wmBitmap.compress(Bitmap.CompressFormat.JPEG, 95, it) }
-            @Suppress("DEPRECATION")
-            MediaScannerConnection.scanFile(
-                this, arrayOf(file.absolutePath), arrayOf("image/jpeg"), null
-            )
-            Uri.fromFile(file)
+            // Insert vào MediaStore (thay vì chỉ scanFile) để trả về content:// giống nhánh Q+:
+            // file:// làm ShowImageActivity phải share qua FileProvider, và nhiều app nhận
+            // (Facebook/Instagram) không đọc được file:// URI. Cột DATA là bắt buộc ở API < 29.
+            val values = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                @Suppress("DEPRECATION")
+                put(MediaStore.Images.Media.DATA, file.absolutePath)
+                put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+                put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+            }
+            contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values) ?: run {
+                // Insert fail (một số ROM) → vẫn cho ảnh hiện trong Gallery bằng media scanner.
+                @Suppress("DEPRECATION")
+                MediaScannerConnection.scanFile(
+                    this, arrayOf(file.absolutePath), arrayOf("image/jpeg"), null
+                )
+                Uri.fromFile(file)
+            }
         }
         // Đánh dấu draft này tạo từ Template (kèm template id) → mở lại đúng layout khi bấm trong My Draft
         DraftStore.tag(this, uri.toString(), DraftType.TEMPLATE, templateData.id)

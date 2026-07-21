@@ -16,6 +16,11 @@ class TemplateEditorView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ViewGroup(context, attrs, defStyleAttr) {
 
+    private companion object {
+        // Cạnh dài tối đa của bitmap được phép vẽ lên canvas (hardware canvas giới hạn 100MB).
+        const val MAX_CANVAS_DIM = 3000
+    }
+
     // ── Child views ───────────────────────────────────────
     val drawView: DrawView? by lazy {
         try { DrawView(context) } catch (e: Exception) { null }
@@ -401,7 +406,7 @@ class TemplateEditorView @JvmOverloads constructor(
     // ── Public API ────────────────────────────────────────
 
     fun setBackgroundBitmap(bitmap: Bitmap) {
-        backgroundBitmap = bitmap
+        backgroundBitmap = clampForCanvas(bitmap)
         invalidate()
     }
 
@@ -476,7 +481,28 @@ class TemplateEditorView @JvmOverloads constructor(
     }
 
     // ── Set ảnh vào cell ──────────────────────────────────
-    fun setImageToCell(cell: PhotoCell, bitmap: Bitmap) {
+
+    /**
+     * Chốt chặn cuối: hardware canvas từ chối vẽ bitmap > 100MB
+     * (RuntimeException "Canvas: trying to draw too large bitmap" trong [onDraw]).
+     * Ảnh lẽ ra đã được hạ mẫu lúc decode, nhưng nếu caller đưa vào ảnh quá lớn thì thu nhỏ ở đây.
+     */
+    private fun clampForCanvas(src: Bitmap): Bitmap {
+        val longest = max(src.width, src.height)
+        if (longest <= MAX_CANVAS_DIM) return src
+        val s = MAX_CANVAS_DIM.toFloat() / longest
+        return runCatching {
+            Bitmap.createScaledBitmap(
+                src,
+                (src.width * s).toInt().coerceAtLeast(1),
+                (src.height * s).toInt().coerceAtLeast(1),
+                true
+            )
+        }.getOrDefault(src)
+    }
+
+    fun setImageToCell(cell: PhotoCell, src: Bitmap) {
+        val bitmap = clampForCanvas(src)
         Log.d("TemplateEditorView", "setImageToCell: ${bitmap.width}x${bitmap.height}")
         cell.bitmap = bitmap
 

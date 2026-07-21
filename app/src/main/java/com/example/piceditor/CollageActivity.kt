@@ -64,6 +64,7 @@ import com.example.piceditor.model.TemplateItem
 import com.example.piceditor.model.ToolItem
 import com.example.piceditor.utils.AndroidUtils
 import com.example.piceditor.utils.BarsUtils
+import com.example.piceditor.utils.CropCache
 import com.example.piceditor.utils.FrameImageUtils
 import com.example.piceditor.utils.ImageUtils
 import com.example.piceditor.utilsApp.Constant
@@ -155,6 +156,7 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
     // ── Crop ──
     private var cropFragment: UCropFragment? = null
     private var cropDestUri: Uri? = null
+    private var cropSrcFile: File? = null
 
     // ── Draw panel init flag ──
     private var drawPanelInitialized = false
@@ -611,7 +613,9 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
             return
         }
 
-        val srcFile = File(cacheDir, "crop_src_${System.currentTimeMillis()}.jpg")
+        CropCache.purgeStale(this)
+
+        val srcFile = CropCache.newSrcFile(this)
         try {
             FileOutputStream(srcFile).use { bmp.compress(Bitmap.CompressFormat.JPEG, 95, it) }
         } catch (e: Exception) {
@@ -619,9 +623,10 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
             Toast.makeText(this, getString(R.string.unable_to_read_image_file), Toast.LENGTH_SHORT).show()
             return
         }
+        cropSrcFile = srcFile
 
         val srcUri = Uri.fromFile(srcFile)
-        val destFile = File(cacheDir, "crop_dest_${System.currentTimeMillis()}.jpg")
+        val destFile = CropCache.newDestFile(this)
         cropDestUri = Uri.fromFile(destFile)
 
         val options = UCrop.Options().apply {
@@ -713,6 +718,11 @@ open class CollageActivity : BaseActivityNew<ActivityCollageBinding>(), View.OnC
             supportFragmentManager.beginTransaction().remove(it).commitAllowingStateLoss()
         }
         cropFragment = null
+        // uCrop đã đọc xong ảnh nguồn (crop xong, lỗi, hay user huỷ) → xoá luôn.
+        // File kết quả (crop_dest_*) KHÔNG xoá ở đây: URI của nó được forward sang
+        // FilterCollageActivity — để CropCache.purgeStale dọn ở lần crop sau.
+        CropCache.delete(cropSrcFile)
+        cropSrcFile = null
     }
 
     // ── UCropFragmentCallback ──

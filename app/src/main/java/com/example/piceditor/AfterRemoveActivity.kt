@@ -61,6 +61,7 @@ import com.example.piceditor.draw.test.BeardAdapter
 import com.example.piceditor.model.ToolItem
 import com.example.piceditor.sticker.StickerPanelController
 import com.example.piceditor.utils.BarsUtils
+import com.example.piceditor.utils.CropCache
 import com.example.piceditor.utilsApp.Constant
 import com.example.piceditor.utilsApp.DraftStore
 import com.example.piceditor.utilsApp.DraftType
@@ -110,6 +111,7 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
     // ── Crop (UCropFragment nhúng) ────────────────────────
     private var cropFragment: UCropFragment? = null
     private var cropDestUri: Uri? = null
+    private var cropSrcFile: File? = null
 
     // ─────────────────────────────────────────────────────────────────────────
     // BaseActivityNew overrides
@@ -544,7 +546,9 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
             return
         }
 
-        val srcFile = File(cacheDir, "crop_src_${System.currentTimeMillis()}.png")
+        CropCache.purgeStale(this)
+
+        val srcFile = CropCache.newSrcFile(this, "png")
         try {
             FileOutputStream(srcFile).use {
                 bmp.compress(Bitmap.CompressFormat.PNG, 100, it)
@@ -554,9 +558,10 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
             Toast.makeText(this, getString(R.string.the_photo_was_not_prepared), Toast.LENGTH_SHORT).show()
             return
         }
+        cropSrcFile = srcFile
 
         val srcUri = Uri.fromFile(srcFile)
-        val destFile = File(cacheDir, "crop_dest_${System.currentTimeMillis()}.png")
+        val destFile = CropCache.newDestFile(this, "png")
         cropDestUri = Uri.fromFile(destFile)
 
         val options = UCrop.Options().apply {
@@ -597,6 +602,11 @@ class AfterRemoveActivity : BaseActivityNew<ActivityAfterRemoveBinding>(),
                 .commitAllowingStateLoss()
         }
         cropFragment = null
+        // uCrop đã đọc xong ảnh nguồn (crop xong, lỗi, hay user huỷ) → xoá luôn.
+        // File kết quả (crop_dest_*) KHÔNG xoá ở đây: loadCroppedSubject đọc bằng Glide (async)
+        // — để CropCache.purgeStale dọn ở lần crop sau.
+        CropCache.delete(cropSrcFile)
+        cropSrcFile = null
     }
 
     private fun confirmCrop() {
