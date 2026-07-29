@@ -140,13 +140,16 @@ $CELLS = [ordered]@{
   #   rieng, nen o ve sau de len o ve truoc o cho rect giao nhau. De o tron thu 3 (theo thu tu
   #   toa do) thi no phu 49% polaroid phia tren -> anh polaroid bi vong tron de mat (da thay tren
   #   may ao). Design la polaroid NAM TREN vong tron, nen tron ve truoc, 4 polaroid ve sau.
-  "bd11"=@(@(124,593,930,1358),@(446,304,791,642),@(678,467,982,771,-11),@(139,1212,488,1542),@(375,1369,678,1676,-11))
+  "bd11"=@(@(124,593,930,1358),@(462,323,772,634,8),@(679,466,985,772,-11.2),@(159,1229,468,1538,7.8),@(375,1370,680,1677,-11.2))
   # bd12: luoi 2 cot x 3 hang the "Ace", 3 o anh. Do tay tu luoi toa do: cot phai chay
   #   x 644..1076 (khong phai 1018 nhu detector doan), o tren cao toi y 464.
-  "bd12"=@(@(644,0,1076,464),@(120,770,480,1256),@(644,1570,1076,2000))
-  # bd13: 4 polaroid XAM chong nhau, CA 4 DEU NGHIENG. So do cu de o1/o2 = 0 do vi bi phan loai
-  #   nham la "tron" (fill 0.79-0.88) -> anh nam cheo trong khung. Da do lai giu goc.
-  "bd13"=@(@(233,543,571,1011,-21.5),@(577,583,914,1120,11),@(640,1018,985,1568,5),@(279,1036,624,1585,-20))
+  "bd12"=@(@(653,2,1012,440),@(121,759,478,1229),@(657,1604,1013,2000))
+  # bd13: 4 polaroid NGHIENG MANH, chong nhau. Do tren Temp_ theo dai xam cua O ANH (228-242,
+  #   trung tinh) + erode 3 de dut cau noi. Nen giay cung xam nhung VIEN MOUNT TRANG ngan cach
+  #   nen 4 o van tach ra sach: fill 0.80-0.97 = hinh chu nhat that, goc dang tin.
+  #   CANH BAO: dung nhin overlay roi doan lai. Toi da tung tuong goc -21.5 la "qua nghieng"
+  #   va hoan tac ve 0 — do la SAI, the that su nghieng ngan ay.
+  "bd13"=@(@(233,546,571,1004,-21.8),@(579,589,914,1117,10.8),@(645,1020,984,1567,5.8),@(281,1037,619,1588,-19.8))
   # bd14/bd15: o XAM SANG ~218 -> ngoai dai GRAY -> GRAY2
   "bd14"=@(@(409,848,840,1171),@(409,1220,840,1538))
   "bd15"=@(@(82,405,491,818),@(82,874,491,1287),@(82,1343,491,1756))
