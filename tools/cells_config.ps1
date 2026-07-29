@@ -53,7 +53,7 @@ $CELLS = [ordered]@{
   # gs07 CLASS OF 26: 3 polaroid TRANG nghieng (-10.5/4.5/-5.5) - NONE + minrect white
   "gs07"=@(@(100,138,567,615,-10.5),@(615,796,1054,1239,4.5),@(64,1370,520,1830,-5.5))
   # gs08 Seniors: o phone (-6, giu nguyen - OK) + polaroid (6 deg). Polaroid duoi bi toi -> do mep tay, rect bao kin polaroid
-  "gs08"=@(@(93,451,545,1040,-6),@(612,920,1108,1500,6))
+  "gs08"=@(@(93,451,545,1040,-6),@(643,967,1060,1397,6))
   "gs09"=@(@(519,477,997,814),@(91,1006,600,1370))
   "gs10"=@(,@(222,628,856,1306))
 
@@ -71,7 +71,7 @@ $CELLS = [ordered]@{
   # is07 Lovely Barbie: 2 khung BO GOC, o trong XAM 237 NGHIENG (-3 / 6 deg) -> GRAY mask clip bo goc
   "is07"=@(@(178,210,829,776,-3),@(273,947,1019,1617,6))
   # is08 Save The Moments: 3 khung giay RACH, o trong XAM 237 NGHIENG (13.5 / -2 / -13 deg) -> GRAY mask
-  "is08"=@(@(162,169,708,716,13.5),@(514,730,1060,1276,-2),@(106,1229,652,1776,-13))
+  "is08"=@(@(162,169,708,716,13.5),@(106,1229,652,1776,-13),@(514,730,1060,1276,-2))
   "is09"=@(@(136,552,386,851),@(430,552,989,1536),@(136,895,386,1194),@(136,1238,386,1536))
   # is10 Vinyl: 2 polaroid o trong TRANG 255 (vien 231 tach duoc), NGHIENG (7 / -17 deg) -> NONE + rect xoay
   "is10"=@(@(538,209,1023,709,7),@(161,1028,607,1485,-17))
@@ -263,6 +263,9 @@ $MASKS = @{ "is05"="GRAY"; "is12"="GRAY"; "sm05"="GRAY"; "sp01"="GRAY"; "is06"="
             "bd02"="GRAY"; "cp02"="GRAY"; "cp07"="GRAY"; "cp08"="WHITE";
             "gs01"="GRAY"; "gs05"="WHITE"; "gs02"="WHITE";
             "sp03"="GRAY"; "sp07"="GRAY";
+            # sm06: 5 o BO GOC (ban kinh ~24 don vi — do pixel: tai y=271 vung o bat dau x=77,
+            #   tai y=300 la x=53). Rect vuong tho 4 goc ra nen trang -> can GRAY clip theo hinh.
+            "sm06"="GRAY";
             "sp08"="WHITE"; "sp09"="WHITE";
 
             # ---- Dot import 2 (asset 11..20) ----
