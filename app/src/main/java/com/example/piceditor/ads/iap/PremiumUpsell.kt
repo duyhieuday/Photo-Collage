@@ -49,7 +49,29 @@ object PremiumUpsell {
         return prefs.getPremium() == 1 || prefs.isRemoveAd
     }
 
+    /**
+     * Dialog mời Premium khi free user chạm tính năng premium.
+     *
+     * [onContinue] = hành động user VỪA BẤM (mở template, chọn sticker, áp filter...) và nó
+     * CHẮC CHẮN chạy đúng 1 LẦN nếu user không chủ ý rời đi: bấm Continue, back, hay tap ra
+     * ngoài đều thực hiện hành động đó. Ngoại lệ duy nhất là "Go Premium" — user chủ ý sang
+     * paywall nên KHÔNG mở tính năng sau lưng paywall.
+     *
+     * Trước đây dialog `setCancelable(true)` nhưng KHÔNG có OnDismissListener và chỉ nút
+     * Continue gọi [onContinue] → back/tap-ngoài làm dialog đóng mà hành động không chạy, tức
+     * cú tap của user rơi vào hư không. Càng dễ gặp vì nút Continue đang để alpha 0.2
+     * (dialog_premium_upsell.xml) nên back/tap-ngoài là phản xạ tự nhiên hơn.
+     */
     fun showFeatureDialog(activity: Activity, onContinue: () -> Unit) {
+        // Chạy đúng 1 LẦN dù đi nhánh nào (Continue / back / tap ngoài / lỗi / activity finishing).
+        val proceeded = AtomicBoolean(false)
+        val proceedOnce = {
+            if (proceeded.compareAndSet(false, true)) {
+                // onContinue thường mở interstitial → chặn remove-ads-upsell chồng lên sau khi đóng inter.
+                suppressRemoveAdsOnce = true
+                onContinue()
+            }
+        }
         try {
             val dialog = Dialog(activity)
             val view = LayoutInflater.from(activity).inflate(R.layout.dialog_premium_upsell, null)
@@ -61,20 +83,25 @@ object PremiumUpsell {
             )
             dialog.setCancelable(true)
             view.findViewById<View>(R.id.btnGoPremium).setOnClickListener {
+                // Chủ ý sang paywall → "tiêu" luôn lượt proceed để OnDismissListener không
+                // mở tính năng phía sau PremiumActivity.
+                proceeded.set(true)
                 dialog.dismiss()
                 activity.startActivity(Intent(activity, PremiumActivity::class.java))
             }
-            view.findViewById<View>(R.id.btnContinueFree).setOnClickListener {
-                // onContinue có thể mở interstitial → chặn remove-ads-upsell chồng lên sau khi đóng inter.
-                suppressRemoveAdsOnce = true
-                dialog.dismiss()
-                onContinue()
+            view.findViewById<View>(R.id.btnContinueFree).setOnClickListener { dialog.dismiss() }
+            // Đóng kiểu nào (Continue / back / tap ngoài) cũng thực hiện hành động đúng 1 lần.
+            // Trừ khi activity đang chết: back 2 nhịp liên tiếp vừa đóng dialog vừa rời màn thì
+            // onDismiss vẫn bắn — lúc đó mở tính năng nữa là đi ngược ý user (và startActivity
+            // trên activity đang finish dễ lỗi).
+            dialog.setOnDismissListener {
+                if (!activity.isFinishing && !activity.isDestroyed) proceedOnce()
             }
-            if (!activity.isFinishing) dialog.show() else onContinue()
+            if (!activity.isFinishing) dialog.show() else proceedOnce()
         } catch (e: Exception) {
             // Lỗi gì cũng không chặn người dùng — cứ cho tiếp tục
             e.printStackTrace()
-            onContinue()
+            proceedOnce()
         }
     }
 
