@@ -41,6 +41,20 @@ $PXAREA = ($LOGIC_W / [double]$AW) * ($LOGIC_H / [double]$AH)   # dien tich logi
 if ($Ids.Count -eq 0) { $Ids = @($CELLS.Keys) }
 $Ids = @($Ids | ForEach-Object { $_ -split ',' } | Where-Object { $_ -match '\S' } | ForEach-Object { $_.Trim().ToLower() })
 
+# Hop chu nhat cua mot cell (da tinh goc xoay) -> @(l,t,r,b)
+function RotBounds([object[]]$cell) {
+  $cl = [double]$cell[0]; $ct = [double]$cell[1]; $cr = [double]$cell[2]; $cb = [double]$cell[3]
+  $dg = 0.0; if ($cell.Count -ge 5) { $dg = [double]$cell[4] }
+  if ($dg -eq 0.0) { return @($cl, $ct, $cr, $cb) }
+  $rd = [math]::PI * $dg / 180.0
+  $co = [math]::Cos($rd); $si = [math]::Sin($rd)
+  $mx = ($cl + $cr) / 2.0; $my = ($ct + $cb) / 2.0
+  $hw = ($cr - $cl) / 2.0; $hh = ($cb - $ct) / 2.0
+  $ex = [math]::Abs($hw * $co) + [math]::Abs($hh * $si)
+  $ey = [math]::Abs($hw * $si) + [math]::Abs($hh * $co)
+  return @(($mx - $ex), ($my - $ey), ($mx + $ex), ($my + $ey))
+}
+
 $report = @()
 
 foreach ($id in $Ids) {
@@ -52,6 +66,19 @@ foreach ($id in $Ids) {
 
   $cellList = @($CELLS[$id] | Where-Object { $_ })
   if ($cellList.Count -eq 0) { continue }
+
+  # App co bat CellOwnerMask cho template nay khong? Cong bat = co 2 rect chong hoac ke sat
+  # trong 8 don vi (giong CellOwnerMask.anyOverlap). Neu co thi muc TRAN da duoc app xu ly,
+  # bao ra chi de biet, khong phai loi.
+  $ownerFix = $false
+  for ($a = 0; $a -lt $cellList.Count -and -not $ownerFix; $a++) {
+    $ba = RotBounds $cellList[$a]
+    for ($b = $a + 1; $b -lt $cellList.Count; $b++) {
+      $bb2 = RotBounds $cellList[$b]
+      if (($ba[0] - 8) -lt $bb2[2] -and ($ba[2] + 8) -gt $bb2[0] -and
+          ($ba[1] - 8) -lt $bb2[3] -and ($ba[3] + 8) -gt $bb2[1]) { $ownerFix = $true; break }
+    }
+  }
 
   # --- doc anh o do phan giai phan tich, NearestNeighbor de khong che them mau xam gia ---
   $srcImg = [System.Drawing.Image]::FromFile($path)
@@ -212,8 +239,13 @@ foreach ($id in $Ids) {
       if ($ci -eq $owner) { continue }
       $v = [int]$paintCnt["$lab`:$ci"]
       if ($v * $PXAREA -ge $MinArea) {
-        $report += [pscustomobject]@{ Id = $id; Kind = 'TRAN'; Cell = ("o{0}" -f ($ci + 1)); Into = ("o{0}" -f ($owner + 1)); Area = [int]($v * $PXAREA)
-          Note = ("o{0} ve sau nen dam {1}% dien tich slot cua o{2}" -f ($ci + 1), [int](100 * $v / $size), ($owner + 1)) }
+        $kind = if ($ownerFix) { 'TRAN-DA-FIX' } else { 'TRAN' }
+        $note = if ($ownerFix) {
+          "o{0} chong slot o{1} {2}% - app da cat bang CellOwnerMask" -f ($ci + 1), ($owner + 1), [int](100 * $v / $size)
+        } else {
+          "o{0} ve sau nen dam {1}% dien tich slot cua o{2}" -f ($ci + 1), [int](100 * $v / $size), ($owner + 1)
+        }
+        $report += [pscustomobject]@{ Id = $id; Kind = $kind; Cell = ("o{0}" -f ($ci + 1)); Into = ("o{0}" -f ($owner + 1)); Area = [int]($v * $PXAREA); Note = $note }
       }
     }
     $miss = $size - $painted

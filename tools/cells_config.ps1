@@ -217,14 +217,17 @@ $CELLS = [ordered]@{
   "sp13"=@(@(568,34,1089,995),@(34,1005,555,1966),@(568,1007,1089,1968))
   "sp14"=@(,@(98,330,1024,1197))
   "sp17"=@(@(214,522,896,1250),@(300,1328,821,1887))
-  # sp16: 2 vung XAM ben phai dai phim CHEO. Canh trai cua moi vung nghieng ~5 do -> rect bao
-  #   trum, GRAY mask clip theo dung hinh.
-  #   (sp15 cung kieu nay nhung 3 dai cheo co y CHONG nhau -> khong bieu dien duoc, da bo.)
-  #   O TREN truoc do bi hut: bbox that cua slot la (591,0,1125,1007) - vi dai CHEO nen goc
-  #   duoi-trai thop ra ngoai rect (620,0,1125,980) -> con vien xam khong co anh doc canh trai
-  #   va day. Noi ra dung bbox; phan chong len o duoi (y 989..1007) da co mask so huu tung o
-  #   (CellOwnerMask) lo, khong tran sang nhau.
-  "sp16"=@(@(591,0,1125,1007),@(660,980,1125,2000))
+  # sp16: THUC RA CO 5 O, khong phai 2. Ca trang giay nghieng -5.5 do: cot TRAI 3 panel + dai
+  #   phim doc o giua + cot PHAI 2 panel.
+  #   Truoc day chi bat duoc 2 panel PHAI vi chung mau XAM; 3 panel TRAI mau TRANG nam tren nen
+  #   TRANG nen khong dai mau nao tach ra, nhin Temp_ bang mat cung khong thay (o trang tren nen
+  #   trang). Diff Temp_/Thumb_ moi lo ra: designer dat 5 anh. Xem tools\audit_missing.ps1.
+  #   Do bang tools\measure_diff.ps1 -Id sp16 -ForceDeg -5.5 (min-area-rect tren vung diff).
+  #   Bo GRAY mask -> NONE: mask mot mau khong the vua an o trang vua an o xam. Voi NONE thi
+  #   moi panel la mot HINH CHU NHAT XOAY dung nghia nen anh fill khop chinh xac; rect nao cham
+  #   bien anh thi cu de tran ra ngoai canvas (canvas tu cat), nho vay canh doc theo dai phim
+  #   van dung mep panel.
+  "sp16"=@(@(-34,-14,521,675,-5.5),@(-33,694,592,1365,-5.5),@(-26,1386,655,2031,-5.5),@(638,-27,1167,985,-5.5),@(744,1007,1171,2011,-5.5))
   # sp18: luoi 2x2 FULL-BLEED, o duoi-trai la khoi chu xam -> 3 o anh. Khung toan TRANG khong
   #   co vien nen detector khong tach duoc; do tay tu tools\grid_measure.ps1.
   "sp18"=@(@(0,0,563,995),@(563,0,1125,995),@(563,995,1125,2000))
@@ -299,8 +302,10 @@ $MASKS = @{ "is05"="GRAY"; "is12"="GRAY"; "sm05"="GRAY"; "sp01"="GRAY"; "is06"="
             "sp12"="WHITE";   # 3 o TRON + 1 o PILL
             "gs18"="WHITE";   # vien LUON SONG
             "sm14"="GRAY";    # 3 o BLOB huu co
-            "sp14"="GRAY";    # the BO GOC -> rect vuong an mat 4 goc mount
-            "sp16"="GRAY" }   # 2 vung canh CHEO
+            "sp14"="GRAY" }   # the BO GOC -> rect vuong an mat 4 goc mount
+            # sp16 DA BO mask: 5 panel deu la chu nhat xoay -5.5 do, ma 3 panel trai mau TRANG
+            #   + 2 panel phai mau XAM nen khong dai mau nao phuc vu duoc ca hai. NONE + rect
+            #   xoay tran ra ngoai canvas la khop chinh xac. Xem ghi chu o $CELLS.
             # Tat ca template con lai (o chu nhat, ke ca nghieng) -> NONE. Xem quy tac o tren.
 # Ghi chu Sports: sp02/sp06/sp10 = o CHU NHAT -> NONE (mask GRAY toan cuc gay bleed cheo khi rect nghieng cham lo xam
 #   o ben canh; NONE gioi han anh trong rect tung o). sp03 (tem rang cua) + sp07 giu GRAY (can clip hinh khong-chu-nhat).
