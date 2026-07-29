@@ -365,7 +365,9 @@ class TemplateEditorView @JvmOverloads constructor(
         if (scale <= 0f) return null
         val logicX = (x - dx) / scale
         val logicY = (y - dy) / scale
-        return cells.find { cellContains(it, logicX, logicY) }
+        // Duyet NGUOC danh sach: cells ve theo thu tu list nen o cuoi nam TREN CUNG.
+        // Dung find() thi o duoi cung (vd vong tron lon bd11) an het cham cua cac o nam tren no.
+        return cells.findLast { cellContains(it, logicX, logicY) }
     }
 
     // Hit-test trong khong gian logic, co tinh goc xoay cua o.
