@@ -20,8 +20,8 @@ $CELLS = [ordered]@{
   "bd10"=@(@(608,424,1083,889),@(608,935,1083,1402),@(608,1449,1083,1924),@(88,1449,562,1924))
 
   # ---- Couple ----
-  # cp01 Anniversary: 2 o TRANG nghieng (top -6.5) - NONE + minrect white
-  "cp01"=@(@(179,281,983,701,-7),@(151,674,910,1290,-3.4))
+  # cp01 Anniversary: so do CU (nghieng -7 / -3.4) lam o khong khop khung nen template bi an
+  #   khoi catalog. Do lai bang diff Temp_/Thumb_ o dot import 2 -> xem muc "Couple 01, 11..20".
   # cp02 giay rach: 3 dai XAM 232 + divider TRANG -> GRAY mask (giu mep rach)
   "cp02"=@(@(0,0,1125,656),@(0,661,1125,1334),@(0,1331,1125,2000))
   # cp03 film strip: khung NGHIENG ~ -12.7 deg (rect = khung thang quanh tam + goc xoay)
@@ -127,6 +127,128 @@ $CELLS = [ordered]@{
   "sp09"=@(,@(183,135,945,898))
   # sp10: 2 o polaroid XAM nghieng (16 / -12.5) -> GRAY
   "sp10"=@(@(149,161,745,836,16),@(324,1109,946,1825,-12.5))
+
+  # ==================================================================================
+  # Dot import 2 (asset 11..20 moi) - do bang tools\cells2.ps1 (diff Temp_/Thumb_ giao
+  # dai mau phang) + min-area rotated rect. Da doi chieu tung cai voi Thumb_ qua
+  # tools\verify_sheet.ps1 de xac nhan DUNG so o.
+  # ==================================================================================
+
+  # ---- Birthday 11..20 ----
+  # bd11: 1 o lon giua (vong tron) + 4 polaroid TRANG quanh -> WHITE mask clip dung hinh.
+  #   THU TU QUAN TRONG: o tron phai dung DAU. Cells ve theo thu tu list, moi o clip theo rect
+  #   rieng, nen o ve sau de len o ve truoc o cho rect giao nhau. De o tron thu 3 (theo thu tu
+  #   toa do) thi no phu 49% polaroid phia tren -> anh polaroid bi vong tron de mat (da thay tren
+  #   may ao). Design la polaroid NAM TREN vong tron, nen tron ve truoc, 4 polaroid ve sau.
+  "bd11"=@(@(124,593,930,1358),@(446,304,791,642),@(678,467,982,771,-11),@(139,1212,488,1542),@(375,1369,678,1676,-11))
+  # bd12: luoi 2 cot x 3 hang the "Ace", 3 o anh. Do tay tu luoi toa do: cot phai chay
+  #   x 644..1076 (khong phai 1018 nhu detector doan), o tren cao toi y 464.
+  "bd12"=@(@(644,0,1076,464),@(120,770,480,1256),@(644,1570,1076,2000))
+  # bd13: 4 polaroid XAM chong nhau, CA 4 DEU NGHIENG. So do cu de o1/o2 = 0 do vi bi phan loai
+  #   nham la "tron" (fill 0.79-0.88) -> anh nam cheo trong khung. Da do lai giu goc.
+  "bd13"=@(@(233,543,571,1011,-21.5),@(577,583,914,1120,11),@(640,1018,985,1568,5),@(279,1036,624,1585,-20))
+  # bd14/bd15: o XAM SANG ~218 -> ngoai dai GRAY -> GRAY2
+  "bd14"=@(@(409,848,840,1171),@(409,1220,840,1538))
+  "bd15"=@(@(82,405,491,818),@(82,874,491,1287),@(82,1343,491,1756))
+  "bd16"=@(,@(240,605,881,1461,1))
+  "bd17"=@(,@(135,780,986,1636))
+  "bd18"=@(,@(176,345,945,1538))
+  # bd19: 2 the nghieng 10.5, MOI THE bi 1 thanh HONG chia doi -> 4 o (khong phai 2).
+  #   Quet doc theo truc cua the: thanh chia nam dung t=0.50 tren ca hai the.
+  #   LUU Y khi chia o NGHIENG: khong cat thang toa do duoc, vi moi o xoay quanh TAM RIENG
+  #   cua no. Phai lay tam moi nua roi XOAY offset do quanh tam the (10.5 do) de ra tam that.
+  "bd19"=@(@(658,307,1042,758,10.5),@(181,476,565,928,10.5),@(571,787,955,1220,10.5),@(93,957,477,1391,10.5))
+  # bd20: 1 o HINH TRON rang cua -> rect bao trum + WHITE mask clip theo vien rang cua
+  "bd20"=@(,@(210,589,908,1287))
+
+  # ---- Couple 01, 11..20 ----
+  # cp01: mo lai (truoc bi an vi o khong khop khung). 2 o TRANG; o TREN nghieng -6.5 do
+  #   (so do cu de 0 vi bi phan loai nham la "tron"; ban do tay tu 2026-06 cung ra -7).
+  #   O DUOI do tay tu luoi toa do: vung trang chay x 156..924, y 770..1280.
+  "cp01"=@(@(235,282,994,821,-6.5),@(156,770,924,1280))
+  "cp11"=@(,@(311,638,818,1392))
+  "cp12"=@(,@(255,518,892,1497))
+  # cp13: luoi 2 cot x 3 hang, o giua-phai la chu -> 5 o anh. Vach phan cach manh nen
+  #   phai do o AW=600 (AW=300 lam 5 o dinh thanh 1).
+  "cp13"=@(@(13,11,557,664),@(568,15,1110,665),@(13,673,557,1323),@(13,1335,557,1985),@(568,1335,1112,1989))
+  "cp14"=@(,@(206,659,920,1373,-15))
+  # cp15: o hinh VOM (arch) -> rect bao trum + WHITE mask clip theo vom
+  "cp15"=@(,@(202,371,922,1475))
+  "cp16"=@(@(135,300,611,762),@(536,1189,1016,1651))
+  "cp17"=@(@(450,296,995,850,-4),@(151,1075,708,1649,8.5))
+  # cp18: CHI 3 O, cot PHAI. Cot TRAI la artwork Zootopia IN CUNG trong Temp_CP18.png (mo file
+  #   nguon ra thay ro: trai co hinh, phai trang tron) — khong phai o anh. Truoc do minh chia
+  #   deu 2x6 vi thay Thumb_ co 6 "anh", khong nhan ra 3 anh trai la hinh in san.
+  "cp18"=@(@(562,0,1125,667),@(562,667,1125,1334),@(562,1334,1125,2000))
+  "cp19"=@(@(131,379,998,968),@(482,1330,984,1829,0.5))
+  "cp20"=@(,@(212,423,930,1138,1))
+
+  # ---- Glad season 11..20 ----
+  "gs11"=@(,@(177,573,841,1253,2))
+  "gs12"=@(@(49,289,551,799),@(461,1017,892,1463))
+  "gs13"=@(,@(197,575,901,1313,0.5))
+  "gs14"=@(,@(54,740,910,1271,3.5))
+  "gs15"=@(@(160,514,569,1058,-10),@(621,1165,1021,1679,14.5))
+  "gs16"=@(,@(319,563,832,1092))
+  "gs17"=@(,@(300,754,818,1280))
+  "gs18"=@(,@(101,540,1024,1659))
+  "gs19"=@(,@(87,1226,578,1593,6))
+  # gs20: detector con bat them 1 dai doc hep o goc tren-phai (964,51,1099,423) - doi chieu
+  #   Thumb_ chi co 1 anh -> da bo dai do.
+  "gs20"=@(,@(259,687,855,1306))
+
+  # ---- IG Story 16..17 (is18 Temp_=Thumb_ nen khong dung duoc) ----
+  "is16"=@(,@(259,477,862,1081))
+  "is17"=@(@(106,153,570,622,-0.5),@(353,686,864,1212,-7),@(576,1308,1124,1900,-0.5))
+
+  # ---- Sports 11..20 ----
+  "sp11"=@(,@(98,375,1028,1625))
+  # sp12 "80": 3 o TRON ben trai + 1 o PILL lon ben phai. Cac hinh nay khong phai chu nhat nen
+  #   rect chi BAO TRUM, WHITE mask lo phan clip theo dung hinh tron/pill.
+  "sp12"=@(@(60,664,444,1000),@(500,660,1066,1850),@(64,1090,416,1424),@(50,1530,430,1860))
+  # sp13: luoi 3 o XAM, vach phan cach manh -> do o AW=600
+  "sp13"=@(@(568,34,1089,995),@(34,1005,555,1966),@(568,1007,1089,1968))
+  "sp14"=@(,@(98,330,1024,1197))
+  "sp17"=@(@(214,522,896,1250),@(300,1328,821,1887))
+  # sp16: 2 vung XAM ben phai dai phim CHEO. Canh trai cua moi vung nghieng ~5 do -> rect bao
+  #   trum, GRAY mask clip theo dung hinh. Hai rect roi nhau theo y nen khong tranh hit-test.
+  #   (sp15 cung kieu nay nhung 3 dai cheo co y CHONG nhau -> khong bieu dien duoc, da bo.)
+  "sp16"=@(@(620,0,1125,980),@(660,980,1125,2000))
+  # sp18: luoi 2x2 FULL-BLEED, o duoi-trai la khoi chu xam -> 3 o anh. Khung toan TRANG khong
+  #   co vien nen detector khong tach duoc; do tay tu tools\grid_measure.ps1.
+  "sp18"=@(@(0,0,563,995),@(563,0,1125,995),@(563,995,1125,2000))
+  # sp19: 3 o XAM (217,217,217) xep bac thang, DINH LIEN NHAU thanh 1 component nen
+  #   connected-components khong tach duoc. Do bang cach quet bien trai/phai theo TUNG HANG
+  #   de tim buoc thang (chinh xac hon han doc luoi bang mat, vd o1 that ra rong toi 408
+  #   chu khong phai 296).
+  "sp19"=@(@(0,0,408,600),@(302,600,825,1420),@(720,1420,1125,2000))
+  "sp20"=@(@(56,281,544,1921),@(566,356,1058,998),@(566,1148,1058,1887))
+
+  # ---- Summer vibe 10, 12..20 (sm11 thieu Thumb_ nen khong do duoc) ----
+  # sm10: o hinh VOM -> WHITE mask
+  "sm10"=@(,@(79,0,1024,1325))
+  "sm12"=@(@(251,30,870,657),@(251,687,870,1313),@(251,1343,870,1970))
+  # sm13: luoi 7 o (3 tren + 1 dai giua + 3 duoi)
+  "sm13"=@(@(75,424,371,724),@(409,424,709,728),@(750,428,1046,728),@(75,762,1046,1328),@(75,1362,371,1925),@(412,1362,708,1925),@(750,1362,1046,1925))
+  # sm14: 4 o hinh BLOB huu co xep doc; AW=600 tach duoc 3 -> GRAY mask clip theo hinh blob
+  "sm14"=@(@(214,261,909,855),@(150,784,977,1348),@(231,1293,894,1813))
+  "sm15"=@(@(574,184,1058,649),@(8,203,484,664),@(45,852,472,1261),@(585,1107,1102,1602),@(30,1437,491,1857))
+  # sm16: luoi 2x2 o TRANG duoi tieu de NEW DROP -> do o AW=600
+  "sm16"=@(@(139,669,557,1046),@(566,671,988,1048),@(137,1055,557,1434),@(568,1050,986,1434))
+  # sm17: 4 o TRANG (do cu chi ra 2 vi nguong loc qua chat + do phan giai phan tich qua cao
+  #   lam mep rang cua noi o vao nen roi bi loai). Do lai o AW=450 -> du 4, da verify overlay.
+  #   O3 la polaroid CO MOUNT: so do theo khung bao ca mount, ma voi NONE thi rect chinh la anh
+  #   -> phai thu ve vung anh ben trong (day 1508 -> 1455, doc theo luoi toa do).
+  "sm17"=@(@(62,62,538,775),@(685,262,922,491,-1.2),@(440,755,1050,1455,2.8),@(62,1498,675,1938))
+  # sm18: luoi 2 cot x 3 hang, o GIUA-TRAI la panel chu -> 5 o anh. Truoc chi co 3 vi
+  #   Thumb_ de trong 2 o cot phai; "Thumb_ khong dien" KHONG co nghia la khong phai slot.
+  "sm18"=@(@(0,0,560,662),@(562,0,1122,662),@(562,665,1122,1332),@(0,1332,560,1998),@(562,1332,1122,1998))
+  # sm19 "Sea you": 4 o TRANG bo goc. Truoc chi co 3 — thieu o NHO duoi-trai, vi trong Thumb_
+  #   designer dat vao do mot the chu "beach" nen minh tuong la trang tri; mo Temp_ ra thi no
+  #   la o trang rong nhu 3 o kia. Giu NONE: goc bo rat nhe, ma WHITE mask se an ca nen troi
+  #   (gan trang) nam trong rect.
+  "sm19"=@(@(94,773,536,1328),@(626,927,952,1280),@(565,1368,1012,1828),@(142,1400,490,1722))
+  "sm20"=@(,@(248,675,870,1568))
 }
 
 # Mask clip anh dung theo pixel khung (chinh xac, o chi can bao trum):
@@ -141,6 +263,30 @@ $MASKS = @{ "is05"="GRAY"; "is12"="GRAY"; "sm05"="GRAY"; "sp01"="GRAY"; "is06"="
             "bd02"="GRAY"; "cp02"="GRAY"; "cp07"="GRAY"; "cp08"="WHITE";
             "gs01"="GRAY"; "gs05"="WHITE"; "gs02"="WHITE";
             "sp03"="GRAY"; "sp07"="GRAY";
-            "sp08"="WHITE"; "sp09"="WHITE" }
+            "sp08"="WHITE"; "sp09"="WHITE";
+
+            # ---- Dot import 2 (asset 11..20) ----
+            # QUY TAC (rut ra sau khi user bao 12 template lech, 2026-07-28):
+            #   O HINH CHU NHAT (ke ca nghieng) -> KHONG dung mask, de NONE.
+            #   Mask theo mau la mask TOAN CUC: no chocc thung MOI pixel dung dai mau nam trong
+            #   cellRect, ke ca VIEN TRANG (mount) cua polaroid -> anh trum len mount thay vi
+            #   nam gon trong do (cp17/cp01/cp12/bd13). Them nua, pixel MEP da bi anti-alias thi
+            #   nam ngoai dai -> con nguyen -> tao vanh sang mong dev tren anh (sm13/sm16/sp18).
+            #   NONE thi anh fill dung cellRect, clip goi -> khong tran, khong vanh.
+            #   Chi dung mask khi o KHONG phai chu nhat, vi luc do rect chi bao trum va mask moi
+            #   la thu cat dung hinh: bd11 (tron), bd20 (tron rang cua), cp15+sm10 (vom),
+            #   sp12 (tron+pill), sm14 (blob), gs18 (vien luon song), sp16 (canh cheo).
+            # CHI 10 template nay con mask, vi o cua chung KHONG phai chu nhat:
+            "bd11"="WHITE";   # o lon = vong TRON
+            "bd20"="WHITE";   # o TRON rang cua
+            "cp14"="WHITE";   # sticker trai tim DE LEN o -> mask chua sticker lai
+            "cp15"="WHITE";   # o hinh VOM (pill)
+            "sm10"="WHITE";   # o hinh VOM
+            "sp12"="WHITE";   # 3 o TRON + 1 o PILL
+            "gs18"="WHITE";   # vien LUON SONG
+            "sm14"="GRAY";    # 3 o BLOB huu co
+            "sp14"="GRAY";    # the BO GOC -> rect vuong an mat 4 goc mount
+            "sp16"="GRAY" }   # 2 vung canh CHEO
+            # Tat ca template con lai (o chu nhat, ke ca nghieng) -> NONE. Xem quy tac o tren.
 # Ghi chu Sports: sp02/sp06/sp10 = o CHU NHAT -> NONE (mask GRAY toan cuc gay bleed cheo khi rect nghieng cham lo xam
 #   o ben canh; NONE gioi han anh trong rect tung o). sp03 (tem rang cua) + sp07 giu GRAY (can clip hinh khong-chu-nhat).
