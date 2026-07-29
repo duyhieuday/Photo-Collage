@@ -91,7 +91,11 @@ $CELLS = [ordered]@{
   #   Rect = bbox bao trum gray (mask tu cat). Thu tu: left-upper truoc, top-right SAU
   #   (de o top-right ve de len, khong bi anh o trai tran vao goc chong cheo L-shape).
   #   o center NGHIENG 9.5 deg.
-  "sm02"=@(@(149,520,588,957),@(487,366,1024,704),@(149,989,585,1425),@(612,805,978,1261,9.5),@(538,1285,1004,1650))
+  #   O TEM NGHIENG phai ve TRUOC o left-lower: rect xoay cua no thop ra x~577 o goc duoi-trai,
+  #   ma o left-lower chay toi x=586 (do pixel hang y=1150..1240), nen ve sau thi anh tem
+  #   dam mot vet vao o trai (da thay tren may ao: vet do an vao anh xanh). Slot tem that su
+  #   bat dau tu x=620 nen doi cho la du - khong can sua toa do.
+  "sm02"=@(@(149,520,588,957),@(487,366,1024,704),@(612,805,978,1261,9.5),@(149,989,585,1425),@(538,1285,1004,1650))
   # sm03 Summer Time: 3 trang so tay XAM 237 NGHIENG (9 / -10.5 / 14.5 deg) - minrect gray
   "sm03"=@(@(149,367,733,751,9),@(442,863,1025,1248,-10.5),@(404,1450,988,1834,14.5))
   # sm04 Summer Break: 2 o XAM ~222 NGHIENG (-8 / 4.5 deg) - minrect gray2 + NONE
@@ -214,9 +218,13 @@ $CELLS = [ordered]@{
   "sp14"=@(,@(98,330,1024,1197))
   "sp17"=@(@(214,522,896,1250),@(300,1328,821,1887))
   # sp16: 2 vung XAM ben phai dai phim CHEO. Canh trai cua moi vung nghieng ~5 do -> rect bao
-  #   trum, GRAY mask clip theo dung hinh. Hai rect roi nhau theo y nen khong tranh hit-test.
+  #   trum, GRAY mask clip theo dung hinh.
   #   (sp15 cung kieu nay nhung 3 dai cheo co y CHONG nhau -> khong bieu dien duoc, da bo.)
-  "sp16"=@(@(620,0,1125,980),@(660,980,1125,2000))
+  #   O TREN truoc do bi hut: bbox that cua slot la (591,0,1125,1007) - vi dai CHEO nen goc
+  #   duoi-trai thop ra ngoai rect (620,0,1125,980) -> con vien xam khong co anh doc canh trai
+  #   va day. Noi ra dung bbox; phan chong len o duoi (y 989..1007) da co mask so huu tung o
+  #   (CellOwnerMask) lo, khong tran sang nhau.
+  "sp16"=@(@(591,0,1125,1007),@(660,980,1125,2000))
   # sp18: luoi 2x2 FULL-BLEED, o duoi-trai la khoi chu xam -> 3 o anh. Khung toan TRANG khong
   #   co vien nen detector khong tach duoc; do tay tu tools\grid_measure.ps1.
   "sp18"=@(@(0,0,563,995),@(563,0,1125,995),@(563,995,1125,2000))

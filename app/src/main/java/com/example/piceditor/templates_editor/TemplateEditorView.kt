@@ -52,6 +52,10 @@ class TemplateEditorView @JvmOverloads constructor(
     private val cellPaint    = Paint(Paint.ANTI_ALIAS_FLAG)
     private val overlayPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val bgPaint      = Paint(Paint.ANTI_ALIAS_FLAG)
+    // Cat lop anh cua mot o theo mask so huu cua chinh o do (DST_IN: giu phan mask khong trong suot).
+    private val ownerClipPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN)
+    }
 
     var activeCell: PhotoCell? = null
         private set
@@ -207,6 +211,15 @@ class TemplateEditorView @JvmOverloads constructor(
                 cell.rect.right  - cellSpacing, cell.rect.bottom - cellSpacing
             ) else RectF(cell.rect)
 
+            // O co rect chong o khac: ve vao lop rieng roi cat theo mask SO HUU cua o, de anh
+            // khong lot sang slot cua o ben canh (xem CellOwnerMask). Chi cac template co rect
+            // chong nhau moi co ownerMask, con lai di duong cu.
+            val ownMask = cell.ownerMask
+            val ownRect = cell.ownerMaskRect
+            val layerId = if (ownMask != null && ownRect != null && cell.bitmap != null) {
+                canvas.saveLayer(ownRect, null)
+            } else -1
+
             canvas.save()
 
             // Khung anh nghieng: xoay he toa do quanh tam o truoc khi clip + ve.
@@ -249,6 +262,11 @@ class TemplateEditorView @JvmOverloads constructor(
             }
 
             canvas.restore()
+
+            if (layerId >= 0 && ownMask != null && ownRect != null) {
+                canvas.drawBitmap(ownMask, null, ownRect, ownerClipPaint)
+                canvas.restoreToCount(layerId)
+            }
         }
 
         // 5. Mask overlay — fill logic space

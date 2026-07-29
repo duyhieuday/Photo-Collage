@@ -16,4 +16,9 @@ data class PhotoCell(
     // Nguồn ảnh gốc đã fill vào ô (content:// hoặc file://) — để lưu/khôi phục draft.
     // Đặt NGOÀI primary constructor nên không tính vào equals()/hashCode()/copy().
     var sourceUri: Uri? = null
+
+    // Mask rieng cua o (xem CellOwnerMask): chi khac null khi rect o nay chong rect o khac VA
+    // mask mau lam anh o nay lot sang slot cua o kia. Null = ve nhu cu.
+    var ownerMask: Bitmap? = null
+    var ownerMaskRect: RectF? = null
 }

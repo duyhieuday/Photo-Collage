@@ -885,7 +885,21 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
                                 MaskMode.NONE  -> null
                             }
 
-                            TemplateLoadResult(rawBmp, maskBmp, targetW.toFloat(), targetH.toFloat())
+                            // Mask mau la mask TOAN CUC: o nao rect chong o khac se dam anh sang
+                            // slot cua o do (thay ro o sm14/sm02). Tinh truoc mask so huu cho
+                            // rieng nhung template co rect chong nhau — cac template con lai
+                            // khong dung toi nen khong doi gi.
+                            val rectList = templateData.cellRects.map { RectF(it) }
+                            val angleList = TemplateCells.angles[templateData.id].orEmpty()
+                            val ownerMasks =
+                                if (maskBmp != null && CellOwnerMask.anyOverlap(rectList, angleList)) {
+                                    runCatching { CellOwnerMask.build(maskBmp, rectList, angleList) }
+                                        .getOrNull()
+                                } else null
+
+                            TemplateLoadResult(
+                                rawBmp, maskBmp, targetW.toFloat(), targetH.toFloat(), ownerMasks
+                            )
                         }
 
                         binding.templateEditorView.templateLogicW = result.logicW
@@ -897,7 +911,12 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
                         val angleList = TemplateCells.angles[templateData.id].orEmpty()
                         binding.templateEditorView.cells =
                             templateData.cellRects.mapIndexed { i, rect ->
-                                PhotoCell(RectF(rect), angle = angleList.getOrElse(i) { 0f })
+                                PhotoCell(RectF(rect), angle = angleList.getOrElse(i) { 0f }).apply {
+                                    result.ownerMasks?.getOrNull(i)?.let {
+                                        ownerMask = it.mask
+                                        ownerMaskRect = it.rect
+                                    }
+                                }
                             }.toMutableList()
 
                         if (DEBUG_FILL_CELLS) {
@@ -931,7 +950,9 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
         val raw: Bitmap,
         val mask: Bitmap?,
         val logicW: Float,
-        val logicH: Float
+        val logicH: Float,
+        // Mask so huu tung o — chi khac null voi template co rect chong nhau (xem CellOwnerMask).
+        val ownerMasks: List<CellOwnerMask.Result?>? = null
     )
 
     // -- Gallery --
