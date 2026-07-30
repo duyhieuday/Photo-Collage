@@ -153,7 +153,9 @@ $CELLS = [ordered]@{
   #   green TL (443,303,792,639) | pink TR (652,437,1012,797) | pink BL (139,1209,489,1545) |
   #   green B (348,1343,708,1703) | tron (123,593,932,1358). Rect = hinh vuong 370/380 quanh tam
   #   cua tung long khung, giu nguyen goc nghieng.
-  "bd11"=@(@(123,593,932,1358),@(432,286,802,656,8),@(642,427,1022,807,-11.2),@(129,1192,499,1562,7.8),@(338,1333,718,1713,-11.2))
+  #   Rect = DUNG bbox long khung (khong noi thua): noi thua thi 4 goc rect an ra giay nhan, ma
+  #   giay co diem sang >240 nen lot vai vet mau ra ngoai khung.
+  "bd11"=@(@(123,593,932,1358),@(441,295,793,647,8),@(651,436,1013,798,-11.2),@(138,1201,490,1553,7.8),@(347,1342,709,1704,-11.2))
   # bd12: luoi 2 cot x 3 hang the "Ace", 3 o anh. Do tay tu luoi toa do: cot phai chay
   #   x 644..1076 (khong phai 1018 nhu detector doan), o tren cao toi y 464.
   "bd12"=@(@(653,2,1012,440),@(121,759,478,1229),@(657,1604,1013,2000))

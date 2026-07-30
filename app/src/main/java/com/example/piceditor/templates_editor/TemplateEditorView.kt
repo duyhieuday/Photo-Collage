@@ -442,6 +442,42 @@ class TemplateEditorView @JvmOverloads constructor(
 
     // ── Mask creation ─────────────────────────────────────
 
+    /**
+     * No rong vung TRONG SUOT cua mask ra [r] pixel.
+     *
+     * Vi sao can: mep trong cua moi khung bi ANTI-ALIAS, nen mot vanh 1-2 pixel co mau NAM GIUA
+     * mau o va mau vien -> khong dat nguong nao ca -> mask khong choc thung -> render ra mot
+     * VANH TRANG MANH quanh moi anh (ban mau cua designer khong co vanh do). No ra 2 pixel thi
+     * an het vanh anti-alias; phan an lan vao vien mau chi 1-2 pixel, khong nhin ra.
+     *
+     * Lam theo 2 luot ngang/doc (max-filter tach chieu) cho nhanh: O(2*r*N) thay vi O(r^2*N).
+     */
+    private fun dilateTransparent(pixels: IntArray, w: Int, h: Int, r: Int) {
+        if (r <= 0) return
+        val rowHit = BooleanArray(w * h)
+        for (y in 0 until h) {
+            val base = y * w
+            for (x in 0 until w) {
+                var hit = false
+                var i = max(0, x - r)
+                val end = min(w - 1, x + r)
+                while (i <= end) { if (pixels[base + i] == 0) { hit = true; break }; i++ }
+                rowHit[base + x] = hit
+            }
+        }
+        val outHit = BooleanArray(w * h)
+        for (x in 0 until w) {
+            for (y in 0 until h) {
+                var hit = false
+                var j = max(0, y - r)
+                val end = min(h - 1, y + r)
+                while (j <= end) { if (rowHit[j * w + x]) { hit = true; break }; j++ }
+                outHit[y * w + x] = hit
+            }
+        }
+        for (i in pixels.indices) if (outHit[i]) pixels[i] = Color.TRANSPARENT
+    }
+
     fun createMaskFromWhite(src: Bitmap): Bitmap {
         val w = src.width; val h = src.height
         val pixels = IntArray(w * h)
@@ -450,6 +486,7 @@ class TemplateEditorView @JvmOverloads constructor(
             val r = Color.red(pixels[i]); val g = Color.green(pixels[i]); val b = Color.blue(pixels[i])
             if (r > 240 && g > 240 && b > 240) pixels[i] = Color.TRANSPARENT
         }
+        dilateTransparent(pixels, w, h, 2)
         val mask = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         mask.setPixels(pixels, 0, w, 0, 0, w, h)
         return mask
@@ -466,6 +503,7 @@ class TemplateEditorView @JvmOverloads constructor(
             val mx = max(r, max(g, b)); val mn = min(r, min(g, b))
             if (mx in 231..243 && (mx - mn) <= 7) pixels[i] = Color.TRANSPARENT
         }
+        dilateTransparent(pixels, w, h, 2)
         val mask = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         mask.setPixels(pixels, 0, w, 0, 0, w, h)
         return mask
@@ -482,6 +520,7 @@ class TemplateEditorView @JvmOverloads constructor(
             val mx = max(r, max(g, b)); val mn = min(r, min(g, b))
             if (mx in 208..228 && (mx - mn) <= 10) pixels[i] = Color.TRANSPARENT
         }
+        dilateTransparent(pixels, w, h, 2)
         val mask = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         mask.setPixels(pixels, 0, w, 0, 0, w, h)
         return mask

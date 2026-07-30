@@ -923,10 +923,12 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
                             // To MOI O MOT MAU DAC KHAC NHAU: ho mep -> thay nen template, tran ->
                             // thay mau la nam trong khung ben canh. Mau dac lo ca hai loai loi ma
                             // anh that che mat (anh sang tren mount trang nhin nhu khong lech).
+                            // Tranh mau GAN DEN va GAN TRANG: net ve / chu trong template hay
+                            // trung vao do, lam tools\audit_render.ps1 nhan nham la anh cua o.
                             val dbgColors = intArrayOf(
-                                0xFFC8E619.toInt(), 0xFF1E1E1E.toInt(), 0xFF005AC8.toInt(),
+                                0xFFC8E619.toInt(), 0xFF00A0A0.toInt(), 0xFF005AC8.toInt(),
                                 0xFFE61E28.toInt(), 0xFF783CFF.toInt(), 0xFF28C83C.toInt(),
-                                0xFFFF00AA.toInt(), 0xFFFF8C00.toInt(), 0xFF00C8FF.toInt()
+                                0xFFFF00AA.toInt(), 0xFFFF8C00.toInt(), 0xFF9A6B3F.toInt()
                             )
                             binding.templateEditorView.cells.forEachIndexed { i, cell ->
                                 val swatch = createBitmap(64, 64)

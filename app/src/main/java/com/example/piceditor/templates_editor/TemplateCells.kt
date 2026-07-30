@@ -68,7 +68,7 @@ object TemplateCells {
         "sp08" to listOf(RectF(575f, 148f, 1104f, 678f), RectF(532f, 730f, 1062f, 1260f), RectF(489f, 1312f, 1019f, 1843f)),
         "sp09" to listOf(RectF(183f, 135f, 945f, 898f)),
         "sp10" to listOf(RectF(149f, 161f, 745f, 836f), RectF(324f, 1109f, 946f, 1825f)),
-        "bd11" to listOf(RectF(123f, 593f, 932f, 1358f), RectF(432f, 286f, 802f, 656f), RectF(642f, 427f, 1022f, 807f), RectF(129f, 1192f, 499f, 1562f), RectF(338f, 1333f, 718f, 1713f)),
+        "bd11" to listOf(RectF(123f, 593f, 932f, 1358f), RectF(441f, 295f, 793f, 647f), RectF(651f, 436f, 1013f, 798f), RectF(138f, 1201f, 490f, 1553f), RectF(347f, 1342f, 709f, 1704f)),
         "bd12" to listOf(RectF(653f, 2f, 1012f, 440f), RectF(121f, 759f, 478f, 1229f), RectF(657f, 1604f, 1013f, 2000f)),
         "bd13" to listOf(RectF(579f, 589f, 914f, 1117f), RectF(233f, 546f, 571f, 1004f), RectF(281f, 1037f, 619f, 1588f), RectF(645f, 1020f, 984f, 1567f)),
         "bd14" to listOf(RectF(409f, 848f, 840f, 1171f), RectF(409f, 1220f, 840f, 1538f)),
