@@ -144,7 +144,16 @@ $CELLS = [ordered]@{
   #   rieng, nen o ve sau de len o ve truoc o cho rect giao nhau. De o tron thu 3 (theo thu tu
   #   toa do) thi no phu 49% polaroid phia tren -> anh polaroid bi vong tron de mat (da thay tren
   #   may ao). Design la polaroid NAM TREN vong tron, nen tron ve truoc, 4 polaroid ve sau.
-  "bd11"=@(@(124,593,930,1358),@(462,323,772,634,8),@(679,466,985,772,-11.2),@(159,1229,468,1538,7.8),@(375,1370,680,1677,-11.2))
+  #   RECT PHAI PHU TRUM LONG KHUNG (2026-07-30): so do cu vua khit nen mep tren long khung pink
+  #   duoi-trai KHONG nam trong rect cua no -> vung do chi nam trong rect O TRON -> hien anh cua
+  #   o tron (thay ro tren may: dai LIME trong khung pink). Tuong tu khung pink tren-phai an dai
+  #   den cua khung green. Template CO MASK thi rect chi can bao trum, mask lo cat, va da co
+  #   CellOwnerMask chia quyen so huu nen khong so dam sang o khac -> cu de rect rong ra.
+  #   Long khung do bang tools\shape_bbox.ps1 (flood tu 1 diem trong long khung):
+  #   green TL (443,303,792,639) | pink TR (652,437,1012,797) | pink BL (139,1209,489,1545) |
+  #   green B (348,1343,708,1703) | tron (123,593,932,1358). Rect = hinh vuong 370/380 quanh tam
+  #   cua tung long khung, giu nguyen goc nghieng.
+  "bd11"=@(@(123,593,932,1358),@(432,286,802,656,8),@(642,427,1022,807,-11.2),@(129,1192,499,1562,7.8),@(338,1333,718,1713,-11.2))
   # bd12: luoi 2 cot x 3 hang the "Ace", 3 o anh. Do tay tu luoi toa do: cot phai chay
   #   x 644..1076 (khong phai 1018 nhu detector doan), o tren cao toi y 464.
   "bd12"=@(@(653,2,1012,440),@(121,759,478,1229),@(657,1604,1013,2000))
@@ -153,7 +162,12 @@ $CELLS = [ordered]@{
   #   nen 4 o van tach ra sach: fill 0.80-0.97 = hinh chu nhat that, goc dang tin.
   #   CANH BAO: dung nhin overlay roi doan lai. Toi da tung tuong goc -21.5 la "qua nghieng"
   #   va hoan tac ve 0 — do la SAI, the that su nghieng ngan ay.
-  "bd13"=@(@(233,546,571,1004,-21.8),@(579,589,914,1117,10.8),@(645,1020,984,1567,5.8),@(281,1037,619,1588,-19.8))
+  #   THU TU VE (2026-07-30): bd13 KHONG co mask nen anh chi bi gioi han boi rect tung o, o ve
+  #   sau de len o ve truoc o cho rect giao nhau - ma ca 4 the deu chong nhau. Doc thu tu xep
+  #   THAT tu Thumb_ (crop cho hai the giap nhau, xem vien trang cua the nao nam tren):
+  #   duoi -> tren = TR, TL, BL, BR. Truoc day xep TL,TR,BR,BL nen the DUOI-TRAI dam anh vao
+  #   the DUOI-PHAI (thiet ke thi the duoi-phai nam TREN) va the TREN-PHAI dam vao TREN-TRAI.
+  "bd13"=@(@(579,589,914,1117,10.8),@(233,546,571,1004,-21.8),@(281,1037,619,1588,-19.8),@(645,1020,984,1567,5.8))
   # bd14/bd15: o XAM SANG ~218 -> ngoai dai GRAY -> GRAY2
   "bd14"=@(@(409,848,840,1171),@(409,1220,840,1538))
   "bd15"=@(@(82,405,491,818),@(82,874,491,1287),@(82,1343,491,1756))
@@ -212,7 +226,12 @@ $CELLS = [ordered]@{
   "sp11"=@(,@(98,375,1028,1625))
   # sp12 "80": 3 o TRON ben trai + 1 o PILL lon ben phai. Cac hinh nay khong phai chu nhat nen
   #   rect chi BAO TRUM, WHITE mask lo phan clip theo dung hinh tron/pill.
-  "sp12"=@(@(60,664,444,1000),@(500,660,1066,1850),@(64,1090,416,1424),@(50,1530,430,1860))
+  #   SUA 2026-07-30: so do cu CAT CUT ca 4 hinh -> phan hinh nam ngoai rect khong co anh nen
+  #   hien NEN TRANG = vanh trang o mep (tron: cat 21-33 don vi tren/duoi; pill: cat 48 ben trai
+  #   va 50 ben duoi). Do lai bang cach quet dai TRANG tung hang (tools\probe_row-style): tron 1
+  #   x 62..436 y 645..1020 | pill x 452..1077 y 645..1900 | tron 3 x 56..436 y 1065..1455 |
+  #   tron 4 x 50..435 y 1515..1900. Rect noi ra bao trum + ~4 don vi le.
+  "sp12"=@(@(58,641,440,1024),@(448,641,1081,1904),@(52,1061,440,1459),@(46,1511,440,1904))
   # sp13: luoi 3 o XAM, vach phan cach manh -> do o AW=600
   "sp13"=@(@(568,34,1089,995),@(34,1005,555,1966),@(568,1007,1089,1968))
   "sp14"=@(,@(98,330,1024,1197))
