@@ -920,10 +920,18 @@ class TemplateEditorActivity : BaseActivityNew<ActivityTemplateEditorBinding>(),
                             }.toMutableList()
 
                         if (DEBUG_FILL_CELLS) {
-                            // Tô ẢNH THẬT (có chữ) vào mọi ô để thấy ảnh clip theo mask + do nghieng noi dung.
-                            val test = BitmapFactory.decodeResource(resources, R.drawable.thumb_gs03)
-                            binding.templateEditorView.cells.forEach {
-                                binding.templateEditorView.setImageToCell(it, test)
+                            // To MOI O MOT MAU DAC KHAC NHAU: ho mep -> thay nen template, tran ->
+                            // thay mau la nam trong khung ben canh. Mau dac lo ca hai loai loi ma
+                            // anh that che mat (anh sang tren mount trang nhin nhu khong lech).
+                            val dbgColors = intArrayOf(
+                                0xFFC8E619.toInt(), 0xFF1E1E1E.toInt(), 0xFF005AC8.toInt(),
+                                0xFFE61E28.toInt(), 0xFF783CFF.toInt(), 0xFF28C83C.toInt(),
+                                0xFFFF00AA.toInt(), 0xFFFF8C00.toInt(), 0xFF00C8FF.toInt()
+                            )
+                            binding.templateEditorView.cells.forEachIndexed { i, cell ->
+                                val swatch = createBitmap(64, 64)
+                                swatch.eraseColor(dbgColors[i % dbgColors.size])
+                                binding.templateEditorView.setImageToCell(cell, swatch)
                             }
                         }
 
