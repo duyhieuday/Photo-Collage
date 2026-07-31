@@ -121,7 +121,9 @@ object TemplateRepository {
             TemplateData("is08", "IS08", R.drawable.temp_is08, R.drawable.thumb_is08, cells("is08"), mask("is08")),
             TemplateData("is09", "IS09", R.drawable.temp_is09, R.drawable.thumb_is09, cells("is09"), mask("is09")),
             // thumb_is10 import bị lệch design (3 khung) so với temp_is10 (2 khung) -> preview dùng temp_ cho khớp.
-            TemplateData("is10", "IS10", R.drawable.temp_is10, R.drawable.temp_is10, cells("is10"), mask("is10")),
+            // is10: nguon Thumb_IS10 truoc day khac design voi temp_is10 nen phai lay chinh
+            // temp_ lam preview. Nay designer da xuat lai dung design -> co thumb_is10 rieng.
+            TemplateData("is10", "IS10", R.drawable.temp_is10, R.drawable.thumb_is10, cells("is10"), mask("is10")),
             TemplateData("is11", "IS11", R.drawable.temp_is11, R.drawable.thumb_is11, cells("is11"), mask("is11")),
             TemplateData("is12", "IS12", R.drawable.temp_is12, R.drawable.thumb_is12, cells("is12"), mask("is12")),
             TemplateData("is13", "IS13", R.drawable.temp_is13, R.drawable.thumb_is13, cells("is13"), mask("is13")),
