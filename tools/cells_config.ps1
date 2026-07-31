@@ -1,4 +1,4 @@
-# Master config for template photo-cells. ASCII only. Dot-sourced by gen_cells.ps1 & verify_cells.ps1.
+﻿# Master config for template photo-cells. ASCII only. Dot-sourced by gen_cells.ps1 & verify_cells.ps1.
 # Cells from Figma frames (verified via overlay by sub-agents). Logic space 1125x2000.
 
 $CELLS = [ordered]@{
@@ -25,7 +25,7 @@ $CELLS = [ordered]@{
   # cp02 giay rach: 3 dai XAM 232 + divider TRANG -> GRAY mask (giu mep rach)
   "cp02"=@(@(0,0,1125,656),@(0,661,1125,1334),@(0,1331,1125,2000))
   # cp03 film strip: khung NGHIENG ~ -12.7 deg (rect = khung thang quanh tam + goc xoay)
-  "cp03"=@(@(84,92,730,576,-12.7),@(202,631,848,1111,-12.5),@(323,1166,959,1662,-12.9))
+  "cp03"=@(@(84,92,730,576,-12.7),@(195,628,856,1126,-12.5),@(323,1166,959,1662,-12.9))
   "cp04"=@(@(500,40,1069,788),@(111,1085,672,1833))
   "cp05"=@(@(117,161,531,712),@(416,826,855,1412))
   # cp06: man hinh may anh + o trang the LOVERS CLUB (do tay tu luoi, verify vfill)
@@ -45,7 +45,7 @@ $CELLS = [ordered]@{
   # gs02 typewriter: 2 o TRANG 255, nen kem 242 (khong WHITE-mask duoc) -> NONE
   "gs02"=@(@(188,349,936,838),@(187,870,936,1286))
   # gs03 BACK to SCHOOL (most-popular): 4 polaroid TRANG nghieng nhe; cell cu THANG -> them goc (NONE, nen trang)
-  "gs03"=@(@(101,469,540,1086,-3),@(557,487,1020,1083,1.5),@(589,1126,1022,1702,-2.5),@(119,1125,552,1701,0.5))
+  "gs03"=@(@(101,469,540,1086,-3),@(586,506,1020,1083,1.5),@(589,1126,1022,1702,-2.5),@(119,1125,552,1701,0.5))
   "gs04"=@(@(32,52,368,708),@(392,52,732,708),@(756,52,1092,708),@(32,1292,368,1944),@(392,1292,732,1944),@(756,1292,1092,1944))
   # gs05 THE CLASS (blue grid): 2 o TRANG 255 (o lon BO GOC), nen XANH -> WHITE mask (clip bo goc, khung xanh+textbox giu)
   "gs05"=@(@(80,80,1049,1049),@(59,1592,457,1968))
@@ -118,7 +118,7 @@ $CELLS = [ordered]@{
   # sp04 badminton: 2 o polaroid ruot TRANG (gan thang) -> NONE + rect
   "sp04"=@(@(191,108,752,846,0.5),@(531,1070,1098,1828,0.5))
   # sp05 Queen Futsal: 2 o TRANG tren so tay nghieng (5 / -3.5) -> NONE + rect
-  "sp05"=@(@(199,485,915,972,5),@(244,1101,874,1662,-3.5))
+  "sp05"=@(@(199,485,915,972,5),@(257,1094,867,1661,-3.5))
   # sp06 scoreboard: 2 o XAM doc thang trong khung trang -> GRAY
   "sp06"=@(@(76,316,700,878),@(76,920,700,1482))
   # sp07 HALF TIME: 1 o XAM lon polaroid nghieng -7 -> GRAY
@@ -164,7 +164,7 @@ $CELLS = [ordered]@{
   #   trung tinh) + erode 3 de dut cau noi. Nen giay cung xam nhung VIEN MOUNT TRANG ngan cach
   #   nen 4 o van tach ra sach: fill 0.80-0.97 = hinh chu nhat that, goc dang tin.
   #   CANH BAO: dung nhin overlay roi doan lai. Toi da tung tuong goc -21.5 la "qua nghieng"
-  #   va hoan tac ve 0 — do la SAI, the that su nghieng ngan ay.
+  #   va hoan tac ve 0 â€” do la SAI, the that su nghieng ngan ay.
   #   THU TU VE (2026-07-30): bd13 KHONG co mask nen anh chi bi gioi han boi rect tung o, o ve
   #   sau de len o ve truoc o cho rect giao nhau - ma ca 4 the deu chong nhau. Doc thu tu xep
   #   THAT tu Thumb_ (crop cho hai the giap nhau, xem vien trang cua the nao nam tren):
@@ -186,7 +186,7 @@ $CELLS = [ordered]@{
   #   Quet doc theo truc cua the: thanh chia nam dung t=0.50 tren ca hai the.
   #   LUU Y khi chia o NGHIENG: khong cat thang toa do duoc, vi moi o xoay quanh TAM RIENG
   #   cua no. Phai lay tam moi nua roi XOAY offset do quanh tam the (10.5 do) de ra tam that.
-  "bd19"=@(@(658,307,1042,758,10.5),@(181,476,565,928,10.5),@(571,787,955,1220,10.5),@(93,957,477,1391,10.5))
+  "bd19"=@(@(658,307,1042,758,10.5),@(186,480,602,939,10.5),@(571,787,955,1220,10.5),@(93,957,477,1391,10.5))
   # bd20: 1 o HINH TRON rang cua -> rect bao trum + WHITE mask clip theo vien rang cua
   "bd20"=@(,@(210,589,908,1287))
 
@@ -204,12 +204,12 @@ $CELLS = [ordered]@{
   # cp15: o hinh VOM (arch) -> rect bao trum + WHITE mask clip theo vom
   "cp15"=@(,@(202,371,922,1475))
   "cp16"=@(@(135,300,611,762),@(536,1189,1016,1651))
-  "cp17"=@(@(450,296,995,850,-4),@(151,1075,708,1649,8.5))
+  "cp17"=@(@(455,295,989,843,-4),@(151,1075,708,1649,8.5))
   # cp18: CHI 3 O, cot PHAI. Cot TRAI la artwork Zootopia IN CUNG trong Temp_CP18.png (mo file
-  #   nguon ra thay ro: trai co hinh, phai trang tron) — khong phai o anh. Truoc do minh chia
+  #   nguon ra thay ro: trai co hinh, phai trang tron) â€” khong phai o anh. Truoc do minh chia
   #   deu 2x6 vi thay Thumb_ co 6 "anh", khong nhan ra 3 anh trai la hinh in san.
   "cp18"=@(@(562,0,1125,667),@(562,667,1125,1334),@(562,1334,1125,2000))
-  "cp19"=@(@(131,379,998,968),@(482,1330,984,1829,0.5))
+  "cp19"=@(@(132,381,990,957),@(482,1330,984,1829,0.5))
   # cp20 player nhac: rect cu (212,423,930,1138,1) RONG hon vung anh that ~12 don vi moi phia
   #   -> anh an vao VIEN DO cua khung player. Do lai bang diff Temp_/Thumb_ (fill 0.98 = hinh
   #   chu nhat sach) ra (227,434,921,1126,0.5).
@@ -218,16 +218,16 @@ $CELLS = [ordered]@{
   # ---- Glad season 11..20 ----
   "gs11"=@(,@(177,573,841,1253,2))
   "gs12"=@(@(49,289,551,799),@(461,1017,892,1463))
-  "gs13"=@(,@(197,575,901,1313,0.5))
+  "gs13"=@(,@(206,584,895,1313,0.5))
   "gs14"=@(,@(54,740,910,1271,3.5))
-  "gs15"=@(@(160,514,569,1058,-10),@(621,1165,1021,1679,14.5))
+  "gs15"=@(@(164,527,565,1056,-10),@(628,1173,1012,1678,14.5))
   "gs16"=@(,@(319,563,832,1092))
   "gs17"=@(,@(300,754,818,1280))
   "gs18"=@(,@(101,540,1024,1659))
   "gs19"=@(,@(87,1226,578,1593,6))
   # gs20: detector con bat them 1 dai doc hep o goc tren-phai (964,51,1099,423) - doi chieu
   #   Thumb_ chi co 1 anh -> da bo dai do.
-  "gs20"=@(,@(259,687,855,1306))
+  "gs20"=@(,@(270,699,849,1292))
 
   # ---- IG Story 16..17 (is18 Temp_=Thumb_ nen khong dung duoc) ----
   # is16 player iPhone: rect hut 5 don vi mep phai so voi vung anh that (diff fill 0.96).
@@ -284,16 +284,16 @@ $CELLS = [ordered]@{
   "sm14"=@(@(211,257,912,858),@(147,778,980,1351),@(228,1290,897,1816))
   "sm15"=@(@(574,184,1058,649),@(8,203,484,664),@(45,852,472,1261),@(585,1107,1102,1602),@(30,1437,491,1857))
   # sm16: luoi 2x2 o TRANG duoi tieu de NEW DROP -> do o AW=600
-  "sm16"=@(@(139,669,557,1046),@(566,671,988,1048),@(137,1055,557,1434),@(568,1050,986,1434))
+  "sm16"=@(@(139,669,557,1046),@(566,671,988,1048),@(137,1055,557,1434),@(570,1061,984,1430))
   # sm17: 4 o TRANG (do cu chi ra 2 vi nguong loc qua chat + do phan giai phan tich qua cao
   #   lam mep rang cua noi o vao nen roi bi loai). Do lai o AW=450 -> du 4, da verify overlay.
   #   O3 la polaroid CO MOUNT: so do theo khung bao ca mount, ma voi NONE thi rect chinh la anh
   #   -> phai thu ve vung anh ben trong (day 1508 -> 1455, doc theo luoi toa do).
-  "sm17"=@(@(62,62,538,775),@(685,262,922,491,-1.2),@(440,755,1050,1455,2.8),@(62,1498,675,1938))
+  "sm17"=@(@(62,62,538,775),@(685,262,922,491,-1.2),@(440,755,1050,1455,2.8),@(63,1529,675,1937))
   # sm18: luoi 2 cot x 3 hang, o GIUA-TRAI la panel chu -> 5 o anh. Truoc chi co 3 vi
   #   Thumb_ de trong 2 o cot phai; "Thumb_ khong dien" KHONG co nghia la khong phai slot.
   "sm18"=@(@(0,0,560,662),@(562,0,1122,662),@(562,665,1122,1332),@(0,1332,560,1998),@(562,1332,1122,1998))
-  # sm19 "Sea you": 4 o TRANG bo goc. Truoc chi co 3 — thieu o NHO duoi-trai, vi trong Thumb_
+  # sm19 "Sea you": 4 o TRANG bo goc. Truoc chi co 3 â€” thieu o NHO duoi-trai, vi trong Thumb_
   #   designer dat vao do mot the chu "beach" nen minh tuong la trang tri; mo Temp_ ra thi no
   #   la o trang rong nhu 3 o kia. Giu NONE: goc bo rat nhe, ma WHITE mask se an ca nen troi
   #   (gan trang) nam trong rect.
@@ -313,7 +313,7 @@ $MASKS = @{ "is05"="GRAY"; "is12"="GRAY"; "sm05"="GRAY"; "sp01"="GRAY"; "is06"="
             "bd02"="GRAY"; "cp02"="GRAY"; "cp07"="GRAY"; "cp08"="WHITE";
             "gs01"="GRAY"; "gs05"="WHITE"; "gs02"="WHITE";
             "sp03"="GRAY"; "sp07"="GRAY";
-            # sm06: 5 o BO GOC (ban kinh ~24 don vi — do pixel: tai y=271 vung o bat dau x=77,
+            # sm06: 5 o BO GOC (ban kinh ~24 don vi â€” do pixel: tai y=271 vung o bat dau x=77,
             #   tai y=300 la x=53). Rect vuong tho 4 goc ra nen trang -> can GRAY clip theo hinh.
             "sm06"="GRAY";
             "sp08"="WHITE"; "sp09"="WHITE";
@@ -349,3 +349,4 @@ $MASKS = @{ "is05"="GRAY"; "is12"="GRAY"; "sm05"="GRAY"; "sp01"="GRAY"; "is06"="
             # Tat ca template con lai (o chu nhat, ke ca nghieng) -> NONE. Xem quy tac o tren.
 # Ghi chu Sports: sp02/sp06/sp10 = o CHU NHAT -> NONE (mask GRAY toan cuc gay bleed cheo khi rect nghieng cham lo xam
 #   o ben canh; NONE gioi han anh trong rect tung o). sp03 (tem rang cua) + sp07 giu GRAY (can clip hinh khong-chu-nhat).
+
