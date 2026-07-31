@@ -1,4 +1,4 @@
-# So ANH CHUP THAT cua app (DEBUG_FILL_CELLS to moi o mot MAU DAC) voi CHO DESIGNER DAT ANH,
+﻿# So ANH CHUP THAT cua app (DEBUG_FILL_CELLS to moi o mot MAU DAC) voi CHO DESIGNER DAT ANH,
 # theo tung pixel. Tra ve tung CUM loi kem bbox:
 #   HO   = designer co anh o day ma app KHONG co  -> hien nen/khung, thieu anh
 #   TRAN = app co anh o day ma designer KHONG co  -> anh lan ra ngoai khung
@@ -126,7 +126,11 @@ function Clusters([bool[]]$flag, [int]$aw, [int]$ah, [int]$minPx) {
       }
     }
     $n++
-    if ($cnt -ge $minPx) { $res += , @($cnt, $mnX, $mnY, $mxX, $mxY) }
+    # Tra ve PSCustomObject chu KHONG phai mang: PowerShell tu duoi mang long nhau khi return,
+    # lam $c[1..4] bien thanh so le -> bbox in ra sai het (da dinh: moi cum deu in "(0,0,2,2)").
+    if ($cnt -ge $minPx) {
+      $res += [pscustomobject]@{ N = $cnt; X0 = $mnX; Y0 = $mnY; X1 = $mxX; Y1 = $mxY }
+    }
   }
   return $res
 }
@@ -141,14 +145,15 @@ $minPx = [int]($MinArea / $PXAREA)
 $sxl = $LOGIC_W / [double]$AW; $syl = $LOGIC_H / [double]$AH
 $rows = @()
 foreach ($c in (Clusters $gapFlag $AW $AH $minPx)) {
-  $rows += [pscustomobject]@{ Loai = 'HO'; Area = [int]($c[0] * $PXAREA)
-    Bbox = ("({0},{1},{2},{3})" -f [int]($c[1] * $sxl), [int]($c[2] * $syl), [int](($c[3] + 1) * $sxl), [int](($c[4] + 1) * $syl))
-    W = [int]((($c[3] - $c[1]) + 1) * $sxl); H = [int]((($c[4] - $c[2]) + 1) * $syl) }
+  $rows += [pscustomobject]@{ Loai = 'HO'; Area = [int]($c.N * $PXAREA)
+    Bbox = ("({0},{1},{2},{3})" -f [int]($c.X0 * $sxl), [int]($c.Y0 * $syl), [int](($c.X1 + 1) * $sxl), [int](($c.Y1 + 1) * $syl))
+    W = [int]((($c.X1 - $c.X0) + 1) * $sxl); H = [int]((($c.Y1 - $c.Y0) + 1) * $syl) }
 }
 foreach ($c in (Clusters $ovFlag $AW $AH $minPx)) {
-  $rows += [pscustomobject]@{ Loai = 'TRAN'; Area = [int]($c[0] * $PXAREA)
-    Bbox = ("({0},{1},{2},{3})" -f [int]($c[1] * $sxl), [int]($c[2] * $syl), [int](($c[3] + 1) * $sxl), [int](($c[4] + 1) * $syl))
-    W = [int]((($c[3] - $c[1]) + 1) * $sxl); H = [int]((($c[4] - $c[2]) + 1) * $syl) }
+  $rows += [pscustomobject]@{ Loai = 'TRAN'; Area = [int]($c.N * $PXAREA)
+    Bbox = ("({0},{1},{2},{3})" -f [int]($c.X0 * $sxl), [int]($c.Y0 * $syl), [int](($c.X1 + 1) * $sxl), [int](($c.Y1 + 1) * $syl))
+    W = [int]((($c.X1 - $c.X0) + 1) * $sxl); H = [int]((($c.Y1 - $c.Y0) + 1) * $syl) }
 }
 Write-Host ("==== {0} : {1} cum >= {2} don vi^2 ====" -f $Id, $rows.Count, $MinArea)
 $rows | Sort-Object -Property Area -Descending | Select-Object -First 14 | Format-Table -AutoSize
+

@@ -169,7 +169,12 @@ $CELLS = [ordered]@{
   #   THAT tu Thumb_ (crop cho hai the giap nhau, xem vien trang cua the nao nam tren):
   #   duoi -> tren = TR, TL, BL, BR. Truoc day xep TL,TR,BR,BL nen the DUOI-TRAI dam anh vao
   #   the DUOI-PHAI (thiet ke thi the duoi-phai nam TREN) va the TREN-PHAI dam vao TREN-TRAI.
-  "bd13"=@(@(579,589,914,1117,10.8),@(233,546,571,1004,-21.8),@(281,1037,619,1588,-19.8),@(645,1020,984,1567,5.8))
+  #   SO DO CUOI = flood-fill CO SEED tung the roi lay min-area rotated rect
+  #   (tools\shape_bbox.ps1 -Mode GRAY -Win 320), fill 0.89-0.97 = hinh chu nhat that.
+  #   DA THU va BO cach lay vung diff Temp_/Thumb_ lam rect: vung diff chi fill 0.72-0.79 (mep
+  #   the + bong do cung vao diff) nen min-area-rect phinh ra ~25% -> anh trum len VIEN MOUNT,
+  #   do bang tools\audit_render.ps1 ra TRAN 68000 don vi^2, te hon han (ban nay chi HO ~1500).
+  "bd13"=@(@(579,586,915,1115,10.5),@(236,546,574,1013,-22),@(281,1038,620,1587,-20),@(644,1018,983,1565,5.5))
   # bd14/bd15: o XAM SANG ~218 -> ngoai dai GRAY -> GRAY2
   "bd14"=@(@(409,848,840,1171),@(409,1220,840,1538))
   "bd15"=@(@(82,405,491,818),@(82,874,491,1287),@(82,1343,491,1756))

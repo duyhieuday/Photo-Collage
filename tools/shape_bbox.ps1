@@ -97,6 +97,46 @@ foreach ($s in $seedList) {
   $fill = [math]::Round($cnt / [double](($maxX - $minX + 1) * ($maxY - $minY + 1)), 2)
   Write-Host ("hinh {0} seed({1},{2}) -> bbox ({3},{4},{5},{6})  {7}x{8}  fill {9}" -f `
       $idx, $lx, $ly, $l, $t, $r, $b, ($r - $l), ($b - $t), $fill)
+
+  # --- min-area ROTATED rect cua chinh vung vua loang (chi lay pixel BIEN cho nhanh) ---
+  $edge = New-Object System.Collections.ArrayList
+  for ($py = $minY; $py -le $maxY; $py++) {
+    for ($px = $minX; $px -le $maxX; $px++) {
+      $ii = $py * $AW + $px
+      if (-not $seen[$ii]) { continue }
+      $isEdge = $false
+      foreach ($d in @(@(1, 0), @(-1, 0), @(0, 1), @(0, -1))) {
+        $nx2 = $px + $d[0]; $ny2 = $py + $d[1]
+        if ($nx2 -lt 0 -or $nx2 -ge $AW -or $ny2 -lt 0 -or $ny2 -ge $AH) { $isEdge = $true; break }
+        if (-not $seen[$ny2 * $AW + $nx2]) { $isEdge = $true; break }
+      }
+      if ($isEdge) { [void]$edge.Add(@($px, $py)) }
+    }
+  }
+  $bestA = [double]::MaxValue; $bestD = 0.0; $bl = 0.0; $bt = 0.0; $brr = 0.0; $bb2 = 0.0
+  for ($deg = -30.0; $deg -le 30.0; $deg += 0.5) {
+    $rad2 = [math]::PI * $deg / 180.0
+    $co2 = [math]::Cos($rad2); $si2 = [math]::Sin($rad2)
+    $mnx = [double]::MaxValue; $mxx = [double]::MinValue; $mny = [double]::MaxValue; $mxy = [double]::MinValue
+    foreach ($p in $edge) {
+      $rx2 = $p[0] * $co2 + $p[1] * $si2
+      $ry2 = -$p[0] * $si2 + $p[1] * $co2
+      if ($rx2 -lt $mnx) { $mnx = $rx2 }; if ($rx2 -gt $mxx) { $mxx = $rx2 }
+      if ($ry2 -lt $mny) { $mny = $ry2 }; if ($ry2 -gt $mxy) { $mxy = $ry2 }
+    }
+    $a2 = ($mxx - $mnx) * ($mxy - $mny)
+    if ($a2 -lt $bestA) { $bestA = $a2; $bestD = $deg; $bl = $mnx; $bt = $mny; $brr = $mxx; $bb2 = $mxy }
+  }
+  $rad3 = [math]::PI * $bestD / 180.0
+  $co3 = [math]::Cos($rad3); $si3 = [math]::Sin($rad3)
+  $ccx2 = ($bl + $brr) / 2.0; $ccy2 = ($bt + $bb2) / 2.0
+  $ox2 = $ccx2 * $co3 - $ccy2 * $si3
+  $oy2 = $ccx2 * $si3 + $ccy2 * $co3
+  $wl = ($brr - $bl) / $sx; $hl = ($bb2 - $bt) / $sy
+  $cxl = $ox2 / $sx; $cyl = $oy2 / $sy
+  $mfill = [math]::Round($cnt / [double]$bestA, 2)
+  Write-Host ("        rect xoay = ({0},{1},{2},{3},{4})   {5}x{6}  fill {7}" -f `
+      [int]($cxl - $wl / 2), [int]($cyl - $hl / 2), [int]($cxl + $wl / 2), [int]($cyl + $hl / 2), $bestD, [int]$wl, [int]$hl, $mfill)
 }
 Write-Host "Rect dang dung:"
 foreach ($c in @($CELLS[$Id] | Where-Object { $_ })) { Write-Host ("  ({0})" -f ($c -join ',')) }

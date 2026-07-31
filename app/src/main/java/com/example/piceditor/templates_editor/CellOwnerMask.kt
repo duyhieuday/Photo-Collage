@@ -154,6 +154,58 @@ object CellOwnerMask {
             }
         }
 
+        // --- vung NEN (khong phai slot) -> cat khoi MOI o ---
+        // Template co nen cung mau voi o (giay nhan bd11 trang, net xoan trang sp12) thi ca nen
+        // dinh thanh mot vung trong suot khong lo. Pixel nen nao roi vao rect cua mot o se an
+        // mau cua o do -> lot vet mau ra ngoai khung. Vung nao khong o nao phu duoc >= 50% thi
+        // khong phai slot: cat het.
+        run {
+            val comp = IntArray(gw * gh) { -1 }
+            val q = IntArray(gw * gh)
+            var nComp = 0
+            val compSize = ArrayList<Int>()
+            for (seed in 0 until gw * gh) {
+                if (!open[seed] || comp[seed] >= 0) continue
+                var head = 0; var tail = 0
+                q[tail++] = seed; comp[seed] = nComp
+                var size = 0
+                while (head < tail) {
+                    val cur = q[head++]; size++
+                    val cy = cur / gw; val cx = cur - cy * gw
+                    for (dy in -1..1) {
+                        val ny = cy + dy
+                        if (ny < 0 || ny >= gh) continue
+                        for (dx in -1..1) {
+                            val nx = cx + dx
+                            if (nx < 0 || nx >= gw) continue
+                            val ni = ny * gw + nx
+                            if (open[ni] && comp[ni] < 0) { comp[ni] = nComp; q[tail++] = ni }
+                        }
+                    }
+                }
+                compSize.add(size); nComp++
+            }
+            if (nComp > 0) {
+                val cov = Array(nComp) { IntArray(n) }
+                for (idx in 0 until gw * gh) {
+                    if (!open[idx]) continue
+                    val gy = idx / gw; val gx = idx - gy * gw
+                    val lx = (gx * STEP + 0.5f); val ly = (gy * STEP + 0.5f)
+                    val cc = comp[idx]
+                    for (i in 0 until n) if (contains(rects[i], cosA[i], sinA[i], lx, ly)) cov[cc][i]++
+                }
+                val isBg = BooleanArray(nComp)
+                for (c in 0 until nComp) {
+                    var best = 0
+                    for (i in 0 until n) if (cov[c][i] > best) best = cov[c][i]
+                    if (best.toFloat() / compSize[c] < 0.5f) isBg[c] = true
+                }
+                for (idx in 0 until gw * gh) {
+                    if (open[idx] && isBg[comp[idx]]) owner[idx] = -3
+                }
+            }
+        }
+
         // --- slot nam GON trong vung chong: khong co nguon de loang -> giao cho o co tam gan nhat ---
         for (gy in 0 until gh) {
             val base = gy * gw
@@ -189,7 +241,8 @@ object CellOwnerMask {
                     val idx = base + gx
                     if (!open[idx]) continue
                     val own = owner[idx]
-                    if (own >= 0 && own != i &&
+                    // -3 = vung nen: cung phai cat, nen tinh la tranh chap.
+                    if ((own == -3 || (own >= 0 && own != i)) &&
                         contains(rects[i], cosA[i], sinA[i], (gx * STEP + 0.5f), (gy * STEP + 0.5f))
                     ) { conflict = true; break }
                 }
@@ -206,6 +259,7 @@ object CellOwnerMask {
                 for (gx in x0..x1) {
                     val idx = src + gx
                     // Giu (mo) o cho khong phai vung trong suot — vi o do mask tong da che roi.
+                    // owner == -3 la vung NEN: cat khoi moi o.
                     val keep = !open[idx] || owner[idx] == i || owner[idx] == -1
                     px[dst + (gx - x0)] = if (keep) Color.BLACK else Color.TRANSPARENT
                 }
