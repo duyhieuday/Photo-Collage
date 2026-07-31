@@ -478,7 +478,13 @@ class TemplateEditorView @JvmOverloads constructor(
         for (i in pixels.indices) if (outHit[i]) pixels[i] = Color.TRANSPARENT
     }
 
-    fun createMaskFromWhite(src: Bitmap): Bitmap {
+    /**
+     * [dilate] = so pixel no rong vung trong suot. Mac dinh 2 de an vanh anti-alias.
+     * TRUYEN 0 khi can tinh QUYEN SO HUU (CellOwnerMask): no rong lam hai slot ke nhau DINH
+     * LIEN qua vach trang mong -> thanh mot vung lien thong -> chia quyen so huu bi lan, anh o
+     * nay thoc sang o kia (da thay o sm14: mang lime thoc xuong blob teal).
+     */
+    fun createMaskFromWhite(src: Bitmap, dilate: Int = 2): Bitmap {
         val w = src.width; val h = src.height
         val pixels = IntArray(w * h)
         src.getPixels(pixels, 0, w, 0, 0, w, h)
@@ -486,7 +492,7 @@ class TemplateEditorView @JvmOverloads constructor(
             val r = Color.red(pixels[i]); val g = Color.green(pixels[i]); val b = Color.blue(pixels[i])
             if (r > 240 && g > 240 && b > 240) pixels[i] = Color.TRANSPARENT
         }
-        dilateTransparent(pixels, w, h, 2)
+        dilateTransparent(pixels, w, h, dilate)
         val mask = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         mask.setPixels(pixels, 0, w, 0, 0, w, h)
         return mask
@@ -494,7 +500,7 @@ class TemplateEditorView @JvmOverloads constructor(
 
     // Mask ô xám #ededed: pixel trung tính sáng (~225..245) -> trong suốt.
     // Loại trắng (>245: viền/giấy) và màu (saturation cao). Ảnh hiện đúng theo hình khung xám.
-    fun createMaskFromGray(src: Bitmap): Bitmap {
+    fun createMaskFromGray(src: Bitmap, dilate: Int = 2): Bitmap {
         val w = src.width; val h = src.height
         val pixels = IntArray(w * h)
         src.getPixels(pixels, 0, w, 0, 0, w, h)
@@ -503,7 +509,7 @@ class TemplateEditorView @JvmOverloads constructor(
             val mx = max(r, max(g, b)); val mn = min(r, min(g, b))
             if (mx in 231..243 && (mx - mn) <= 7) pixels[i] = Color.TRANSPARENT
         }
-        dilateTransparent(pixels, w, h, 2)
+        dilateTransparent(pixels, w, h, dilate)
         val mask = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         mask.setPixels(pixels, 0, w, 0, 0, w, h)
         return mask
@@ -511,7 +517,7 @@ class TemplateEditorView @JvmOverloads constructor(
 
     // Mask ô xám SÁNG hơn (~#d9d9d9): pixel trung tính ~208..228 -> trong suốt.
     // Dùng cho ô xám ngoài dải GRAY (sm02 ~217, sm04 ~222).
-    fun createMaskFromGray2(src: Bitmap): Bitmap {
+    fun createMaskFromGray2(src: Bitmap, dilate: Int = 2): Bitmap {
         val w = src.width; val h = src.height
         val pixels = IntArray(w * h)
         src.getPixels(pixels, 0, w, 0, 0, w, h)
@@ -520,7 +526,7 @@ class TemplateEditorView @JvmOverloads constructor(
             val mx = max(r, max(g, b)); val mn = min(r, min(g, b))
             if (mx in 208..228 && (mx - mn) <= 10) pixels[i] = Color.TRANSPARENT
         }
-        dilateTransparent(pixels, w, h, 2)
+        dilateTransparent(pixels, w, h, dilate)
         val mask = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         mask.setPixels(pixels, 0, w, 0, 0, w, h)
         return mask

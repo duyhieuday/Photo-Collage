@@ -35,6 +35,9 @@ object CellOwnerMask {
     /** Buoc luoi phan tich: 2 = mot nua do phan giai template. */
     private const val STEP = 2
 
+    /** Co lai bay nhieu pixel truoc khi chia quyen so huu — bang dung muc mask da no rong. */
+    private const val ERODE_PX = 2
+
     /** Ket qua cho mot o: bitmap alpha + o vuong (toa do logic) de ve. */
     class Result(val mask: Bitmap, val rect: RectF)
 
@@ -71,26 +74,47 @@ object CellOwnerMask {
         val gh = bh / STEP
         if (gw < 4 || gh < 4) return List(n) { null }
 
-        // --- vung trong suot cua mask, lay mau theo luoi ---
-        // O luoi chi tinh la "trong suot" khi CA STEPxSTEP pixel goc deu trong suot. Lay mau 1
-        // diem thi vach trang mong ngan cach hai slot (vd 2 blob sm14 giap nhau) de bi bo sot ->
-        // hai slot dinh thanh mot vung lien thong -> loang tran sang nhau. Yeu cau ca cum lam
-        // vach day them 1 o luoi, du de hai slot tach roi. Mep bi bao mon coi nhu "khong trong
-        // suot" nen van ve nhu cu — khong sinh lo.
+        // --- vung trong suot cua mask, CO LAI (erode) truoc khi chia quyen so huu ---
+        //
+        // Mask da duoc no rong ERODE_PX pixel de an vanh anti-alias (xem dilateTransparent).
+        // Nhung chinh cai no rong do lam hai slot ke nhau DINH LIEN qua vach trang mong -> thanh
+        // mot vung lien thong -> loang chia quyen so huu bi lan, anh o nay thoc sang o kia (da
+        // thay o sm14: mang lime thoc xuong blob teal).
+        // Nen o day co lai dung bay nhieu: o luoi chi tinh la trong suot khi CA cua so
+        // (STEP + 2*ERODE_PX)^2 pixel goc deu trong suot. Chi dung cho viec chia quyen so huu -
+        // luc VE van dung mask da no rong, nen khong sinh lo o mep.
+        //
+        // Doc alpha vao mot mang byte (1 byte/pixel) roi moi quet: doc thang tung dong bang
+        // getPixels thi phai dem theo nhieu dong mot luc, con tao THEM mot Bitmap mask nua thi
+        // HET BO NHO (da thu, app chet ngay khi mo template).
+        val alpha = ByteArray(bw * bh)
+        run {
+            val row = IntArray(bw)
+            for (y in 0 until bh) {
+                maskBmp.getPixels(row, 0, bw, 0, y, bw, 1)
+                val base = y * bw
+                for (x in 0 until bw) alpha[base + x] = if (Color.alpha(row[x]) == 0) 1 else 0
+            }
+        }
         val open = BooleanArray(gw * gh)
-        val rowA = IntArray(bw)
-        val rowB = IntArray(bw)
         for (gy in 0 until gh) {
-            val sy = gy * STEP
-            maskBmp.getPixels(rowA, 0, bw, 0, sy, bw, 1)
-            if (sy + 1 < bh) maskBmp.getPixels(rowB, 0, bw, 0, sy + 1, bw, 1)
+            val y0 = max(0, gy * STEP - ERODE_PX)
+            val y1 = min(bh - 1, gy * STEP + STEP - 1 + ERODE_PX)
             val base = gy * gw
             for (gx in 0 until gw) {
-                val sx = gx * STEP
-                val ok = Color.alpha(rowA[sx]) == 0 &&
-                        (sx + 1 >= bw || Color.alpha(rowA[sx + 1]) == 0) &&
-                        (sy + 1 >= bh || Color.alpha(rowB[sx]) == 0) &&
-                        (sy + 1 >= bh || sx + 1 >= bw || Color.alpha(rowB[sx + 1]) == 0)
+                val x0 = max(0, gx * STEP - ERODE_PX)
+                val x1 = min(bw - 1, gx * STEP + STEP - 1 + ERODE_PX)
+                var ok = true
+                var y = y0
+                loop@ while (y <= y1) {
+                    val rowBase = y * bw
+                    var x = x0
+                    while (x <= x1) {
+                        if (alpha[rowBase + x].toInt() == 0) { ok = false; break@loop }
+                        x++
+                    }
+                    y++
+                }
                 open[base + gx] = ok
             }
         }

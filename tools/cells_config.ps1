@@ -155,7 +155,8 @@ $CELLS = [ordered]@{
   #   cua tung long khung, giu nguyen goc nghieng.
   #   Rect = DUNG bbox long khung (khong noi thua): noi thua thi 4 goc rect an ra giay nhan, ma
   #   giay co diem sang >240 nen lot vai vet mau ra ngoai khung.
-  "bd11"=@(@(123,593,932,1358),@(441,295,793,647,8),@(651,436,1013,798,-11.2),@(138,1201,490,1553,7.8),@(347,1342,709,1704,-11.2))
+  #   (nho hon slot vai pixel la sinh loi loang: xem ghi chu sm14) -> de du 3px margin.
+  "bd11"=@(@(120,590,935,1361),@(438,292,796,650,8),@(648,433,1016,801,-11.2),@(135,1198,493,1556,7.8),@(344,1339,712,1707,-11.2))
   # bd12: luoi 2 cot x 3 hang the "Ace", 3 o anh. Do tay tu luoi toa do: cot phai chay
   #   x 644..1076 (khong phai 1018 nhu detector doan), o tren cao toi y 464.
   "bd12"=@(@(653,2,1012,440),@(121,759,478,1229),@(657,1604,1013,2000))
@@ -275,7 +276,12 @@ $CELLS = [ordered]@{
   # sm13: luoi 7 o (3 tren + 1 dai giua + 3 duoi)
   "sm13"=@(@(75,424,371,724),@(409,424,709,728),@(750,428,1046,728),@(75,762,1046,1328),@(75,1362,371,1925),@(412,1362,708,1925),@(750,1362,1046,1925))
   # sm14: 4 o hinh BLOB huu co xep doc; AW=600 tach duoc 3 -> GRAY mask clip theo hinh blob
-  "sm14"=@(@(214,261,909,855),@(150,784,977,1348),@(231,1293,894,1813))
+  #   RECT PHAI BAO TRON SLOT, du vai pixel: bbox that cua 3 blob la (214,260,909,855),
+  #   (150,781,975,1347), (232,1293,893,1812). Ban cu de o2 bat dau y=784 trong khi blob2 bat
+  #   dau tu 781 -> 3px dau blob2 nam NGOAI rect o2 nhung TRONG rect o1, thanh "vung rieng cua
+  #   o1" va lam moi loang -> ca canh phai blob2 bi gan cho o1 -> anh o1 thoc xuong blob2
+  #   (user bao "anh de len nhau"). No moi rect them ~3px la het.
+  "sm14"=@(@(211,257,912,858),@(147,778,980,1351),@(228,1290,897,1816))
   "sm15"=@(@(574,184,1058,649),@(8,203,484,664),@(45,852,472,1261),@(585,1107,1102,1602),@(30,1437,491,1857))
   # sm16: luoi 2x2 o TRANG duoi tieu de NEW DROP -> do o AW=600
   "sm16"=@(@(139,669,557,1046),@(566,671,988,1048),@(137,1055,557,1434),@(568,1050,986,1434))
@@ -332,6 +338,10 @@ $MASKS = @{ "is05"="GRAY"; "is12"="GRAY"; "sm05"="GRAY"; "sp01"="GRAY"; "is06"="
             "sp12"="WHITE";   # 3 o TRON + 1 o PILL
             "gs18"="WHITE";   # vien LUON SONG
             "sm14"="GRAY";    # 3 o BLOB huu co
+            # cp20: man hinh player la TRANG TINH (255) con TRAI TIM + bang ca nhan + nut bam
+            #   deu mau dam -> WHITE mask giu chung NAM TREN anh. De NONE thi anh fill ca rect
+            #   va DE LEN TRAI TIM (user bao dung cho nay).
+            "cp20"="WHITE";
             "sp14"="GRAY" }   # the BO GOC -> rect vuong an mat 4 goc mount
             # sp16 DA BO mask: 5 panel deu la chu nhat xoay -5.5 do, ma 3 panel trai mau TRANG
             #   + 2 panel phai mau XAM nen khong dai mau nao phuc vu duoc ca hai. NONE + rect
