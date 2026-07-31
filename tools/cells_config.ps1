@@ -209,7 +209,10 @@ $CELLS = [ordered]@{
   #   deu 2x6 vi thay Thumb_ co 6 "anh", khong nhan ra 3 anh trai la hinh in san.
   "cp18"=@(@(562,0,1125,667),@(562,667,1125,1334),@(562,1334,1125,2000))
   "cp19"=@(@(131,379,998,968),@(482,1330,984,1829,0.5))
-  "cp20"=@(,@(212,423,930,1138,1))
+  # cp20 player nhac: rect cu (212,423,930,1138,1) RONG hon vung anh that ~12 don vi moi phia
+  #   -> anh an vao VIEN DO cua khung player. Do lai bang diff Temp_/Thumb_ (fill 0.98 = hinh
+  #   chu nhat sach) ra (227,434,921,1126,0.5).
+  "cp20"=@(,@(227,434,921,1126,0.5))
 
   # ---- Glad season 11..20 ----
   "gs11"=@(,@(177,573,841,1253,2))
@@ -226,7 +229,8 @@ $CELLS = [ordered]@{
   "gs20"=@(,@(259,687,855,1306))
 
   # ---- IG Story 16..17 (is18 Temp_=Thumb_ nen khong dung duoc) ----
-  "is16"=@(,@(259,477,862,1081))
+  # is16 player iPhone: rect hut 5 don vi mep phai so voi vung anh that (diff fill 0.96).
+  "is16"=@(,@(258,477,867,1082))
   "is17"=@(@(106,153,570,622,-0.5),@(353,686,864,1212,-7),@(576,1308,1124,1900,-0.5))
 
   # ---- Sports 11..20 ----
