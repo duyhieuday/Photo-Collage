@@ -194,7 +194,13 @@ $CELLS = [ordered]@{
   # cp01: mo lai (truoc bi an vi o khong khop khung). 2 o TRANG; o TREN nghieng -6.5 do
   #   (so do cu de 0 vi bi phan loai nham la "tron"; ban do tay tu 2026-06 cung ra -7).
   #   O DUOI do tay tu luoi toa do: vung trang chay x 156..924, y 770..1280.
-  "cp01"=@(@(235,282,994,821,-6.5),@(156,770,924,1280))
+  #   So do chot 2026-08-03 = vung anh THAT cua designer (diff Temp_/Thumb_).
+  #   LUU Y khi doc ket qua diff cua cp01: o2 bi TACH LAM HAI vung - (222,774,906,1292) va mot
+  #   dai mong (165,870,213,1292) - vi giua anh co doan mau trung template nen diff bo qua.
+  #   Lay HOP hai vung moi ra dung: x chay tu 165 chu khong phai 222. Neu chi lay vung lon thi
+  #   o2 bi hut mat 57 don vi ben trai. (tools\audit_rectfit.ps1 bao "thua 84" cung vi ly do
+  #   nay - con so do la ao.)
+  "cp01"=@(@(244,290,988,812,-6.5),@(165,774,906,1292))
   "cp11"=@(,@(311,638,818,1392))
   "cp12"=@(,@(255,518,892,1497))
   # cp13: luoi 2 cot x 3 hang, o giua-phai la chu -> 5 o anh. Vach phan cach manh nen
