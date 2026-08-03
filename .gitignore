@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Anh debug/verify do cac script trong tools/ sinh ra - khong phai nguon, dung commit
+tools/_out/

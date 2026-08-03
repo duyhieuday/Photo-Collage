@@ -3,7 +3,6 @@ package com.example.piceditor.templates_editor
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import android.util.Log
 import android.view.*
 import com.example.piceditor.draw.DrawView
 import kotlin.math.abs
@@ -187,12 +186,6 @@ class TemplateEditorView @JvmOverloads constructor(
         val scale = tf[0]
         val dx = tf[1]
         val dy = tf[2]
-
-        // ✅ DEBUG LOG (có thể xóa sau khi test xong)
-        Log.d("TemplateDebug",
-            "viewW=$w viewH=$h | logic=${templateLogicW}x${templateLogicH} | " +
-                    "scale=$scale dx=$dx dy=$dy | " +
-                    "rawBmp=${templateBitmapRaw?.width}x${templateBitmapRaw?.height}")
 
         // Vẽ template + cells + mask trong cùng 1 transform
         canvas.save()
@@ -568,7 +561,6 @@ class TemplateEditorView @JvmOverloads constructor(
 
     fun setImageToCell(cell: PhotoCell, src: Bitmap) {
         val bitmap = clampForCanvas(src)
-        Log.d("TemplateEditorView", "setImageToCell: ${bitmap.width}x${bitmap.height}")
         cell.bitmap = bitmap
 
         val drawRect = if (cellSpacing > 0f) RectF(
