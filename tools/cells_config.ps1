@@ -194,14 +194,17 @@ $CELLS = [ordered]@{
   # cp01: mo lai (truoc bi an vi o khong khop khung). 2 o TRANG; o TREN nghieng -6.5 do
   #   (so do cu de 0 vi bi phan loai nham la "tron"; ban do tay tu 2026-06 cung ra -7).
   #   O DUOI do tay tu luoi toa do: vung trang chay x 156..924, y 770..1280.
-  #   So do chot 2026-08-03, HAI cach do doc lap deu khop:
-  #     flood vung TRANG cua o    -> o1 (245,291,987,811,-6.5)  o2 (226,773,903,1293)
-  #     diff Temp_/Thumb_ vung lon-> o1 (244,290,988,812,-6.5)  o2 (222,774,906,1292)
-  #   TOI DA TUNG SAI o day: diff cua o2 con mot dai mong (165,870,213,1292) nen toi tuong o2
-  #   bi tach doi va keo mep trai ve 165 -> anh trum len VIEN MOUNT va vung HOA OAI HUONG.
-  #   Dai do KHONG phai anh (vet trang la bat dau tu 226). Dung tin mot phep do; phai co hai
-  #   cach doc lap khop nhau.
-  "cp01"=@(@(244,290,988,812,-6.5),@(223,772,905,1294))
+  #   O2 - MEP TRAI LA 164, KHONG PHAI 222/226. Ca hai phep do truoc deu bi CONG OAI HUONG danh
+  #   lua, moi cai mot kieu:
+  #     - flood vung trang: cong hoa (mau dam) CHAN duong loang tai x~213..226 nen dung lai o
+  #       226, tuong do la mep o.
+  #     - connected-components tren diff: cong hoa GIONG HET o ca Temp_ lan Thumb_ nen diff=0
+  #       doc theo no -> vung anh bi CAT DOI thanh (163..213) va (224..906).
+  #   Quet TUNG HANG moi ra dung (tools rowscan): vet trang chay lien tuc 164..905 o moi hang
+  #   tu y=950 tro xuong, khoang dut 211..226 dung bang be ngang cong hoa.
+  #   BAI HOC: trang tri nam DE LEN o anh se pha CA hai cach do; phai quet theo hang.
+  #   o1 da dung: kiem lai bang quet hang (y=400 anh chay 225..972, rect cho ra 224.5..973).
+  "cp01"=@(@(244,290,988,812,-6.5),@(164,772,905,1294))
   "cp11"=@(,@(311,638,818,1392))
   "cp12"=@(,@(255,518,892,1497))
   # cp13: luoi 2 cot x 3 hang, o giua-phai la chu -> 5 o anh. Vach phan cach manh nen
