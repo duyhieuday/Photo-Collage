@@ -194,13 +194,14 @@ $CELLS = [ordered]@{
   # cp01: mo lai (truoc bi an vi o khong khop khung). 2 o TRANG; o TREN nghieng -6.5 do
   #   (so do cu de 0 vi bi phan loai nham la "tron"; ban do tay tu 2026-06 cung ra -7).
   #   O DUOI do tay tu luoi toa do: vung trang chay x 156..924, y 770..1280.
-  #   So do chot 2026-08-03 = vung anh THAT cua designer (diff Temp_/Thumb_).
-  #   LUU Y khi doc ket qua diff cua cp01: o2 bi TACH LAM HAI vung - (222,774,906,1292) va mot
-  #   dai mong (165,870,213,1292) - vi giua anh co doan mau trung template nen diff bo qua.
-  #   Lay HOP hai vung moi ra dung: x chay tu 165 chu khong phai 222. Neu chi lay vung lon thi
-  #   o2 bi hut mat 57 don vi ben trai. (tools\audit_rectfit.ps1 bao "thua 84" cung vi ly do
-  #   nay - con so do la ao.)
-  "cp01"=@(@(244,290,988,812,-6.5),@(165,774,906,1292))
+  #   So do chot 2026-08-03, HAI cach do doc lap deu khop:
+  #     flood vung TRANG cua o    -> o1 (245,291,987,811,-6.5)  o2 (226,773,903,1293)
+  #     diff Temp_/Thumb_ vung lon-> o1 (244,290,988,812,-6.5)  o2 (222,774,906,1292)
+  #   TOI DA TUNG SAI o day: diff cua o2 con mot dai mong (165,870,213,1292) nen toi tuong o2
+  #   bi tach doi va keo mep trai ve 165 -> anh trum len VIEN MOUNT va vung HOA OAI HUONG.
+  #   Dai do KHONG phai anh (vet trang la bat dau tu 226). Dung tin mot phep do; phai co hai
+  #   cach doc lap khop nhau.
+  "cp01"=@(@(244,290,988,812,-6.5),@(223,772,905,1294))
   "cp11"=@(,@(311,638,818,1392))
   "cp12"=@(,@(255,518,892,1497))
   # cp13: luoi 2 cot x 3 hang, o giua-phai la chu -> 5 o anh. Vach phan cach manh nen
@@ -348,6 +349,11 @@ $MASKS = @{ "is05"="GRAY"; "is12"="GRAY"; "sm05"="GRAY"; "sp01"="GRAY"; "is06"="
             #   deu mau dam -> WHITE mask giu chung NAM TREN anh. De NONE thi anh fill ca rect
             #   va DE LEN TRAI TIM (user bao dung cho nay).
             "cp20"="WHITE";
+            # cp01: HOA KHO ve DE LEN anh (oai huong + cuc ben trai, cuc ben phai, hoa ly goc
+            #   tren). O anh la TRANG TINH (255) con nen giay 236,226,219 / 251,247,236 - kenh B
+            #   duoi 240 nen WHITE mask KHONG an vao nen. De NONE thi anh fill ca rect va PHU MAT
+            #   HOA (user bao dung cho nay).
+            "cp01"="WHITE";
             "sp14"="GRAY" }   # the BO GOC -> rect vuong an mat 4 goc mount
             # sp16 DA BO mask: 5 panel deu la chu nhat xoay -5.5 do, ma 3 panel trai mau TRANG
             #   + 2 panel phai mau XAM nen khong dai mau nao phuc vu duoc ca hai. NONE + rect
