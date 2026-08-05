@@ -40,7 +40,7 @@ jobs:
         env:
           # build.gradle doc 2 bien nay cho maven repo MCT-LIB/CommonLibrary.
           # Neu chua tao secret thi chuoi rong -> hanh vi giong y hien tai.
-          GPR_USER: ${{ secrets.GPR_USER }}
+          GPR_USER: ${{ secrets.GPR_USER || 'MCT-LIB' }}
           GPR_TOKEN: ${{ secrets.GPR_TOKEN }}
         run: ./gradlew assembleDebug --stacktrace
 
