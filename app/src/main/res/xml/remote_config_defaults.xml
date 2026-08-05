@@ -30,5 +30,21 @@
         <value>20000</value>
     </entry>
 
+    <!-- Luồng first flow (giống app translate): ép chạy lại Language+Onboarding mỗi lần mở -->
+    <entry>
+        <key>first_flow</key>
+        <value>no</value>
+    </entry>
+    <!-- Inter sau khi bấm tick ở màn Language -->
+    <entry>
+        <key>inter_Language</key>
+        <value>no</value>
+    </entry>
+    <!-- Giữ nút tick ẩn 2s rồi fade-in để user xem native ad lâu hơn -->
+    <entry>
+        <key>delay_tick</key>
+        <value>no</value>
+    </entry>
+
 
 </defaultsMap>

@@ -1,9 +1,12 @@
 package com.example.piceditor;
 
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 
@@ -15,7 +18,9 @@ import com.adjust.sdk.Adjust;
 import com.adjust.sdk.AdjustAdRevenue;
 import com.adjust.sdk.AdjustConfig;
 import com.example.piceditor.adapters.LanguageAdapter;
+import com.example.piceditor.ads.Callback;
 import com.example.piceditor.ads.IdAds;
+import com.example.piceditor.ads.InterAds;
 import com.example.piceditor.base.BaseActivityNew;
 import com.example.piceditor.base.BaseFragment;
 import com.example.piceditor.databinding.ActivityLanguageBinding;
@@ -60,6 +65,12 @@ public class LanguageActivity extends BaseActivityNew<ActivityLanguageBinding> {
     private NativeAd currentNativeAd2;
     private boolean isNative = true;
 
+    /** Đánh dấu vào màn này từ SplashActivity (luồng first flow), phân biệt với vào từ SettingActivity. */
+    public static final String EXTRA_FROM_SPLASH = "from_splash";
+    private boolean fromSplash;
+    /** Chặn bấm tick lần 2 khi nhánh INTER_Language đang chờ inter đóng (tránh mở 2 lần OnBoarding). */
+    private boolean isNavigating;
+
     @Override
     public int getLayoutRes() {
         return R.layout.activity_language;
@@ -93,6 +104,10 @@ public class LanguageActivity extends BaseActivityNew<ActivityLanguageBinding> {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Vào từ Splash (lần đầu chạy hoặc remote first_flow) → chọn xong đi tiếp OnBoarding.
+        // Vào từ Setting → chỉ đổi ngôn ngữ rồi về Home, không kéo lại onboarding.
+        fromSplash = getIntent().getBooleanExtra(EXTRA_FROM_SPLASH, false);
 
         BarsUtils.setStatusBarColor(this, Color.parseColor("#01000000"));
         BarsUtils.setAppearanceLightStatusBars(this, true);
@@ -137,7 +152,26 @@ public class LanguageActivity extends BaseActivityNew<ActivityLanguageBinding> {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString("getSignLanguage", language.getSignLanguage());
                 editor.apply();
-                getBinding().iconTick.setVisibility(View.VISIBLE);
+                if (PreferenceUtil.getInstance(LanguageActivity.this)
+                        .getValue(Constant.SharePrefKey.delay_tick, "no").equals("yes")) {
+                    // Giống translate: giữ tick ẩn 2s rồi fade-in, để user ở lại với native ad lâu hơn.
+                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                if (getBinding().iconTick.getVisibility() != View.VISIBLE) {
+                                    getBinding().iconTick.setVisibility(View.VISIBLE);
+                                    getBinding().iconTick.setAlpha(0f);
+                                    ObjectAnimator.ofFloat(getBinding().iconTick, View.ALPHA, 0f, 1f)
+                                            .setDuration(300).start();
+                                }
+                            } catch (Exception ignored) {
+                            }
+                        }
+                    }, 2000);
+                } else {
+                    getBinding().iconTick.setVisibility(View.VISIBLE);
+                }
                 if (isNative) {
                     getBinding().adFrame1.setVisibility(View.VISIBLE);
                     isNative = false;
@@ -149,56 +183,49 @@ public class LanguageActivity extends BaseActivityNew<ActivityLanguageBinding> {
         getBinding().iconTick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (PreferenceUtil.getInstance(LanguageActivity.this).getValue(Constant.SharePrefKey.TEST_OBD, "no").equals("yes") && PreferenceUtil.getInstance(getApplicationContext()).getValue(Constant.SharePrefKey.HEHE, false)) {
-                    if (Prefs.getBoolean(Prefs.Key.FIRST_ONBOARDING, true)) {
-                        // Đánh dấu đã chọn ngôn ngữ để Splash không route lại LanguageActivity (tránh lặp onboarding).
-                        Prefs.putBoolean(Prefs.Key.KEY_LANGUAGE, false);
-                        sharedPreferences = getSharedPreferences("signLanguage", MODE_PRIVATE);
-                        String signLanguage = sharedPreferences.getString("getSignLanguage", null);
-                        if (signLanguage == null) {
-                            String systemLanguage = Locale.getDefault().getLanguage();
-                            languageManager.updateResource(systemLanguage);
-                        } else {
-                            languageManager.updateResource(signLanguage);
-                        }
-                        Intent intent = new Intent(LanguageActivity.this, ABOnBoardingActivity.class);
-                        startActivity(intent);
-                        finish();
-                    } else {
-                        Prefs.putBoolean(Prefs.Key.KEY_LANGUAGE, false);
-                        sharedPreferences = getSharedPreferences("signLanguage", MODE_PRIVATE);
-                        String signLanguage = sharedPreferences.getString("getSignLanguage", null);
-                        if (signLanguage == null) {
-                            String systemLanguage = Locale.getDefault().getLanguage();
-                            languageManager.updateResource(systemLanguage);
-                        } else {
-                            languageManager.updateResource(signLanguage);
-                        }
-                        Intent intent = new Intent(LanguageActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
+                if (isNavigating) return;
+                isNavigating = true;
+                sharedPreferences = getSharedPreferences("signLanguage", MODE_PRIVATE);
+                String signLanguage = sharedPreferences.getString("getSignLanguage", null);
+                if (signLanguage == null) {
+                    String systemLanguage = Locale.getDefault().getLanguage();
+                    languageManager.updateResource(systemLanguage);
                 } else {
-                    Prefs.putBoolean(Prefs.Key.KEY_LANGUAGE, false);
-                    sharedPreferences = getSharedPreferences("signLanguage", MODE_PRIVATE);
-                    String signLanguage = sharedPreferences.getString("getSignLanguage", null);
-                    if (signLanguage == null) {
-                        String systemLanguage = Locale.getDefault().getLanguage();
-                        languageManager.updateResource(systemLanguage);
-                    } else {
-                        languageManager.updateResource(signLanguage);
-                    }
-                    Intent intent = new Intent(LanguageActivity.this, MainActivity.class);
-                    startActivity(intent);
+                    languageManager.updateResource(signLanguage);
+                }
+                // Đánh dấu đã chọn ngôn ngữ để Splash không route lại LanguageActivity (tránh lặp onboarding).
+                Prefs.putBoolean(Prefs.Key.KEY_LANGUAGE, false);
+
+                if (!fromSplash) {
+                    // Vào từ Setting: chỉ đổi ngôn ngữ rồi về Home.
+                    startActivity(new Intent(LanguageActivity.this, MainActivity.class));
                     finish();
+                    return;
                 }
 
+                Prefs.putBoolean(Prefs.Key.FIRST_ONBOARDING, false);
+                if (PreferenceUtil.getInstance(LanguageActivity.this)
+                        .getValue(Constant.SharePrefKey.INTER_Language, "no").equals("yes")) {
+                    InterAds.showAdsBreak(LanguageActivity.this, new Callback() {
+                        @Override
+                        public void callback() {
+                            goOnBoarding();
+                        }
+                    });
+                } else {
+                    goOnBoarding();
+                }
             }
         });
 
         refreshAd();
         refreshAd1();
 
+    }
+
+    private void goOnBoarding() {
+        startActivity(new Intent(LanguageActivity.this, ABOnBoardingActivity.class));
+        finish();
     }
 
     private void populateNativeAdView(NativeAd nativeAd, AdUnifiedLanguageBinding adView) {

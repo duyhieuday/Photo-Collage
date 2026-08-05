@@ -81,20 +81,37 @@ public class SplashActivity extends BaseActivityNew<ActivitySplashBinding> {
         boolean isFirstRun = Prefs.getBoolean(Prefs.Key.KEY_LANGUAGE, true);
         if (!isIntented) {
             isIntented = true;
-            // Nếu remote BẬT onboarding (test_obd==yes && hehe) + lần đầu chạy → vào luồng onboarding
-            // (LanguageActivity → ABOnBoarding → [Premium first-run] → Home).
-            // Nếu KHÔNG remote onboarding → hiện paywall first-run (dismissible) rồi Home như bình thường.
-            boolean showObd = PreferenceUtil.getInstance(this)
-                    .getValue(Constant.SharePrefKey.TEST_OBD, "no").equals("yes")
-                    && PreferenceUtil.getInstance(this)
-                    .getValue(Constant.SharePrefKey.HEHE, false);
-            if (showObd && isFirstRun) {
-                startActivity(new Intent(this, LanguageActivity.class));
+            // Giống luồng app translate: lần đầu chạy → Language → OnBoarding.
+            // Các lần sau chỉ quay lại Language khi remote first_flow=="yes" (ép chạy lại full
+            // first flow để AB test); ngược lại → paywall first-run (dismissible) rồi Home.
+            // Riêng user đã trả tiền thì KHÔNG ép chạy lại: họ đã chọn ngôn ngữ rồi, mà first flow
+            // còn kèm native/inter ad nên bắt xem lại mỗi lần mở app là vô lý. Lần đầu chạy vẫn
+            // qua Language như thường (chưa chọn ngôn ngữ, và lúc đó cũng chưa biết trạng thái mua).
+            boolean firstFlow = PreferenceUtil.getInstance(this)
+                    .getValue(Constant.SharePrefKey.FIRST_FLOW, "no").equals("yes")
+                    && !isPaidUser();
+            if (isFirstRun || firstFlow) {
+                Intent i = new Intent(this, LanguageActivity.class);
+                i.putExtra(LanguageActivity.EXTRA_FROM_SPLASH, true);
+                startActivity(i);
                 finish();
             } else {
                 // Paywall first-run (Day-0, điểm chuyển đổi cao nhất) hoặc thẳng Home. Tự finish().
                 PremiumActivity.startFirstRunPaywallOrHome(this);
             }
+        }
+    }
+
+    /**
+     * Đã mua Premium (sub) hoặc Remove-ads. Dùng đúng quy ước sẵn có của app khi quyết định
+     * bỏ qua quảng cáo (xem InterAds.showAdsBreak): premium == 1 || isRemoveAd.
+     */
+    private boolean isPaidUser() {
+        try {
+            com.example.piceditor.ads.Prefs p = new com.example.piceditor.ads.Prefs(this);
+            return p.getPremium() == 1 || p.isRemoveAd();
+        } catch (Exception e) {
+            return false;
         }
     }
 

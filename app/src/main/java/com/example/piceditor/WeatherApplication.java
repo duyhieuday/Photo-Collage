@@ -387,6 +387,8 @@ public class WeatherApplication extends Application{
             String inter_time = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.INTER_TIME);
             String first_flow = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.FIRST_FLOW);
             String inter_onb = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.INTER_Onb);
+            String inter_language = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.INTER_Language);
+            String delay_tick = mFirebaseRemoteConfig.getString(Constant.RemoteConfigKey.delay_tick);
             try {
                 percent = Integer.parseInt(mFirebaseRemoteConfig.getString("percent"));
 
@@ -397,9 +399,9 @@ public class WeatherApplication extends Application{
 
             //CHƯA TEST
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.BANNER_COL, banner_coll);
-            PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.TEST_LANGUAGE, test_language);
+            PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.TEST_LANGUAGE, "yes");
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.NATIVE_AFTER_INTER, native_after_inter);
-            PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.TEST_OBD, test_obd);
+            PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.TEST_OBD, "yes");
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.INTER_SPLASH, inter_splash);
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.NATIVE_FULL_OBD, native_full_obd);
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.CLICK_INTER, click_inter);
@@ -411,6 +413,8 @@ public class WeatherApplication extends Application{
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.INTER_TIME, inter_time);
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.FIRST_FLOW, first_flow);
             PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.INTER_Onb, inter_onb);
+            PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.INTER_Language, inter_language);
+            PreferenceUtil.getInstance(this).setValue(Constant.SharePrefKey.delay_tick, delay_tick);
 
 
 //            for (int i = 0; i < 100; i++) {
