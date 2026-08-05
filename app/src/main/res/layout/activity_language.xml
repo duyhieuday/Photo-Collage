@@ -47,6 +47,7 @@
                 android:src="@drawable/ic_check_tool"
                 android:padding="@dimen/dimen_8dp"
                 android:visibility="invisible"
+                android:tint="@color/black"
                 />
 
         </RelativeLayout>
