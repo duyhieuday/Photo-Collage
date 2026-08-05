@@ -16,3 +16,8 @@ local.properties
 
 # Anh debug/verify do cac script trong tools/ sinh ra - khong phai nguon, dung commit
 tools/_out/
+
+# Keystore ky release - KHONG BAO GIO commit, chi luu o GitHub Secrets
+*.jks
+*.keystore
+keystore.properties

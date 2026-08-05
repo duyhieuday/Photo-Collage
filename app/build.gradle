@@ -8,6 +8,12 @@ plugins {
     id 'com.google.firebase.crashlytics'
 }
 
+// Cho phep CI ghi de version qua env. Bo trong -> giu nguyen gia tri mac dinh ben duoi.
+def ciVersionCode = System.getenv("VERSION_CODE")
+def ciVersionName = System.getenv("VERSION_NAME")
+// Keystore chi doc tu env (CI) hoac ~/.gradle/gradle.properties. KHONG hardcode vao day.
+def ciKeystoreFile = System.getenv("KEYSTORE_FILE") ?: project.findProperty("KEYSTORE_FILE")
+
 android {
     namespace 'com.example.piceditor'
     compileSdk 36
@@ -16,8 +22,8 @@ android {
         applicationId "com.ezt.photo.collage.maker"
         minSdk 24
         targetSdk 36
-        versionCode 3
-        versionName "1.0.3"
+        versionCode ciVersionCode?.trim() ? ciVersionCode.trim().toInteger() : 3
+        versionName ciVersionName?.trim() ? ciVersionName.trim() : "1.0.3"
         resConfigs "en"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -25,10 +31,25 @@ android {
         renderscriptSupportModeEnabled true
     }
 
+    signingConfigs {
+        release {
+            if (ciKeystoreFile) {
+                storeFile file(ciKeystoreFile)
+                storePassword System.getenv("KEYSTORE_PASSWORD") ?: project.findProperty("KEYSTORE_PASSWORD")
+                keyAlias System.getenv("KEY_ALIAS") ?: project.findProperty("KEY_ALIAS")
+                keyPassword System.getenv("KEY_PASSWORD") ?: project.findProperty("KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // Chi gan signingConfig khi that su co keystore, de build local khong co env van chay duoc.
+            if (ciKeystoreFile) {
+                signingConfig signingConfigs.release
+            }
         }
     }
     compileOptions {
