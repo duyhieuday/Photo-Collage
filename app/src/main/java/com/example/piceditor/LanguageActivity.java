@@ -193,8 +193,9 @@ public class LanguageActivity extends BaseActivityNew<ActivityLanguageBinding> {
                 } else {
                     languageManager.updateResource(signLanguage);
                 }
-                // Đánh dấu đã chọn ngôn ngữ để Splash không route lại LanguageActivity (tránh lặp onboarding).
-                Prefs.putBoolean(Prefs.Key.KEY_LANGUAGE, false);
+                // KHÔNG đánh dấu first flow đã xong ở đây. Mốc đó nằm ở MainActivity
+                // (Prefs.Key.KEY_FIRST_FLOW_DONE): user thoát app giữa OnBoarding/paywall thì
+                // lần mở sau vẫn phải được chạy lại Language + OnBoarding từ đầu.
 
                 if (!fromSplash) {
                     // Vào từ Setting: chỉ đổi ngôn ngữ rồi về Home.

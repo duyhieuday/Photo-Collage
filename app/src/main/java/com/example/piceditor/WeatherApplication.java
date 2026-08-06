@@ -70,7 +70,7 @@ public class WeatherApplication extends Application{
             public void run() {
                 ABRC.INSTANCE.check(WeatherApplication.this);
             }
-        }, 1000);
+        }, 500);
         FirebaseApp.initializeApp(this);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         registerActivityLifecycleCallbacks(new AdjustLifecycleCallbacks());

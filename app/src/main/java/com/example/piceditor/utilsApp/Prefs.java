@@ -36,6 +36,7 @@ public class Prefs {
             Key.LANGUAGE,
             Key.LANGUAGE_NAME,
             Key.KEY_LANGUAGE,
+            Key.KEY_FIRST_FLOW_DONE,
             Key.SIGN_LANGUAGE,
             Key.FIRST_ONBOARDING,
             Key.IMAGE_SUCCESS,
@@ -70,7 +71,19 @@ public class Prefs {
         String LANGUAGE = "LANGUAGE";
         String LANGUAGE_NAME = "LANGUAGE_NAME";
         String SIGN_LANGUAGE = "SIGN_LANGUAGE";
+        /**
+         * @deprecated Bản cũ dùng cờ này làm mốc "đã qua first flow", set ngay tại
+         * LanguageActivity nên sai (chưa xong OnBoarding đã đánh dấu). Nay chỉ còn được ĐỌC
+         * trong SplashActivity để migration user cũ. Code mới dùng {@link #KEY_FIRST_FLOW_DONE}.
+         */
+        @Deprecated
         String KEY_LANGUAGE = "KEY_LANGUAGE";
+        /**
+         * First flow (Language -> OnBoarding) đã chạy xong CHƯA. Chỉ được set true khi user
+         * thực sự vào tới Home (MainActivity), không phải lúc bấm xong Language/OnBoarding —
+         * thoát app giữa chừng thì lần mở sau phải chạy lại từ đầu.
+         */
+        String KEY_FIRST_FLOW_DONE = "FIRST_FLOW_DONE";
         String FIRST_ONBOARDING = "FIRST_ONBOARDING";
         String IMAGE_SUCCESS = "IMAGE_SUCCESS";
         String TEST_OBD = "rm_test_obd";

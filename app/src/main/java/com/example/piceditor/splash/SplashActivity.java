@@ -13,6 +13,7 @@ import android.os.Looper;
 import com.example.piceditor.LanguageActivity;
 import com.example.piceditor.R;
 import com.example.piceditor.ads.iap.PremiumActivity;
+import com.example.piceditor.ads.iap.PremiumUpsell;
 import com.example.piceditor.WeatherApplication;
 import com.example.piceditor.ads.GDPRRequestable;
 import com.example.piceditor.ads.InterAds;
@@ -78,27 +79,47 @@ public class SplashActivity extends BaseActivityNew<ActivitySplashBinding> {
     }
 
     private void intent(String debug) {
-        boolean isFirstRun = Prefs.getBoolean(Prefs.Key.KEY_LANGUAGE, true);
-        if (!isIntented) {
-            isIntented = true;
-            // Giống luồng app translate: lần đầu chạy → Language → OnBoarding.
-            // Các lần sau chỉ quay lại Language khi remote first_flow=="yes" (ép chạy lại full
-            // first flow để AB test); ngược lại → paywall first-run (dismissible) rồi Home.
-            // Riêng user đã trả tiền thì KHÔNG ép chạy lại: họ đã chọn ngôn ngữ rồi, mà first flow
-            // còn kèm native/inter ad nên bắt xem lại mỗi lần mở app là vô lý. Lần đầu chạy vẫn
-            // qua Language như thường (chưa chọn ngôn ngữ, và lúc đó cũng chưa biết trạng thái mua).
-            boolean firstFlow = PreferenceUtil.getInstance(this)
-                    .getValue(Constant.SharePrefKey.FIRST_FLOW, "no").equals("yes")
-                    && !isPaidUser();
-            if (isFirstRun || firstFlow) {
-                Intent i = new Intent(this, LanguageActivity.class);
-                i.putExtra(LanguageActivity.EXTRA_FROM_SPLASH, true);
-                startActivity(i);
-                finish();
-            } else {
-                // Paywall first-run (Day-0, điểm chuyển đổi cao nhất) hoặc thẳng Home. Tự finish().
-                PremiumActivity.startFirstRunPaywallOrHome(this);
-            }
+        if (isIntented) return;
+        isIntented = true;
+
+        // HEHE là cờ tổng bật IAP/ads. Nó KHÔNG phải remote config bật/tắt tuỳ ý mà do ABRC
+        // set theo install referrer (gclid/gad_source/gbraid/facebook/instagram) hoặc
+        // countryName == "Viet Nam". Tắt → app chạy "sạch": bỏ qua toàn bộ first flow, vì
+        // Language và OnBoarding đều gắn native/inter ad.
+        //
+        // CỐ Ý không đánh dấu KEY_FIRST_FLOW_DONE ở nhánh này. ABRC chạy bất đồng bộ nên lần
+        // mở đầu tiên HEHE có thể còn false dù install có referrer quảng cáo; không đánh dấu
+        // thì lần mở sau (HEHE đã true) user vẫn được thấy Language + OnBoarding.
+        if (!PremiumUpsell.isIapEnabled(this)) {
+            PremiumActivity.startFirstRunPaywallOrHome(this);
+            return;
+        }
+
+        // Language + OnBoarding hiển thị cho tới khi user THỰC SỰ vào được Home — cờ này chỉ
+        // được set trong MainActivity. Thoát app giữa Language/OnBoarding/paywall thì lần mở
+        // sau chạy lại từ đầu.
+        //
+        // Vế thứ hai là migration: bản cũ đánh dấu bằng KEY_LANGUAGE=false ngay tại
+        // LanguageActivity. User đã qua first flow ở bản cũ chưa từng có KEY_FIRST_FLOW_DONE,
+        // không có dòng này thì bản update sẽ bắt toàn bộ họ xem lại Language + OnBoarding.
+        boolean firstFlowDone = Prefs.getBoolean(Prefs.Key.KEY_FIRST_FLOW_DONE, false)
+                || !Prefs.getBoolean(Prefs.Key.KEY_LANGUAGE, true);
+
+        // Remote first_flow=="yes" ép chạy lại full first flow để AB test. Riêng user đã trả
+        // tiền thì KHÔNG ép: họ đã chọn ngôn ngữ rồi, mà first flow còn kèm native/inter ad
+        // nên bắt xem lại mỗi lần mở app là vô lý.
+        boolean forceFirstFlow = PreferenceUtil.getInstance(this)
+                .getValue(Constant.SharePrefKey.FIRST_FLOW, "no").equals("yes")
+                && !isPaidUser();
+
+        if (!firstFlowDone || forceFirstFlow) {
+            Intent i = new Intent(this, LanguageActivity.class);
+            i.putExtra(LanguageActivity.EXTRA_FROM_SPLASH, true);
+            startActivity(i);
+            finish();
+        } else {
+            // Paywall first-run (Day-0, điểm chuyển đổi cao nhất) hoặc thẳng Home. Tự finish().
+            PremiumActivity.startFirstRunPaywallOrHome(this);
         }
     }
 

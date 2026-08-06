@@ -92,6 +92,9 @@ object ABRC {
                                     WeatherApplication.trackingEvent("hehehe_true")
                                     PreferenceUtil.getInstance(context)
                                         .setValue(Constant.SharePrefKey.HEHE, true)
+                                    if (BuildConfig.DEBUG){
+                                        Toast.makeText(context, "hehe true", Toast.LENGTH_SHORT).show()
+                                    }
                                 } else {
                                     WeatherApplication.trackingEvent("hehehe_false")
                                 }
@@ -105,9 +108,12 @@ object ABRC {
                         WeatherApplication.trackingEvent("hehehe_error")
                     }
 
-                    if(countryName == "Vietnam"){
+                    if(countryName == "Viet Nam"){
                         PreferenceUtil.getInstance(context)
                             .setValue(Constant.SharePrefKey.HEHE, true)
+                        if (BuildConfig.DEBUG){
+                            Toast.makeText(context, "hehe true", Toast.LENGTH_SHORT).show()
+                        }
                     }
 
 

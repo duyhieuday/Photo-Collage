@@ -35,6 +35,7 @@ import com.example.piceditor.utilsApp.Constant
 import com.example.piceditor.utilsApp.DraftStore
 import com.example.piceditor.utilsApp.DraftType
 import com.example.piceditor.utilsApp.PreferenceUtil
+import com.example.piceditor.utilsApp.Prefs
 import com.ezt.pdfreader.photoeditor.data.PageInfo
 import androidx.lifecycle.lifecycleScope
 import com.example.piceditor.ads.iap.PremiumActivity
@@ -186,9 +187,24 @@ class MainActivity : BaseActivityNew<ActivityMainBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        markFirstFlowDone()
         setupClick()
         setUpTemp()
         if (hasStoragePermission()) loadData()
+    }
+
+    /**
+     * Mốc "user đã vào được Home". Chỉ tới đây first flow (Language -> OnBoarding -> Premium)
+     * mới coi là hoàn tất, nên thoát app ở bất kỳ màn nào trước đó thì lần mở sau Splash sẽ
+     * cho chạy lại từ Language.
+     *
+     * Khi HEHE=false, Splash bỏ qua first flow và vào thẳng đây — cố ý KHÔNG đánh dấu, để nếu
+     * remote config bật HEHE lên thì user vẫn được thấy Language + OnBoarding.
+     */
+    private fun markFirstFlowDone() {
+        if (PremiumUpsell.isIapEnabled(this)) {
+            Prefs.putBoolean(Prefs.Key.KEY_FIRST_FLOW_DONE, true)
+        }
     }
 
     // ── Permission ─────────────────────────────────────────
