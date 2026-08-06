@@ -22,8 +22,8 @@ android {
         applicationId "com.ezt.photo.collage.maker"
         minSdk 24
         targetSdk 36
-        versionCode ciVersionCode?.trim() ? ciVersionCode.trim().toInteger() : 3
-        versionName ciVersionName?.trim() ? ciVersionName.trim() : "1.0.3"
+        versionCode ciVersionCode?.trim() ? ciVersionCode.trim().toInteger() : 18
+        versionName ciVersionName?.trim() ? ciVersionName.trim() : "1.0.18"
         resConfigs "en"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
