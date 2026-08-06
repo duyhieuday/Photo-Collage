@@ -93,7 +93,12 @@ jobs:
           GPR_TOKEN: ${{ secrets.GPR_TOKEN }}
         run: ./gradlew bundleRelease assembleRelease --stacktrace
 
-      - name: Verify signature
+      # Chi IN chu ky ra job summary, KHONG so sanh voi gia tri nao.
+      # Nguon duy nhat biet duoc upload key that la Play Console > Setup > App integrity
+      # > App signing > Upload key certificate. Truoc day step nay hardcode mot SHA-1 lay
+      # tu app/release/app-release.apk (build output commit san trong repo) va goi do la
+      # upload key — day chi la suy doan, khong co gi xac minh.
+      - name: Print signing certificate
         run: |
           BT=$(ls -1 "$ANDROID_HOME/build-tools" | sort -V | tail -1)
           APKSIGNER="$ANDROID_HOME/build-tools/$BT/apksigner"
@@ -103,8 +108,8 @@ jobs:
             | tee -a "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "SHA-1 phai khop upload key dang dung tren Play Console:" >> "$GITHUB_STEP_SUMMARY"
-          echo '`3e5508c8e8790717c8027e3857d2e2ca815a8206`' >> "$GITHUB_STEP_SUMMARY"
+          echo "Doi chieu SHA-1 tren voi Upload key certificate trong Play Console" \
+            "truoc khi upload AAB." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Delete keystore
         if: always()
